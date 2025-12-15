@@ -1,0 +1,230 @@
+@import "tailwindcss";
+
+:root {
+  --background: #1a1a1a;
+  --foreground: #ededed;
+
+  /* SVG 글로우 효과 - 스크롤해도 고정 */
+  /* SVG 파일 위치: public/glowcircle.svg (또는 public/glowcircle-orange.svg, glowcircle-white.svg) */
+  --glow-orange: url("/glowcircle.svg");
+  --glow-white: url("/glowcircle.svg");
+}
+
+/* 글로우 효과 애니메이션 */
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes glow-shimmer {
+  0% {
+    opacity: 0.3;
+    filter: blur(40px) brightness(0.8);
+    transform: scale(1);
+  }
+  25% {
+    opacity: 0.9;
+    filter: blur(50px) brightness(1.5);
+    transform: scale(1.05);
+  }
+  50% {
+    opacity: 0.5;
+    filter: blur(45px) brightness(1.2);
+    transform: scale(1.1);
+  }
+  75% {
+    opacity: 1;
+    filter: blur(55px) brightness(1.8);
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.3;
+    filter: blur(40px) brightness(0.8);
+    transform: scale(1);
+  }
+}
+
+@keyframes glow-sparkle {
+  0% {
+    opacity: 0.4;
+    filter: blur(40px) brightness(1) drop-shadow(0 0 20px rgba(255, 98, 0, 0.3));
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    opacity: 0.9;
+    filter: blur(50px) brightness(1.5)
+      drop-shadow(0 0 40px rgba(255, 98, 0, 0.6));
+    transform: rotate(90deg) scale(1.05);
+  }
+  50% {
+    opacity: 0.5;
+    filter: blur(45px) brightness(1.2)
+      drop-shadow(0 0 30px rgba(255, 98, 0, 0.4));
+    transform: rotate(180deg) scale(1.1);
+  }
+  75% {
+    opacity: 1;
+    filter: blur(55px) brightness(1.8)
+      drop-shadow(0 0 50px rgba(255, 98, 0, 0.6));
+    transform: rotate(270deg) scale(1.05);
+  }
+  100% {
+    opacity: 0.4;
+    filter: blur(40px) brightness(1) drop-shadow(0 0 20px rgba(255, 98, 0, 0.3));
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes glow-sparkle-white {
+  0% {
+    opacity: 0.4;
+    filter: brightness(0) invert(1) opacity(0.5) blur(40px) brightness(1)
+      drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    opacity: 0.9;
+    filter: brightness(0) invert(1) opacity(0.5) blur(50px) brightness(1.5)
+      drop-shadow(0 0 40px rgba(255, 255, 255, 0.6));
+    transform: rotate(90deg) scale(1.05);
+  }
+  50% {
+    opacity: 0.5;
+    filter: brightness(0) invert(1) opacity(0.5) blur(45px) brightness(1.2)
+      drop-shadow(0 0 30px rgba(255, 255, 255, 0.4));
+    transform: rotate(180deg) scale(1.1);
+  }
+  75% {
+    opacity: 1;
+    filter: brightness(0) invert(1) opacity(0.5) blur(55px) brightness(1.8)
+      drop-shadow(0 0 50px rgba(255, 255, 255, 0.8));
+    transform: rotate(270deg) scale(1.05);
+  }
+  100% {
+    opacity: 0.4;
+    filter: brightness(0) invert(1) opacity(0.5) blur(40px) brightness(1)
+      drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+/* 글로우 효과 - fixed position으로 스크롤해도 보임 */
+body::before {
+  content: "";
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  animation: glow-sparkle 8s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  animation: glow-sparkle-white 8s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+/* 오렌지 글로우 - 오른쪽 하단 */
+body::before {
+  width: 800px;
+  height: 800px;
+  bottom: 10%;
+  right: -200px;
+  background-image: var(--glow-orange);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  animation-delay: 0s;
+}
+
+/* 화이트 글로우 - 왼쪽 상단 */
+body::after {
+  width: 700px;
+  height: 700px;
+  top: 20%;
+  left: -150px;
+  background-image: var(--glow-white);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  animation-delay: 2s;
+  /* 초기 필터 적용 - 애니메이션 시작 전에도 흰색으로 보이도록 */
+  filter: brightness(0) invert(1) opacity(0.5) blur(40px) brightness(1)
+    drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Brand Color */
+  --color-brand: #ff6b00;
+
+  /* Secondary Colors */
+  --color-secondary-1: #cc9966;
+  --color-secondary-2: #262a2c;
+  --color-secondary-3: #130f49;
+  --color-secondary-4: #ffffff;
+
+  /* Greyscale */
+  --color-grey-50: #f9fafb;
+  --color-grey-100: #f4f4f6;
+  --color-grey-200: #e5e6eb;
+  --color-grey-300: #d3d5da;
+  --color-grey-400: #9ea3ae;
+  --color-grey-500: #6c727f;
+  --color-grey-600: #4d5461;
+  --color-grey-700: #394150;
+  --color-grey-800: #212936;
+  --color-grey-900: #161d21;
+}
+
+/* 다크모드 미디어 쿼리 */
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+} */
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* 스크롤바 숨기기 */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* 무한 스크롤 애니메이션 */
+@keyframes slide-infinite {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-slide-infinite {
+  animation: slide-infinite 20s linear infinite;
+}
