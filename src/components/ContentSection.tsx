@@ -152,7 +152,7 @@ export default function ContentSection({ contentCards }: ContentSectionProps) {
         <div className="w-full py-16 px-4">
           <div className="max-w-[1440px] mx-auto">
             {/* 검색바 */}
-            <div className="flex justify-center mb-8">
+            <div className="flex justify-center mb-8 pt-100">
               <div className="relative max-w-[850px] w-full">
                 <input
                   type="text"

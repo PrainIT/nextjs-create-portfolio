@@ -18,7 +18,8 @@ export default function SearchBar({
   onChange,
 }: SearchBarProps) {
   const [internalValue, setInternalValue] = useState("");
-  const searchKeyword = controlledValue !== undefined ? controlledValue : internalValue;
+  const searchKeyword =
+    controlledValue !== undefined ? controlledValue : internalValue;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,4 +53,3 @@ export default function SearchBar({
     </form>
   );
 }
-

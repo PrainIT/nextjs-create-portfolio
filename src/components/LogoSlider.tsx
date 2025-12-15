@@ -15,7 +15,7 @@ export default function LogoSlider() {
   const duplicatedLogos = [...logos, ...logos];
 
   return (
-    <section className="w-full bg-[#1A1A1A] py-12 border-b border-grey-800">
+    <section className="w-full bg-[#1A1A1A] py-12 border-b border-grey-800 mt-100">
       <div className="relative overflow-hidden">
         {/* 상단 선 */}
         <div className="absolute top-0 left-0 right-0 h-px bg-grey-700" />
