@@ -23,8 +23,6 @@ interface ContentCard {
   title: string;
   description: string;
   subDescription: string;
-  number?: string;
-  brand?: string;
   image?: string;
   slug?: string;
   filters?: string[];
@@ -71,8 +69,7 @@ export default function ContentSection({ contentCards }: ContentSectionProps) {
         (card) =>
           card.title.toLowerCase().includes(keyword) ||
           card.description.toLowerCase().includes(keyword) ||
-          card.subDescription.toLowerCase().includes(keyword) ||
-          card.brand?.toLowerCase().includes(keyword)
+          card.subDescription.toLowerCase().includes(keyword)
       );
     }
 
@@ -163,7 +160,7 @@ export default function ContentSection({ contentCards }: ContentSectionProps) {
     >
       <div
         ref={stickyRef}
-        className="sticky top-[-140px] h-screen flex items-center mb-12"
+        className="sticky top-[-410px] h-screen flex items-center mb-12"
       >
         <div className="w-full py-16 px-4">
           <div className="max-w-[1440px] mx-auto">
@@ -271,16 +268,6 @@ export default function ContentSection({ contentCards }: ContentSectionProps) {
 
                         {/* 카드 텍스트 영역 - 이미지 위에 오버레이 */}
                         <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
-                          {card.number && (
-                            <div className="text-4xl font-bold text-white mb-4 text-center">
-                              {card.number} →
-                            </div>
-                          )}
-                          {card.brand && (
-                            <div className="text-2xl font-bold text-white mb-4 text-center">
-                              {card.brand}
-                            </div>
-                          )}
                           <h3 className="text-xl font-semibold text-white mb-2">
                             {card.title}
                           </h3>
