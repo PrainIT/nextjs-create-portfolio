@@ -96,14 +96,16 @@ export default function ContentSection({ contentCards }: ContentSectionProps) {
     setSectionHeight(`${calculatedHeight}vh`);
   }, [filteredCards]);
 
-  // 가로 스크롤 효과
+  // 가로 스크롤 효과 - requestAnimationFrame으로 최적화
   useEffect(() => {
     if (!sectionRef.current || !carouselRef.current) return;
 
     const section = sectionRef.current;
     const carousel = carouselRef.current;
+    let rafId: number | null = null;
+    let ticking = false;
 
-    const handleScroll = () => {
+    const updateTransform = () => {
       const sectionRect = section.getBoundingClientRect();
       const sectionTop = sectionRect.top;
       const viewportHeight = window.innerHeight;
@@ -123,17 +125,31 @@ export default function ContentSection({ contentCards }: ContentSectionProps) {
         Math.min(1, (window.scrollY - sectionStart) / scrollableHeight)
       );
 
-      // 가로 스크롤 적용
+      // 가로 스크롤 적용 - GPU 가속을 위해 transform 사용
       const transformX = -scrollProgress * maxScrollWidth;
-      carousel.style.transform = `translateX(${transformX}px)`;
+      carousel.style.transform = `translate3d(${transformX}px, 0, 0)`;
+      carousel.style.willChange = "transform";
+
+      ticking = false;
     };
 
-    handleScroll();
+    const handleScroll = () => {
+      if (!ticking) {
+        rafId = requestAnimationFrame(updateTransform);
+        ticking = true;
+      }
+    };
+
+    // 초기 실행
+    updateTransform();
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("resize", handleScroll, { passive: true });
 
     return () => {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleScroll);
     };
@@ -224,7 +240,7 @@ export default function ContentSection({ contentCards }: ContentSectionProps) {
                 className="flex gap-6"
                 style={{
                   willChange: "transform",
-                  transition: "transform 0.1s ease-out",
+                  // transition 제거 - requestAnimationFrame으로 직접 제어하므로 불필요
                 }}
               >
                 {filteredCards.length > 0 ? (
@@ -233,8 +249,9 @@ export default function ContentSection({ contentCards }: ContentSectionProps) {
                       key={card.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
+                      transition={{ delay: index * 0.05, duration: 0.3 }}
                       className="min-w-[407px] flex-shrink-0"
+                      style={{ willChange: "transform, opacity" }}
                     >
                       <div className="bg-grey-800 rounded-2xl overflow-hidden h-[878px] relative">
                         {/* 카드 이미지 영역 */}

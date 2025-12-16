@@ -24,7 +24,11 @@ export default function LogoSlider() {
           <div className="relative w-full overflow-hidden">
             <div
               className="flex animate-slide-infinite"
-              style={{ width: "fit-content" }}
+              style={{
+                width: "fit-content",
+                willChange: "transform",
+                transform: "translateZ(0)", // GPU 가속 강제
+              }}
             >
               {duplicatedLogos.map((logo, index) => (
                 <div
