@@ -13,9 +13,8 @@ const companies = [
   {
     name: "YUHAN-KIMBERLY",
     highlighted: false,
-    top: "48%",
+    top: "38%",
     left: "-14vw", // 화면 밖으로
-    transform: "translateY(-50%)",
   },
   {
     name: "ASTRAZENECA",
@@ -153,13 +152,13 @@ function CompanyCard({
         <motion.div
           className="absolute inset-0 rounded-full"
           style={{
-            backdropFilter: "blur(40px)",
-            WebkitBackdropFilter: "blur(40px)",
-            opacity: 0.8,
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
           }}
           animate={{
+            opacity: isHovered ? 0.9 : 0.8,
             background: isHovered
-              ? "rgba(255, 106, 0, 0.4)"
+              ? "rgba(255, 106, 0, 0.7)"
               : "rgba(0, 0, 0, 0.5)",
           }}
           transition={{ duration: 0.2 }}
@@ -167,10 +166,10 @@ function CompanyCard({
 
         {/* 내부 광택 효과 */}
         <div
-          className="absolute inset-0 rounded-full pointer-events-none"
+          className="absolute inset-1 rounded-full pointer-events-none"
           style={{
             boxShadow:
-              "inset 0px 4px 20px rgba(255, 255, 255, 0.3), inset 0px -4px 20px rgba(0, 0, 0, 0.5)",
+              "inset 4px 4px 20px rgba(255, 255, 255, 0.3), inset 4px -4px 20px rgba(0, 0, 0, 0.5)",
           }}
         />
 
