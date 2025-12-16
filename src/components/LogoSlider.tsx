@@ -117,7 +117,7 @@ export default function LogoSlider() {
           </div>
         </div>
         {/* 하단 선 */}
-        <div className="w-full h-px bg-grey-700" />
+        <div className="w-full h-px bg-grey-700 mb-2" />
       </div>
 
       <div className="flex flex-row items-center items-start mt-12">
