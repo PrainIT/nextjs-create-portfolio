@@ -17,10 +17,23 @@ const BRAND_QUERY = `*[_type == "brand"] | order(order asc, publishedAt desc) {
   order
 }`;
 
+const FLOAT_TEXT_QUERY = `*[_type == "floatText"] | order(order asc) {
+  _id,
+  floatText,
+  slug,
+  highlighted,
+  order
+}`;
+
 const options = { next: { revalidate: 30 } };
 
 export default async function IndexPage() {
   const brands = await client.fetch<SanityDocument[]>(BRAND_QUERY, {}, options);
+  const floatTexts = await client.fetch<SanityDocument[]>(
+    FLOAT_TEXT_QUERY,
+    {},
+    options
+  );
 
   // 더미 데이터 생성 (Sanity에 데이터가 없을 경우)
   const dummyBrands: SanityDocument[] =
@@ -78,9 +91,59 @@ export default async function IndexPage() {
     filters: brand.filters || [],
   }));
 
+  // floatText 데이터를 HeroSection 형식으로 변환
+  // 높이는 랜덤하게 생성 (10vh ~ 90vh 사이)
+  const generateRandomTop = (index: number, total: number) => {
+    // 각 항목이 고르게 분산되도록 하되 약간의 랜덤성 추가
+    const basePosition = 10 + (index / total) * 80; // 10vh ~ 90vh 사이 고르게 분산
+    const randomOffset = (Math.random() - 0.5) * 15; // ±7.5vh 랜덤 오프셋
+    return `${Math.max(5, Math.min(95, basePosition + randomOffset))}vh`;
+  };
+
+  const companies =
+    floatTexts.length > 0
+      ? floatTexts.map((item, index) => ({
+          name: item.floatText || "",
+          highlighted: item.highlighted || false,
+          top: generateRandomTop(index, floatTexts.length),
+          slug: item.slug?.current || "",
+        }))
+      : [
+          {
+            name: "ZESPRI",
+            highlighted: false,
+            top: generateRandomTop(0, 5),
+            slug: "",
+          },
+          {
+            name: "YUHAN-KIMBERLY",
+            highlighted: false,
+            top: generateRandomTop(1, 5),
+            slug: "",
+          },
+          {
+            name: "ASTRAZENECA",
+            highlighted: false,
+            top: generateRandomTop(2, 5),
+            slug: "",
+          },
+          {
+            name: "POSCO FUTURE",
+            highlighted: false,
+            top: generateRandomTop(3, 5),
+            slug: "",
+          },
+          {
+            name: "JIMMY JOHN'S",
+            highlighted: true,
+            top: generateRandomTop(4, 5),
+            slug: "",
+          },
+        ];
+
   return (
     <main className="w-full">
-      <HeroSection />
+      <HeroSection companies={companies} />
       <ContentSection contentCards={contentCards} />
       <LogoSlider />
     </main>

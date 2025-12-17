@@ -1,44 +1,18 @@
 "use client";
 
-import { motion, useAnimationControls, useMotionValue } from "framer-motion";
-import { useState, useEffect } from "react";
+import { motion, useAnimationControls } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 
-const companies = [
-  {
-    name: "ZESPRI",
-    highlighted: false,
-    top: "20vh",
-    left: "4vw",
-  },
-  {
-    name: "YUHAN-KIMBERLY",
-    highlighted: false,
-    top: "38%",
-    left: "-14vw", // 화면 밖으로
-  },
-  {
-    name: "ASTRAZENECA",
-    highlighted: false,
-    bottom: "18vh",
-    left: "14vw",
-  },
-  {
-    name: "POSCO FUTURE",
-    highlighted: false,
-    top: "5vh",
-    right: "-5vw", // 화면 밖으로
-  },
-  {
-    name: "JIMMY JOHN'S",
-    highlighted: true,
-    top: "50%",
-    right: "1.5vw",
-    transform: "translateY(-30%)",
-  },
-];
+interface Company {
+  name: string;
+  highlighted: boolean;
+  top: string;
+  slug: string;
+}
 
 interface CompanyCardProps {
-  company: (typeof companies)[0];
+  company: Company;
   index: number;
   startX: string;
   endX: string;
@@ -54,19 +28,11 @@ function CompanyCard({
 }: CompanyCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const controls = useAnimationControls();
-  const x = useMotionValue(startX);
+  const router = useRouter();
+  const currentXRef = useRef(startX);
 
+  // 초기 애니메이션 시작
   useEffect(() => {
-    // x 값 변경 추적
-    const unsubscribe = x.on("change", (latest) => {
-      // x 값이 변경될 때마다 추적 (필요시 사용)
-    });
-
-    return () => unsubscribe();
-  }, [x]);
-
-  useEffect(() => {
-    // 초기 애니메이션 시작
     const timer = setTimeout(
       () => {
         controls.start({
@@ -78,8 +44,8 @@ function CompanyCard({
             y: { duration: 0.2 },
             x: {
               duration: duration,
-              repeat: Infinity,
               ease: "linear",
+              repeat: Infinity,
               repeatDelay: 0,
             },
           },
@@ -91,42 +57,54 @@ function CompanyCard({
     return () => clearTimeout(timer);
   }, [controls, startX, endX, duration, index]);
 
+  // hover 상태 변경 처리
   useEffect(() => {
     if (isHovered) {
-      // hover 시 현재 위치에서 멈춤
-      const currentXValue = x.get();
+      // hover 시: 즉시 멈춤
       controls.stop();
-      controls.set({ x: currentXValue });
     } else {
-      // hover 해제 시 현재 위치에서 다시 애니메이션 시작
-      const currentXValue = x.get();
-      controls.start({
-        x: [currentXValue, endX],
-        transition: {
-          x: {
-            duration: duration,
-            repeat: Infinity,
-            ease: "linear",
-            repeatDelay: 0,
-          },
-        },
-      });
+      // hover 해제 시
+      // 이미 초기 애니메이션이 실행 중이었다면
+      if (currentXRef.current) {
+        // 1단계: 현재 위치 → 끝 (빠른 속도, 2초 고정)
+        controls
+          .start({
+            x: endX,
+            transition: {
+              duration: 1,
+              ease: "easeInOut",
+            },
+          })
+          .then(() => {
+            // 2단계: 시작 → 끝 (원래 속도로 무한 반복)
+            controls.start({
+              x: [startX, endX],
+              transition: {
+                duration: duration,
+                ease: "linear",
+                repeat: Infinity,
+                repeatDelay: 0,
+              },
+            });
+          });
+      }
     }
-  }, [isHovered, controls, endX, duration, x]);
+  }, [isHovered, controls, startX, endX, duration]);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20, x: startX }}
       animate={controls}
       style={{
-        x,
         top: company.top,
-        left: company.left,
-        right: company.right,
-        bottom: company.bottom,
-        transform: company.transform,
       }}
       className="absolute"
+      onUpdate={(latest) => {
+        // 애니메이션 중 현재 x 위치 추적
+        if (latest.x !== undefined) {
+          currentXRef.current = latest.x as string;
+        }
+      }}
     >
       <motion.div
         className="relative rounded-full overflow-hidden cursor-pointer"
@@ -138,13 +116,13 @@ function CompanyCard({
         }}
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
+        onClick={() => {
+          if (company.slug) {
+            router.push(`/${company.slug}`);
+          }
+        }}
         whileHover={{
           scale: 1.05,
-          x: company.left?.startsWith("-")
-            ? 20
-            : company.right?.startsWith("-")
-              ? -20
-              : 0,
         }}
         transition={{ type: "spring", stiffness: 200 }}
       >
@@ -220,7 +198,11 @@ function CompanyCard({
   );
 }
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  companies: Company[];
+}
+
+export default function HeroSection({ companies }: HeroSectionProps) {
   return (
     <section className="relative w-full h-screen overflow-visible">
       {/* 글로우 효과는 globals.css의 body::before, body::after로 처리됨 */}
