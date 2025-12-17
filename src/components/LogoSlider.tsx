@@ -1,20 +1,36 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useMemo } from "react";
+import Image from "next/image";
 
-const logos = [
-  { name: "Behance", text: "Bē" },
-  { name: "Google", text: "Google" },
-  { name: "Apple", text: "Apple" },
-  { name: "Dribbble", text: "dribbble" },
-  { name: "Awwwards", text: "awwwards." },
-];
+interface Logo {
+  name: string;
+  logo?: string;
+}
 
-export default function LogoSlider() {
-  // 무한 스크롤을 위해 로고 배열을 3번 복제 (첫 세트가 지나가면 두 번째 세트가 정확히 같은 위치에 옴)
-  const duplicatedLogos = [...logos, ...logos, ...logos];
+interface SocialLink {
+  name: string;
+  logo?: string;
+  url: string;
+}
+
+interface LogoSliderProps {
+  logos: Logo[];
+  socialLinks?: SocialLink[];
+}
+
+export default function LogoSlider({
+  logos,
+  socialLinks = [],
+}: LogoSliderProps) {
+  // 데이터가 없으면 빈 배열 반환
+  if (!logos || logos.length === 0) {
+    return null;
+  }
+
   const sliderRef = useRef<HTMLDivElement>(null);
   const [singleSetWidth, setSingleSetWidth] = useState(0);
+  const [repeatCount, setRepeatCount] = useState(3); // 기본값 3번
 
   // 첫 번째 세트(원본 logos 배열)의 전체 너비를 측정하고 동적 keyframes 생성
   useEffect(() => {
@@ -46,6 +62,15 @@ export default function LogoSlider() {
       if (setWidth > 0) {
         setSingleSetWidth(setWidth);
 
+        // 화면 너비를 측정하여 필요한 반복 횟수 계산
+        const viewportWidth = window.innerWidth;
+        // 화면을 꽉 채우기 위해 최소 2-3배는 필요 (무한 스크롤을 위해)
+        // 한 세트 너비가 화면보다 작으면 더 많이 반복
+        const minRepeatCount = Math.ceil((viewportWidth * 2.5) / setWidth);
+        // 최소 3번은 반복 (무한 스크롤을 위해), 최대는 적당히 제한
+        const calculatedRepeatCount = Math.max(3, Math.min(minRepeatCount, 20));
+        setRepeatCount(calculatedRepeatCount);
+
         // 동적으로 keyframes 생성
         const styleId = "logo-slider-keyframes";
         let styleElement = document.getElementById(styleId) as HTMLStyleElement;
@@ -72,7 +97,23 @@ export default function LogoSlider() {
 
     // 초기 측정 시도
     requestAnimationFrame(measureWidth);
-  }, []);
+
+    // 리사이즈 이벤트 리스너 추가
+    const handleResize = () => {
+      requestAnimationFrame(measureWidth);
+    };
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [logos.length]);
+
+  // 반복 횟수에 따라 로고 배열 복제 (메모이제이션으로 최적화)
+  const duplicatedLogos = useMemo(
+    () => Array.from({ length: repeatCount }, () => logos).flat(),
+    [logos, repeatCount]
+  );
 
   return (
     <section className="w-full bg-[#1A1A1A] py-12 border-b border-grey-800">
@@ -107,9 +148,30 @@ export default function LogoSlider() {
                   <div
                     key={`${logo.name}-${index}`}
                     data-set-index={setIndex}
-                    className="flex-shrink-0 mx-12 text-grey-400 text-2xl font-medium whitespace-nowrap"
+                    className="flex-shrink-0 mx-12 flex items-center justify-center"
+                    style={{
+                      height: "40px", // 현재 텍스트 크기와 비슷한 높이
+                      width: "auto",
+                    }}
                   >
-                    {logo.text}
+                    {logo.logo ? (
+                      <Image
+                        src={logo.logo}
+                        alt={logo.name}
+                        width={120}
+                        height={40}
+                        className="object-contain"
+                        style={{
+                          maxHeight: "40px",
+                          width: "auto",
+                          filter: "brightness(0.7)", // 텍스트 색상과 비슷하게
+                        }}
+                      />
+                    ) : (
+                      <span className="text-grey-400 text-2xl font-medium whitespace-nowrap">
+                        {logo.name}
+                      </span>
+                    )}
                   </div>
                 );
               })}
@@ -128,15 +190,41 @@ export default function LogoSlider() {
             편하게 연락해주세요!
           </div>
           <div className="flex flex-row gap-4">
-            <div className="text-grey-400 text-xl font-medium whitespace-nowrap">
-              {logos[0].text}
-            </div>
-            <div className="text-grey-400 text-xl font-medium whitespace-nowrap">
-              {logos[1].text}
-            </div>
-            <div className="text-grey-400 text-xl font-medium whitespace-nowrap">
-              {logos[2].text}
-            </div>
+            {socialLinks.length > 0 ? (
+              socialLinks.slice(0, 3).map((link, index) => (
+                <a
+                  key={`social-${link.name}-${index}`}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
+                  style={{ height: "28px" }}
+                >
+                  {link.logo ? (
+                    <Image
+                      src={link.logo}
+                      alt={link.name}
+                      width={80}
+                      height={28}
+                      className="object-contain"
+                      style={{
+                        maxHeight: "28px",
+                        width: "auto",
+                        filter: "brightness(0.7)",
+                      }}
+                    />
+                  ) : (
+                    <span className="text-grey-400 text-xl font-medium whitespace-nowrap">
+                      {link.name}
+                    </span>
+                  )}
+                </a>
+              ))
+            ) : (
+              <span className="text-grey-400 text-xl font-medium whitespace-nowrap">
+                준비중
+              </span>
+            )}
           </div>
         </div>
         <div className="flex flex-col gap-8 ml-32">

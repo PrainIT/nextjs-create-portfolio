@@ -25,12 +25,37 @@ const FLOAT_TEXT_QUERY = `*[_type == "floatText"] | order(order asc) {
   order
 }`;
 
+const CLIENT_QUERY = `*[_type == "client"] | order(order asc) {
+  _id,
+  name,
+  logo,
+  order
+}`;
+
+const SOCIAL_LINK_QUERY = `*[_type == "socialLink"] | order(order asc) {
+  _id,
+  name,
+  logo,
+  url,
+  order
+}`;
+
 const options = { next: { revalidate: 30 } };
 
 export default async function IndexPage() {
   const brands = await client.fetch<SanityDocument[]>(BRAND_QUERY, {}, options);
   const floatTexts = await client.fetch<SanityDocument[]>(
     FLOAT_TEXT_QUERY,
+    {},
+    options
+  );
+  const clients = await client.fetch<SanityDocument[]>(
+    CLIENT_QUERY,
+    {},
+    options
+  );
+  const socialLinks = await client.fetch<SanityDocument[]>(
+    SOCIAL_LINK_QUERY,
     {},
     options
   );
@@ -141,11 +166,27 @@ export default async function IndexPage() {
           },
         ];
 
+  // 고객사 데이터 변환
+  const clientLogos =
+    clients.length > 0
+      ? clients.map((client) => ({
+          name: client.name || "",
+          logo: client.logo ? urlForImage(client.logo) : undefined,
+        }))
+      : [];
+
+  // 소셜 링크 데이터 변환
+  const socialLinkData = socialLinks.map((link) => ({
+    name: link.name || "",
+    logo: link.logo ? urlForImage(link.logo) : undefined,
+    url: link.url || "",
+  }));
+
   return (
     <main className="w-full">
       <HeroSection companies={companies} />
       <ContentSection contentCards={contentCards} />
-      <LogoSlider />
+      <LogoSlider logos={clientLogos} socialLinks={socialLinkData} />
     </main>
   );
 }
