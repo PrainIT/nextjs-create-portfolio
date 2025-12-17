@@ -23,18 +23,15 @@ export default function LogoSlider({
   logos,
   socialLinks = [],
 }: LogoSliderProps) {
-  // 데이터가 없으면 빈 배열 반환
-  if (!logos || logos.length === 0) {
-    return null;
-  }
-
   const sliderRef = useRef<HTMLDivElement>(null);
   const [singleSetWidth, setSingleSetWidth] = useState(0);
   const [repeatCount, setRepeatCount] = useState(3); // 기본값 3번
 
+  const hasLogos = logos && logos.length > 0;
+
   // 첫 번째 세트(원본 logos 배열)의 전체 너비를 측정하고 동적 keyframes 생성
   useEffect(() => {
-    if (!sliderRef.current) return;
+    if (!sliderRef.current || !hasLogos) return;
 
     // 요소가 완전히 렌더링된 후 측정하기 위해 requestAnimationFrame 사용
     const measureWidth = () => {
@@ -107,12 +104,13 @@ export default function LogoSlider({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [logos.length]);
+  }, [logos.length, hasLogos]);
 
   // 반복 횟수에 따라 로고 배열 복제 (메모이제이션으로 최적화)
   const duplicatedLogos = useMemo(
-    () => Array.from({ length: repeatCount }, () => logos).flat(),
-    [logos, repeatCount]
+    () =>
+      hasLogos ? Array.from({ length: repeatCount }, () => logos).flat() : [],
+    [logos, repeatCount, hasLogos]
   );
 
   return (
@@ -123,59 +121,67 @@ export default function LogoSlider({
         {/* 로고 슬라이더 */}
         <div className="flex items-center justify-center py-20">
           <div className="relative w-full overflow-hidden">
-            <div
-              ref={sliderRef}
-              className="flex"
-              style={{
-                width: "fit-content",
-                willChange: "transform",
-                transform: "translateZ(0)", // GPU 가속 강제
-                // 동적으로 계산된 애니메이션 적용
-                ...(singleSetWidth > 0
-                  ? {
-                      // 정확히 한 세트의 너비만큼 이동 (끊김 없이 부드럽게)
-                      animation: `slide-infinite-smooth ${Math.max(singleSetWidth / 40, 15)}s linear infinite`,
-                    }
-                  : {
-                      // 초기 로딩 시 fallback 애니메이션
-                      animation: "slide-infinite 20s linear infinite",
-                    }),
-              }}
-            >
-              {duplicatedLogos.map((logo, index) => {
-                const setIndex = Math.floor(index / logos.length);
-                return (
-                  <div
-                    key={`${logo.name}-${index}`}
-                    data-set-index={setIndex}
-                    className="flex-shrink-0 mx-12 flex items-center justify-center"
-                    style={{
-                      height: "40px", // 현재 텍스트 크기와 비슷한 높이
-                      width: "auto",
-                    }}
-                  >
-                    {logo.logo ? (
-                      <Image
-                        src={logo.logo}
-                        alt={logo.name}
-                        width={120}
-                        height={40}
-                        className="object-contain"
-                        style={{
-                          maxHeight: "40px",
-                          width: "auto",
-                          filter: "brightness(0.7)", // 텍스트 색상과 비슷하게
-                        }}
-                      />
-                    ) : (
-                      <span className="text-grey-400 text-2xl font-medium whitespace-nowrap">
-                        {logo.name}
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            {hasLogos ? (
+              <div
+                ref={sliderRef}
+                className="flex"
+                style={{
+                  width: "fit-content",
+                  willChange: "transform",
+                  transform: "translateZ(0)", // GPU 가속 강제
+                  // 동적으로 계산된 애니메이션 적용
+                  ...(singleSetWidth > 0
+                    ? {
+                        // 정확히 한 세트의 너비만큼 이동 (끊김 없이 부드럽게)
+                        animation: `slide-infinite-smooth ${Math.max(singleSetWidth / 40, 15)}s linear infinite`,
+                      }
+                    : {
+                        // 초기 로딩 시 fallback 애니메이션
+                        animation: "slide-infinite 20s linear infinite",
+                      }),
+                }}
+              >
+                {duplicatedLogos.map((logo, index) => {
+                  const setIndex = Math.floor(index / logos.length);
+                  return (
+                    <div
+                      key={`${logo.name}-${index}`}
+                      data-set-index={setIndex}
+                      className="flex-shrink-0 mx-12 flex items-center justify-center"
+                      style={{
+                        height: "40px", // 현재 텍스트 크기와 비슷한 높이
+                        width: "auto",
+                      }}
+                    >
+                      {logo.logo ? (
+                        <Image
+                          src={logo.logo}
+                          alt={logo.name}
+                          width={120}
+                          height={40}
+                          className="object-contain"
+                          style={{
+                            maxHeight: "40px",
+                            width: "auto",
+                            filter: "brightness(0.7)", // 텍스트 색상과 비슷하게
+                          }}
+                        />
+                      ) : (
+                        <span className="text-grey-400 text-2xl font-medium whitespace-nowrap">
+                          {logo.name}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center w-full">
+                <span className="text-grey-400 text-2xl font-medium whitespace-nowrap">
+                  준비중
+                </span>
+              </div>
+            )}
           </div>
         </div>
         {/* 하단 선 */}
