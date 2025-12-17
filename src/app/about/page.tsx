@@ -41,33 +41,6 @@ export default async function AboutPage() {
       },
     ],
     mainImage: about?.mainImage || null,
-    projectHistory: about?.projectHistory || [
-      {
-        year: "2023",
-        projects: [
-          "Lorem ipsum dolor sit amet",
-          "Consectetur adipiscing elit",
-          "Sed do eiusmod tempor",
-        ],
-      },
-      {
-        year: "2024",
-        projects: [
-          "Ut enim ad minim veniam",
-          "Quis nostrud exercitation",
-          "Duis aute irure dolor",
-        ],
-      },
-      {
-        year: "2025",
-        projects: ["Excepteur sint occaecat", "Sunt in culpa qui officia"],
-      },
-    ],
-    awards: about?.awards || [
-      "Lorem ipsum dolor sit amet consectetur adipiscing",
-      "Sed do eiusmod tempor incididunt ut labore",
-      "Ut enim ad minim veniam quis nostrud exercitation",
-    ],
     downloadButtonText: about?.downloadButtonText || "회사소개서 다운로드",
     downloadFile: about?.downloadFile || null,
   };
