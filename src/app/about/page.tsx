@@ -4,7 +4,18 @@ import { urlForImage } from "@/sanity/utils";
 import { PortableText } from "next-sanity";
 import AboutPageClient from "./AboutPageClient";
 
-const ABOUT_QUERY = `*[_type == "about"][0]`;
+const ABOUT_QUERY = `*[_type == "about"][0] {
+  ...,
+  contentCards[] {
+    ...,
+    image {
+      asset-> {
+        _id,
+        url
+      }
+    }
+  }
+}`;
 
 const options = { next: { revalidate: 30 } };
 
@@ -41,11 +52,25 @@ export default async function AboutPage() {
       },
     ],
     mainImage: about?.mainImage || null,
+    contentCards: about?.contentCards || [],
   };
 
   const mainImageUrl = dummyAbout.mainImage
     ? urlForImage(dummyAbout.mainImage)
     : null;
 
-  return <AboutPageClient about={dummyAbout} mainImageUrl={mainImageUrl} />;
+  // 콘텐츠 카드 이미지 URL 생성
+  const contentCardImageUrls =
+    dummyAbout.contentCards?.map((card: any) =>
+      card?.image ? urlForImage(card.image) : null
+    ) || [];
+
+  return (
+    <AboutPageClient
+      about={dummyAbout}
+      mainImageUrl={mainImageUrl}
+      contentCards={dummyAbout.contentCards}
+      contentCardImageUrls={contentCardImageUrls}
+    />
+  );
 }

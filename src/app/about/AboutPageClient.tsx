@@ -6,17 +6,22 @@ import SearchBar from "@/components/SearchBar";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { PortableText, type SanityDocument } from "next-sanity";
-import {
-  motion,
-  useInView,
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from "framer-motion";
+import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
+
+interface ContentCard {
+  image?: {
+    asset?: {
+      _ref?: string;
+    };
+  };
+  link?: string;
+}
 
 interface AboutPageClientProps {
   about: SanityDocument;
   mainImageUrl: string | null;
+  contentCards?: ContentCard[];
+  contentCardImageUrls?: (string | null)[];
 }
 
 // 슬롯 머신 애니메이션 숫자 컴포넌트
@@ -83,9 +88,90 @@ function StatsSection() {
   );
 }
 
+// 가로 나열 콘텐츠 카드 컴포넌트
+function ContentSlider({
+  cards,
+  imageUrls,
+}: {
+  cards: ContentCard[];
+  imageUrls: (string | null)[];
+}) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const scrollWidth = container.scrollWidth;
+      const clientWidth = container.clientWidth;
+      const maxScroll = scrollWidth - clientWidth;
+
+      // 가운데(50%) 위치로 스크롤
+      container.scrollLeft = maxScroll / 2;
+    }
+  }, [cards.length]);
+
+  if (cards.length === 0) return null;
+
+  return (
+    <div
+      ref={scrollContainerRef}
+      className="w-full overflow-x-auto mt-16 scrollbar-hide"
+    >
+      <div className="flex gap-6 pl-8 pr-8">
+        {cards.map((card, index) => {
+          const imageUrl = imageUrls[index];
+
+          const cardContent = (
+            <div
+              key={`card-${index}`}
+              className="flex-shrink-0 w-[850px] h-[450px] bg-grey-800 rounded-2xl overflow-hidden border-2 border-grey-400"
+            >
+              {imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  alt={`Content card ${index + 1}`}
+                  width={850}
+                  height={450}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-grey-700 flex items-center justify-center">
+                  <p className="text-grey-500">No Image</p>
+                </div>
+              )}
+            </div>
+          );
+
+          if (card.link) {
+            return (
+              <a
+                key={`link-${index}`}
+                href={card.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-shrink-0 hover:opacity-90 transition-opacity"
+              >
+                {cardContent}
+              </a>
+            );
+          }
+
+          return (
+            <div key={`wrapper-${index}`} className="flex-shrink-0">
+              {cardContent}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function AboutPageClient({
   about,
   mainImageUrl,
+  contentCards = [],
+  contentCardImageUrls = [],
 }: AboutPageClientProps) {
   const router = useRouter();
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -155,18 +241,27 @@ export default function AboutPageClient({
 
       <StatsSection />
 
-      {mainImageUrl && (
-        <div className="flex justify-center mt-16">
-          <div className="w-full max-w-[850px] h-[450px] border-2 border-grey-400 rounded-2xl overflow-hidden">
-            <Image
-              src={mainImageUrl}
-              alt="about-main"
-              width={940}
-              height={529}
-              className="w-full h-full object-cover"
-            />
-          </div>
+      {contentCards.length > 0 ? (
+        <div className="flex justify-center">
+          <ContentSlider
+            cards={contentCards}
+            imageUrls={contentCardImageUrls}
+          />
         </div>
+      ) : (
+        mainImageUrl && (
+          <div className="flex justify-center mt-16">
+            <div className="w-full max-w-[850px] h-[450px] border-2 border-grey-400 rounded-2xl overflow-hidden">
+              <Image
+                src={mainImageUrl}
+                alt="about-main"
+                width={940}
+                height={529}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        )
       )}
 
       <div className="flex justify-center mt-12 mb-60">
