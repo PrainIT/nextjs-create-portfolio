@@ -74,14 +74,6 @@ export default function AboutPageClient({
         )}
       </div>
 
-      {about.downloadButtonText && (
-        <div className="flex justify-center mt-8">
-          <button className="bg-brand text-white px-8 py-4 rounded-full whitespace-nowrap min-w-40 w-[200px] hover:opacity-80 transition-all duration-300 font-lg">
-            {about.downloadButtonText}
-          </button>
-        </div>
-      )}
-
       {about.description && (
         <div className="flex flex-col gap-4 mt-16 max-w-[850px] mx-auto">
           <div className="text-grey-400 text-base font-normal text-center">
@@ -89,6 +81,29 @@ export default function AboutPageClient({
           </div>
         </div>
       )}
+
+      <div className="flex gap-8 justify-center items-center mt-16">
+        <div className="flex flex-col items-center">
+          <h3 className="text-brand text-5xl font-bold mb-2">595+</h3>
+          <p className="text-grey-300 text-xl mb-1">Donation Received</p>
+          <p className="text-grey-500 text-xs">Donation Received</p>
+          <p className="text-grey-500 text-xs">Donation Received</p>
+        </div>
+        <div className="h-20 w-px bg-grey-600" />
+        <div className="flex flex-col items-center">
+          <h3 className="text-brand text-5xl font-bold mb-2">595+</h3>
+          <p className="text-grey-300 text-lg mb-1">Donation Received</p>
+          <p className="text-grey-500 text-xs">Donation Received</p>
+          <p className="text-grey-500 text-xs">Donation Received</p>
+        </div>
+        <div className="h-20 w-px bg-grey-600" />
+        <div className="flex flex-col items-center">
+          <h3 className="text-brand text-5xl font-bold mb-2">595+</h3>
+          <p className="text-grey-300 text-lg mb-1">Donation Received</p>
+          <p className="text-grey-500 text-xs">Donation Received</p>
+          <p className="text-grey-500 text-xs">Donation Received</p>
+        </div>
+      </div>
 
       {mainImageUrl && (
         <div className="flex justify-center mt-16">
@@ -103,6 +118,16 @@ export default function AboutPageClient({
           </div>
         </div>
       )}
+
+      <div className="flex justify-center mt-12 mb-60">
+        <button
+          onClick={() => router.push("/contact")}
+          className="bg-brand text-white px-2 py-4 rounded-full min-w-40 w-[200px] hover:opacity-80 transition-all duration-300"
+        >
+          CONTACT
+        </button>
+      </div>
+
       {/* 하단 선 */}
       <div className="w-full h-px bg-grey-700 mt-12" />
 

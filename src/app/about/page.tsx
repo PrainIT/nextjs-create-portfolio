@@ -41,8 +41,6 @@ export default async function AboutPage() {
       },
     ],
     mainImage: about?.mainImage || null,
-    downloadButtonText: about?.downloadButtonText || "회사소개서 다운로드",
-    downloadFile: about?.downloadFile || null,
   };
 
   const mainImageUrl = dummyAbout.mainImage

@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState, useMemo } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface Logo {
   name: string;
@@ -23,6 +24,7 @@ export default function LogoSlider({
   logos,
   socialLinks = [],
 }: LogoSliderProps) {
+  const router = useRouter();
   const sliderRef = useRef<HTMLDivElement>(null);
   const [singleSetWidth, setSingleSetWidth] = useState(0);
   const [repeatCount, setRepeatCount] = useState(3); // 기본값 3번
@@ -241,7 +243,10 @@ export default function LogoSlider({
             <br />
             혼자보다 함께할 때 더 뛰어난 크리에이티브를 만들어냅니다.
           </div>
-          <button className="bg-brand text-white px-2 py-4 rounded-full min-w-40 w-[200px] hover:opacity-80 transition-all duration-300">
+          <button
+            onClick={() => router.push("/contact")}
+            className="bg-brand text-white px-2 py-4 rounded-full min-w-40 w-[200px] hover:opacity-80 transition-all duration-300"
+          >
             CONTACT
           </button>
         </div>
