@@ -4,12 +4,83 @@ import NavBar from "@/components/NavBar";
 import { useRouter } from "next/navigation";
 import SearchBar from "@/components/SearchBar";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PortableText, type SanityDocument } from "next-sanity";
+import {
+  motion,
+  useInView,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 
 interface AboutPageClientProps {
   about: SanityDocument;
   mainImageUrl: string | null;
+}
+
+// 슬롯 머신 애니메이션 숫자 컴포넌트
+function AnimatedNumber({ value }: { value: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [displayValue, setDisplayValue] = useState(0);
+  const motionValue = useMotionValue(0);
+  const spring = useSpring(motionValue, {
+    damping: 100,
+    stiffness: 100,
+  });
+
+  useEffect(() => {
+    if (isInView) {
+      motionValue.set(value);
+    }
+  }, [motionValue, isInView, value]);
+
+  useEffect(() => {
+    const unsubscribe = spring.on("change", (latest) => {
+      setDisplayValue(Math.floor(latest));
+    });
+    return () => unsubscribe();
+  }, [spring]);
+
+  return (
+    <motion.h3
+      ref={ref}
+      className="text-brand text-5xl font-bold mb-2"
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      transition={{ duration: 0.5 }}
+    >
+      {displayValue}+
+    </motion.h3>
+  );
+}
+
+// 통계 섹션 컴포넌트
+function StatsSection() {
+  const stats = [
+    { value: 595, label: "Donation Received" },
+    { value: 595, label: "Donation Received" },
+    { value: 595, label: "Donation Received" },
+  ];
+
+  return (
+    <div className="flex gap-8 justify-center items-center mt-16">
+      {stats.map((stat, index) => (
+        <div key={index} className="flex items-center">
+          <div className="flex flex-col items-center">
+            <AnimatedNumber value={stat.value} />
+            <p className="text-grey-300 text-xl mb-1">{stat.label}</p>
+            <p className="text-grey-500 text-xs">{stat.label}</p>
+            <p className="text-grey-500 text-xs">{stat.label}</p>
+          </div>
+          {index < stats.length - 1 && (
+            <div className="h-20 w-px bg-grey-600 ml-8" />
+          )}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export default function AboutPageClient({
@@ -82,28 +153,7 @@ export default function AboutPageClient({
         </div>
       )}
 
-      <div className="flex gap-8 justify-center items-center mt-16">
-        <div className="flex flex-col items-center">
-          <h3 className="text-brand text-5xl font-bold mb-2">595+</h3>
-          <p className="text-grey-300 text-xl mb-1">Donation Received</p>
-          <p className="text-grey-500 text-xs">Donation Received</p>
-          <p className="text-grey-500 text-xs">Donation Received</p>
-        </div>
-        <div className="h-20 w-px bg-grey-600" />
-        <div className="flex flex-col items-center">
-          <h3 className="text-brand text-5xl font-bold mb-2">595+</h3>
-          <p className="text-grey-300 text-lg mb-1">Donation Received</p>
-          <p className="text-grey-500 text-xs">Donation Received</p>
-          <p className="text-grey-500 text-xs">Donation Received</p>
-        </div>
-        <div className="h-20 w-px bg-grey-600" />
-        <div className="flex flex-col items-center">
-          <h3 className="text-brand text-5xl font-bold mb-2">595+</h3>
-          <p className="text-grey-300 text-lg mb-1">Donation Received</p>
-          <p className="text-grey-500 text-xs">Donation Received</p>
-          <p className="text-grey-500 text-xs">Donation Received</p>
-        </div>
-      </div>
+      <StatsSection />
 
       {mainImageUrl && (
         <div className="flex justify-center mt-16">
