@@ -39,14 +39,17 @@ export default function WorkCard({
     <div className="overflow-hidden flex flex-col">
       {/* 이미지/로고 영역 */}
       <div
-        className={`relative w-full bg-gradient-to-br from-grey-700 to-grey-900 flex items-center justify-center rounded-2xl ${
+        className={`relative w-full bg-gradient-to-br from-grey-700 to-grey-900 rounded-2xl overflow-hidden ${
           isSearchMode ? "" : "aspect-square"
         }`}
         style={
-          isSearchMode
+          isSearchMode && !image
             ? {
                 minHeight: "200px",
-                height: image ? "auto" : `${200 + (id % 3) * 100}px`,
+                height: `${200 + (id % 3) * 100}px`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }
             : {}
         }
@@ -58,7 +61,9 @@ export default function WorkCard({
             className={`w-full ${isSearchMode ? "h-auto" : "aspect-square h-full"} object-cover rounded-2xl`}
           />
         ) : (
-          <div className="text-grey-500 text-sm">이미지 영역</div>
+          <div className="text-grey-500 text-sm flex items-center justify-center h-full">
+            이미지 영역
+          </div>
         )}
         {logo && (
           <div className="absolute inset-0 flex items-center justify-center">
