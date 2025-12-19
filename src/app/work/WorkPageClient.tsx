@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import WorkCard from "@/components/WorkCard";
 import SearchBar from "@/components/SearchBar";
@@ -30,6 +31,7 @@ export default function WorkPageClient({
   workProjects,
   workCategories,
 }: WorkPageClientProps) {
+  const router = useRouter();
   const [isSearching, setIsSearching] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -106,14 +108,23 @@ export default function WorkPageClient({
         {/* 콘텐츠 영역 - 3열 그리드 */}
         <div className="grid grid-cols-3 gap-6">
           {filteredProjects.map((project, index) => (
-            <WorkCard
+            <div
               key={project.id}
-              id={index + 1}
-              title={project.title}
-              tags={project.tags}
-              image={project.image}
-              isSearchMode={isSearching}
-            />
+              onClick={() => {
+                if (project.slug) {
+                  router.push(`/work/${project.slug}`);
+                }
+              }}
+              className="cursor-pointer hover:opacity-90 transition-opacity"
+            >
+              <WorkCard
+                id={index + 1}
+                title={project.title}
+                tags={project.tags}
+                image={project.image}
+                isSearchMode={isSearching}
+              />
+            </div>
           ))}
         </div>
       </div>

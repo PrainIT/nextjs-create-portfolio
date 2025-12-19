@@ -55,7 +55,7 @@ export default function WorkCard({
           <img
             src={image}
             alt={title}
-            className={`w-full ${isSearchMode ? "h-auto" : "h-full"} object-cover rounded-2xl`}
+            className={`w-full ${isSearchMode ? "h-auto" : "aspect-square h-full"} object-cover rounded-2xl`}
           />
         ) : (
           <div className="text-grey-500 text-sm">이미지 영역</div>
