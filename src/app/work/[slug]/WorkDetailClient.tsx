@@ -293,6 +293,23 @@ export default function WorkDetailClient({
               )}
             </div>
 
+            {/* Award */}
+            {work.award && (work.award.title || work.award.description) && (
+              <div>
+                <div className="text-sm text-grey-500 mb-2">Award</div>
+                {work.award.title && (
+                  <div className="text-white font-bold mb-1">
+                    {work.award.title}
+                  </div>
+                )}
+                {work.award.description && (
+                  <div className="text-grey-400 text-sm">
+                    {work.award.description}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Template Navigation */}
             {work.templates && work.templates.length > 0 && (
               <div>
@@ -314,23 +331,6 @@ export default function WorkDetailClient({
                     </button>
                   ))}
                 </div>
-              </div>
-            )}
-
-            {/* Award */}
-            {work.award && (work.award.title || work.award.description) && (
-              <div>
-                <div className="text-sm text-grey-500 mb-2">Award</div>
-                {work.award.title && (
-                  <div className="text-white font-bold mb-1">
-                    {work.award.title}
-                  </div>
-                )}
-                {work.award.description && (
-                  <div className="text-grey-400 text-sm">
-                    {work.award.description}
-                  </div>
-                )}
               </div>
             )}
           </div>
