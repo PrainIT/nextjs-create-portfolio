@@ -24,6 +24,7 @@ interface NavBarProps {
   selectedValue?: string;
   onSelect?: (value: string) => void;
   onTitleClick?: () => void;
+  absolute?: boolean;
 }
 
 export default function NavBar({
@@ -35,6 +36,7 @@ export default function NavBar({
   selectedValue,
   onSelect,
   onTitleClick,
+  absolute = false,
 }: NavBarProps) {
   const router = useRouter();
   const [selected, setSelected] = useState(selectedValue || "");
@@ -58,7 +60,9 @@ export default function NavBar({
   };
 
   return (
-    <nav className="absolute left-0 top-0 z-30 pl-8 py-8">
+    <nav
+      className={`pl-8 py-8 ${absolute ? "absolute left-0 top-0 z-30" : ""}`}
+    >
       <div className="flex flex-col gap-8">
         {/* HOME | PageName */}
         <div className="flex items-center gap-2 text-sm text-grey-400">

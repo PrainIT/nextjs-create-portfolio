@@ -190,6 +190,7 @@ export default function AboutPageClient({
           router.push("/");
         }}
         categories={[]}
+        absolute={true}
       />
 
       {/* 검색바 - 오른쪽 위 */}
