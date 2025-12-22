@@ -182,6 +182,7 @@ export default function AboutPageClient({
 
   return (
     <main className="w-full">
+      <div className="w-full h-px bg-grey-700 mt-12" />
       <NavBar
         pageName="ABOUT"
         title=""
