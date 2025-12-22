@@ -21,16 +21,8 @@ const workCategories = [
   {
     title: "영상 콘텐츠",
     items: [
-      { label: "브랜디드 영상", value: "branded-video" },
-      { label: "캠페인 영상", value: "campaign-video" },
+      { label: "유튜브", value: "youtube" },
       { label: "숏폼", value: "short-form" },
-      { label: "웹예능", value: "web-entertainment" },
-      { label: "스케치 영상", value: "sketch-video" },
-      { label: "드라마", value: "drama" },
-      { label: "인터뷰 영상", value: "interview-video" },
-      { label: "모션그래픽", value: "motion-graphics" },
-      { label: "뮤직비디오", value: "music-video" },
-      { label: "LIVE", value: "live" },
     ],
   },
   {

@@ -3,6 +3,8 @@
 import { type SanityDocument } from "next-sanity";
 import { motion } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Template1 from "./templates/Template1";
 import Template2 from "./templates/Template2";
 import Template3 from "./templates/Template3";
@@ -16,6 +18,7 @@ interface Template {
   title?: string;
   description?: string;
   videoUrl?: string;
+  videoUrls?: string[];
   images?: string[];
 }
 
@@ -88,8 +91,13 @@ export default function WorkDetailClient({
   work,
   workImageUrl,
 }: WorkDetailClientProps) {
+  const router = useRouter();
   const templateRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const [activeTemplate, setActiveTemplate] = useState<number | null>(null);
+
+  const handleBack = () => {
+    router.push("/work");
+  };
 
   const getSubCategoryLabel = (category: string, subCategory: string) => {
     const categoryGroup = workCategories.find(
@@ -156,7 +164,14 @@ export default function WorkDetailClient({
           <Template1
             key={index}
             {...commonProps}
-            videoUrl={template.videoUrl}
+            videoUrl={
+              template.subCategory === "youtube" ? template.videoUrl : undefined
+            }
+            videoUrls={
+              template.subCategory === "short-form"
+                ? template.videoUrls
+                : undefined
+            }
             images={template.images || []}
           />
         );
@@ -165,7 +180,14 @@ export default function WorkDetailClient({
           <Template2
             key={index}
             {...commonProps}
-            videoUrl={template.videoUrl}
+            videoUrl={
+              template.subCategory === "youtube" ? template.videoUrl : undefined
+            }
+            videoUrls={
+              template.subCategory === "short-form"
+                ? template.videoUrls
+                : undefined
+            }
           />
         );
       case 3:
@@ -200,43 +222,76 @@ export default function WorkDetailClient({
       {/* NavBar와 콘텐츠 영역 - flex row */}
       <div className="flex-1 flex">
         {/* NavBar - 고정 너비 */}
-        <div className="w-64 flex-shrink-0 pl-8 py-8">
+        <div className="w-64 flex-shrink-0 pl-8 py-8 mr-8">
           <div className="flex flex-col gap-8">
+            {/* HOME | PageName */}
+            <div className="flex items-center gap-2 text-sm text-grey-400">
+              <Link href="/" className="hover:text-grey-200 transition-colors">
+                HOME
+              </Link>
+              <span className="text-grey-600">|</span>
+              <span className="text-grey-200 font-medium">WORK</span>
+            </div>
+
+            {/* 뒤로가기 버튼 */}
+            <motion.button
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1 }}
+              whileHover={{ x: -5 }}
+              whileTap={{ x: -2 }}
+              onClick={handleBack}
+              className="flex items-center gap-2 text-sm text-grey-200 hover:text-grey-100 cursor-pointer transition-colors"
+            >
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M10 12L6 8L10 4"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </motion.button>
+
             {/* Title */}
             {work.title && (
-              <div>
-                <div className="text-sm text-grey-500 mb-2">Title</div>
-                <div className="text-white font-medium">{work.title}</div>
+              <div className="text-white font-bold text-lg break-words">
+                {work.title}
               </div>
             )}
 
-            {/* Client */}
-            {work.client && (
-              <div>
-                <div className="text-sm text-grey-500 mb-2">Client</div>
-                <div className="text-white">{work.client}</div>
-              </div>
-            )}
+            <div className="flex flex-col gap-2">
+              {/* Client */}
+              {work.client && (
+                <div className="text-sm text-grey-500">
+                  <span className="font-bold">Client</span> {work.client}
+                </div>
+              )}
 
-            {/* Work */}
-            {work.category && (
-              <div>
-                <div className="text-sm text-grey-500 mb-2">Work</div>
-                <div className="text-white">
+              {/* Work */}
+              {work.category && (
+                <div className="text-sm text-grey-500">
+                  <span className="font-bold">Work</span>{" "}
                   {categoryLabels[work.category] || work.category}
                   {work.subCategory &&
                     ` > ${getSubCategoryLabel(work.category, work.subCategory)}`}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Data */}
-            {work.publishedAt && (
-              <div>
-                <div className="text-sm text-grey-500 mb-2">Data</div>
-                <div className="text-white">{formatDate(work.publishedAt)}</div>
-              </div>
-            )}
+              {/* Data */}
+              {work.publishedAt && (
+                <div className="text-sm text-grey-500">
+                  <span className="font-bold">Data</span>{" "}
+                  {formatDate(work.publishedAt)}
+                </div>
+              )}
+            </div>
 
             {/* Template Navigation */}
             {work.templates && work.templates.length > 0 && (
@@ -249,10 +304,10 @@ export default function WorkDetailClient({
                     <button
                       key={index}
                       onClick={() => scrollToTemplate(index)}
-                      className={`text-left text-sm transition-colors ${
+                      className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                         activeTemplate === index
-                          ? "text-white font-medium"
-                          : "text-grey-400 hover:text-grey-200"
+                          ? "bg-brand text-white"
+                          : "bg-grey-700 text-grey-200 hover:bg-grey-600"
                       }`}
                     >
                       Template {template.templateType}

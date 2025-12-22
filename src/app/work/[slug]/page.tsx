@@ -28,6 +28,7 @@ const WORK_QUERY = `*[_type == "work" && slug.current == $slug][0] {
     title,
     description,
     videoUrl,
+    videoUrls,
     images[]
   }
 }`;

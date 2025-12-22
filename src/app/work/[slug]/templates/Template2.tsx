@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { getYouTubeEmbedUrl } from "@/app/work/[slug]/utils/youtube";
 
 interface Template2Props {
@@ -11,6 +11,7 @@ interface Template2Props {
   title: string;
   description: string;
   videoUrl?: string;
+  videoUrls?: string[];
 }
 
 const categoryLabels: Record<string, string> = {
@@ -23,16 +24,8 @@ const workCategories = [
   {
     title: "영상 콘텐츠",
     items: [
-      { label: "브랜디드 영상", value: "branded-video" },
-      { label: "캠페인 영상", value: "campaign-video" },
+      { label: "유튜브", value: "youtube" },
       { label: "숏폼", value: "short-form" },
-      { label: "웹예능", value: "web-entertainment" },
-      { label: "스케치 영상", value: "sketch-video" },
-      { label: "드라마", value: "drama" },
-      { label: "인터뷰 영상", value: "interview-video" },
-      { label: "모션그래픽", value: "motion-graphics" },
-      { label: "뮤직비디오", value: "music-video" },
-      { label: "LIVE", value: "live" },
     ],
   },
   {
@@ -82,26 +75,45 @@ export default function Template2({
   title,
   description,
   videoUrl,
+  videoUrls,
 }: Template2Props) {
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const categoryLabel = category ? categoryLabels[category] || category : "";
-  const subCategoryLabel = category && subCategory
-    ? getSubCategoryLabel(category, subCategory)
-    : "";
+  const subCategoryLabel =
+    category && subCategory ? getSubCategoryLabel(category, subCategory) : "";
 
-  // 여러 비디오 URL이 있을 수 있으므로 배열로 처리
-  const videoUrls = videoUrl ? [videoUrl] : [];
+  // 유튜브는 단일, 숏폼은 배열로 처리
+  const allVideoUrls =
+    videoUrls && videoUrls.length > 0
+      ? videoUrls.filter((url) => url && url.trim()) // 빈 URL 필터링
+      : videoUrl && videoUrl.trim()
+        ? [videoUrl]
+        : [];
+
+  // 유효한 URL만 필터링
+  const validUrls = allVideoUrls.filter((url) => {
+    const embedUrl = getYouTubeEmbedUrl(url);
+    return embedUrl && embedUrl.length > 0;
+  });
 
   const handlePrev = () => {
-    setCurrentVideoIndex((prev) =>
-      prev > 0 ? prev - 1 : videoUrls.length - 1
-    );
+    if (!scrollContainerRef.current) return;
+    const container = scrollContainerRef.current;
+    const scrollAmount = container.clientWidth / 3; // 3개 중 1개씩 스크롤
+    container.scrollBy({
+      left: -scrollAmount,
+      behavior: "smooth",
+    });
   };
 
   const handleNext = () => {
-    setCurrentVideoIndex((prev) =>
-      prev < videoUrls.length - 1 ? prev + 1 : 0
-    );
+    if (!scrollContainerRef.current) return;
+    const container = scrollContainerRef.current;
+    const scrollAmount = container.clientWidth / 3; // 3개 중 1개씩 스크롤
+    container.scrollBy({
+      left: scrollAmount,
+      behavior: "smooth",
+    });
   };
 
   return (
@@ -132,26 +144,47 @@ export default function Template2({
         </p>
       )}
 
-      {/* Video Carousel */}
-      {videoUrls.length > 0 && (
+      {/* Video Carousel - 숏폼인 경우 */}
+      {subCategory === "short-form" && validUrls.length > 0 && (
         <div className="relative">
-          <div className="relative w-full aspect-[9/16] rounded-lg overflow-hidden bg-grey-800">
-            <iframe
-              key={currentVideoIndex}
-              src={getYouTubeEmbedUrl(videoUrls[currentVideoIndex])}
-              title={title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-            />
+          <div
+            ref={scrollContainerRef}
+            className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
+            style={{
+              scrollSnapType: "x mandatory",
+            }}
+          >
+            {validUrls.map((url, index) => {
+              const embedUrl = getYouTubeEmbedUrl(url);
+              if (!embedUrl) return null;
+              return (
+                <div
+                  key={index}
+                  className="flex-shrink-0 w-[calc(33.333%-0.67rem)] min-w-[calc(33.333%-0.67rem)]"
+                  style={{
+                    scrollSnapAlign: "start",
+                  }}
+                >
+                  <div className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden bg-grey-800">
+                    <iframe
+                      src={embedUrl}
+                      title={`${title} - Video ${index + 1}`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full h-full"
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* Carousel Controls */}
-          {videoUrls.length > 1 && (
+          {validUrls.length > 3 && (
             <>
               <button
                 onClick={handlePrev}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-grey-900/80 hover:bg-grey-800 flex items-center justify-center transition-colors"
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-grey-900/80 hover:bg-grey-800 flex items-center justify-center transition-colors z-10"
                 aria-label="이전 비디오"
               >
                 <svg
@@ -172,7 +205,7 @@ export default function Template2({
               </button>
               <button
                 onClick={handleNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-grey-900/80 hover:bg-grey-800 flex items-center justify-center transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-grey-900/80 hover:bg-grey-800 flex items-center justify-center transition-colors z-10"
                 aria-label="다음 비디오"
               >
                 <svg
@@ -191,25 +224,25 @@ export default function Template2({
                   />
                 </svg>
               </button>
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                {videoUrls.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentVideoIndex(index)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      index === currentVideoIndex
-                        ? "bg-white w-6"
-                        : "bg-grey-500"
-                    }`}
-                    aria-label={`비디오 ${index + 1}`}
-                  />
-                ))}
-              </div>
             </>
           )}
+        </div>
+      )}
+
+      {/* Video - 유튜브 (단일) */}
+      {subCategory === "youtube" && validUrls.length > 0 && (
+        <div className="relative">
+          <div className="relative w-full aspect-[9/16] rounded-lg overflow-hidden bg-grey-800">
+            <iframe
+              src={getYouTubeEmbedUrl(validUrls[0])}
+              title={title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+            />
+          </div>
         </div>
       )}
     </motion.div>
   );
 }
-

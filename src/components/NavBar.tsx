@@ -73,18 +73,6 @@ export default function NavBar({
           <span className="text-grey-200 font-medium">{pageName}</span>
         </div>
 
-        {/* 제목 */}
-        {onTitleClick ? (
-          <button
-            onClick={onTitleClick}
-            className="text-white font-bold text-lg text-left hover:text-brand transition-colors cursor-pointer"
-          >
-            {title}
-          </button>
-        ) : (
-          <h2 className="text-white font-bold text-lg">{title}</h2>
-        )}
-
         {/* 뒤로가기 버튼 */}
         {showBackButton && (
           <motion.button
@@ -111,6 +99,18 @@ export default function NavBar({
               />
             </svg>
           </motion.button>
+        )}
+
+        {/* 제목 */}
+        {onTitleClick ? (
+          <button
+            onClick={onTitleClick}
+            className="text-white font-bold text-lg text-left hover:text-brand transition-colors cursor-pointer"
+          >
+            {title}
+          </button>
+        ) : (
+          <h2 className="text-white font-bold text-lg">{title}</h2>
         )}
 
         {/* 카테고리별 메뉴 */}
