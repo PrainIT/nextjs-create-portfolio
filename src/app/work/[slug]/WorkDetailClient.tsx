@@ -313,15 +313,12 @@ export default function WorkDetailClient({
             {/* Template Navigation */}
             {work.templates && work.templates.length > 0 && (
               <div>
-                <div className="text-sm text-grey-500 mb-4">
-                  Template Navigation
-                </div>
                 <div className="flex flex-col gap-2">
                   {work.templates.map((template, index) => (
                     <button
                       key={index}
                       onClick={() => scrollToTemplate(index)}
-                      className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      className={`w-full text-center px-4 py-2 rounded-full text-xl font-medium transition-all ${
                         activeTemplate === index
                           ? "bg-brand text-white"
                           : "bg-grey-700 text-grey-200 hover:bg-grey-600"
