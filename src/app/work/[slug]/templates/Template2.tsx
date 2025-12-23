@@ -125,7 +125,7 @@ export default function Template2({
     >
       {/* 카테고리 / Date (우측 정렬) */}
       <div className="flex justify-between items-center mb-6">
-        <div className="text-grey-400 text-sm">
+        <div className="text-brand text-sm">
           {categoryLabel}
           {subCategoryLabel && ` > ${subCategoryLabel}`}
         </div>

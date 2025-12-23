@@ -79,9 +79,8 @@ export default function Template1({
   images,
 }: Template1Props) {
   const categoryLabel = category ? categoryLabels[category] || category : "";
-  const subCategoryLabel = category && subCategory
-    ? getSubCategoryLabel(category, subCategory)
-    : "";
+  const subCategoryLabel =
+    category && subCategory ? getSubCategoryLabel(category, subCategory) : "";
 
   return (
     <motion.div
@@ -92,7 +91,7 @@ export default function Template1({
     >
       {/* 카테고리 / Date (우측 정렬) */}
       <div className="flex justify-between items-center mb-6">
-        <div className="text-grey-400 text-sm">
+        <div className="text-brand text-sm">
           {categoryLabel}
           {subCategoryLabel && ` > ${subCategoryLabel}`}
         </div>
@@ -136,7 +135,10 @@ export default function Template1({
                 const embedUrl = getYouTubeEmbedUrl(url);
                 if (!embedUrl) return null;
                 return (
-                  <div key={index} className="relative w-full aspect-video rounded-lg overflow-hidden">
+                  <div
+                    key={index}
+                    className="relative w-full aspect-video rounded-lg overflow-hidden"
+                  >
                     <iframe
                       src={embedUrl}
                       title={`${title} - Video ${index + 1}`}
@@ -175,4 +177,3 @@ export default function Template1({
     </motion.div>
   );
 }
-

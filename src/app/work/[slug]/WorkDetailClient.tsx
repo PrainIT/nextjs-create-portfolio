@@ -94,6 +94,7 @@ export default function WorkDetailClient({
   const router = useRouter();
   const templateRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const [activeTemplate, setActiveTemplate] = useState<number | null>(null);
+  const [showStickyNav, setShowStickyNav] = useState(false);
 
   const handleBack = () => {
     router.push("/work");
@@ -119,10 +120,13 @@ export default function WorkDetailClient({
     }
   };
 
-  // 스크롤 감지로 activeTemplate 업데이트
+  // 스크롤 감지로 activeTemplate 업데이트 및 sticky nav 표시
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + window.innerHeight / 2;
+
+      // 첫 화면을 벗어났는지 확인 (스크롤이 100px 이상)
+      setShowStickyNav(window.scrollY > 700);
 
       work.templates?.forEach((_, index) => {
         const element = templateRefs.current[index];
@@ -295,7 +299,7 @@ export default function WorkDetailClient({
 
             {/* Award */}
             {work.award && (work.award.title || work.award.description) && (
-              <div>
+              <div className="mb-4">
                 <div className="text-sm text-grey-500 mb-2">Award</div>
                 {work.award.title && (
                   <div className="text-white font-bold mb-1">
@@ -309,28 +313,25 @@ export default function WorkDetailClient({
                 )}
               </div>
             )}
-
-            {/* Template Navigation */}
-            {work.templates && work.templates.length > 0 && (
-              <div>
-                <div className="flex flex-col gap-2">
-                  {work.templates.map((template, index) => (
-                    <button
-                      key={index}
-                      onClick={() => scrollToTemplate(index)}
-                      className={`w-full text-center px-4 py-2 rounded-full text-xl font-medium transition-all ${
-                        activeTemplate === index
-                          ? "bg-brand text-white"
-                          : "bg-grey-700 text-grey-200 hover:bg-grey-600"
-                      }`}
-                    >
-                      Template {template.templateType}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
+          {/* Template Navigation */}
+          {work.templates && work.templates.length > 0 && (
+            <div className="sticky top-[0%] flex flex-col gap-2 py-2.5">
+              {work.templates.map((template, index) => (
+                <button
+                  key={index}
+                  onClick={() => scrollToTemplate(index)}
+                  className={`w-full text-center px-4 py-2 rounded-full text-xl font-medium transition-all ${
+                    activeTemplate === index
+                      ? "bg-brand text-white border-none"
+                      : "border border-grey-700 text-grey-700 hover:text-white hover:border-white"
+                  }`}
+                >
+                  Template {template.templateType}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* 콘텐츠 영역 - 나머지 공간 */}
@@ -349,8 +350,7 @@ export default function WorkDetailClient({
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="mb-16"
               >
-                <div className="text-sm text-grey-500 mb-4">Summary</div>
-                <div className="text-white leading-relaxed whitespace-pre-line">
+                <div className="text-gray-300 leading-relaxed whitespace-pre-line">
                   {work.summary}
                 </div>
               </motion.div>
