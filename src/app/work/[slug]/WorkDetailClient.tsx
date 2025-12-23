@@ -9,6 +9,7 @@ import Template1 from "./templates/Template1";
 import Template2 from "./templates/Template2";
 import Template3 from "./templates/Template3";
 import Template4 from "./templates/Template4";
+import SearchBar from "@/components/SearchBar";
 
 interface Template {
   templateType: number;
@@ -336,6 +337,10 @@ export default function WorkDetailClient({
 
         {/* 콘텐츠 영역 - 나머지 공간 */}
         <div className="flex-1 pr-8 py-8">
+          {/* 검색창 - 오른쪽 위 */}
+          <div className="flex justify-end mb-8">
+            <SearchBar placeholder="SEARCH" />
+          </div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
