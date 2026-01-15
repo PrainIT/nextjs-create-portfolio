@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import WorkCard from "@/components/WorkCard";
 import SearchBar from "@/components/SearchBar";
+import BottomPopup from "@/components/BottomPopup";
 
 interface WorkProject {
   id: string;
@@ -35,6 +36,10 @@ export default function WorkPageClient({
   const [isSearching, setIsSearching] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [selectedProject, setSelectedProject] = useState<WorkProject | null>(
+    null
+  );
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const handleSelect = (value: string) => {
     setSelectedCategory(value);
@@ -48,6 +53,24 @@ export default function WorkPageClient({
     setSelectedCategory("");
     setSearchKeyword("");
     setIsSearching(false);
+  };
+
+  const handleProjectClick = (project: WorkProject) => {
+    // 브랜디드 영상인 경우 팝업 열기
+    if (project.subCategory === "branded-video") {
+      setSelectedProject(project);
+      setIsPopupOpen(true);
+    } else {
+      // 그 외의 경우 기존처럼 라우팅
+      if (project.slug) {
+        router.push(`/work/${project.slug}`);
+      }
+    }
+  };
+
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+    setSelectedProject(null);
   };
 
   // 필터링된 프로젝트
@@ -123,11 +146,7 @@ export default function WorkPageClient({
               {filteredProjects.map((project, index) => (
                 <div
                   key={project.id}
-                  onClick={() => {
-                    if (project.slug) {
-                      router.push(`/work/${project.slug}`);
-                    }
-                  }}
+                  onClick={() => handleProjectClick(project)}
                   className="cursor-pointer hover:opacity-90 transition-opacity mb-6 break-inside-avoid"
                 >
                   <WorkCard
@@ -145,11 +164,7 @@ export default function WorkPageClient({
               {filteredProjects.map((project, index) => (
                 <div
                   key={project.id}
-                  onClick={() => {
-                    if (project.slug) {
-                      router.push(`/work/${project.slug}`);
-                    }
-                  }}
+                  onClick={() => handleProjectClick(project)}
                   className="cursor-pointer hover:opacity-90 transition-opacity"
                 >
                   <WorkCard
@@ -168,6 +183,47 @@ export default function WorkPageClient({
 
       {/* 하단 선 - 전체 너비, NavBar와 WorkCard 아래 */}
       <div className="w-full h-px bg-grey-700 mt-12 mb-12" />
+
+      {/* 브랜디드 영상 팝업 */}
+      <BottomPopup
+        isOpen={isPopupOpen}
+        onClose={handleClosePopup}
+        heightOption={{ wrapChildren: true }}
+      >
+        {selectedProject && (
+          <div className="p-8">
+            <h2 className="text-2xl font-bold mb-4 text-black">
+              {selectedProject.title}
+            </h2>
+            {selectedProject.description && (
+              <p className="text-grey-600 mb-4">
+                {selectedProject.description}
+              </p>
+            )}
+            {selectedProject.tags && selectedProject.tags.length > 0 && (
+              <div className="flex gap-2 flex-wrap">
+                {selectedProject.tags.map((tag, idx) => (
+                  <span
+                    key={idx}
+                    className="px-2 py-1 bg-grey-200 rounded text-sm text-black"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+            {selectedProject.image && (
+              <div className="mt-6">
+                <img
+                  src={selectedProject.image}
+                  alt={selectedProject.title}
+                  className="w-full h-auto rounded-lg"
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </BottomPopup>
     </main>
   );
 }
