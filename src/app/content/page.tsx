@@ -2,24 +2,51 @@ import { type SanityDocument } from "next-sanity";
 import WorkPageClient from "@/components/WorkPageClient";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/utils";
+import {
+  getYouTubeVideoId,
+  getYouTubeThumbnailUrl,
+} from "@/components/work-utils/youtube";
 
 const WORK_QUERY = `*[_type == "work"] | order(order asc, publishedAt desc) {
   _id,
   title,
   slug,
-  image,
+  clientLogo,
   tags,
   category,
   subCategory,
   description,
   publishedAt,
-  order
+  order,
+  templates[] {
+    templateType,
+    category,
+    subCategory,
+    videoUrl,
+    videoUrls,
+    images[]
+  }
 }`;
 
 const options = { next: { revalidate: 30 } };
 
-// 디자인 콘텐츠, 사진 콘텐츠, AI 콘텐츠만 포함
+// 모든 콘텐츠 포함
 const contentCategories = [
+  {
+    title: "영상 콘텐츠",
+    items: [
+      { label: "브랜디드 영상", value: "branded-video" },
+      { label: "캠페인 영상", value: "campaign-video" },
+      { label: "숏폼", value: "short-form" },
+      { label: "웹예능", value: "web-entertainment" },
+      { label: "스케치 영상", value: "sketch-video" },
+      { label: "드라마", value: "drama" },
+      { label: "인터뷰 영상", value: "interview-video" },
+      { label: "모션그래픽", value: "motion-graphics" },
+      { label: "뮤직비디오", value: "music-video" },
+      { label: "LIVE", value: "live" },
+    ],
+  },
   {
     title: "디자인 콘텐츠",
     items: [
@@ -119,24 +146,69 @@ export default async function ContentPage() {
           },
         ];
 
-  // 디자인, 사진, AI 콘텐츠만 필터링
-  const contentWorks = dummyWorks.filter(
-    (work) =>
-      work.category === "design" ||
-      work.category === "photo" ||
-      work.category === "ai"
-  );
+  // 썸네일 URL 추출 함수 (영상 우선, 이미지 차순, clientLogo 최후)
+  const getThumbnailUrl = (
+    work: any
+  ): { image?: string; videoUrl?: string } => {
+    // 1. Template에서 첫 번째 영상 URL 찾기
+    if (work.templates && work.templates.length > 0) {
+      for (const template of work.templates) {
+        // videoUrl이 있으면 우선 사용
+        if (template.videoUrl) {
+          const videoId = getYouTubeVideoId(template.videoUrl);
+          if (videoId) {
+            return {
+              image: getYouTubeThumbnailUrl(videoId),
+              videoUrl: template.videoUrl,
+            };
+          }
+        }
+        // videoUrls 배열의 첫 번째 항목 확인
+        if (template.videoUrls && template.videoUrls.length > 0) {
+          const firstVideoUrl = template.videoUrls[0];
+          const videoId = getYouTubeVideoId(firstVideoUrl);
+          if (videoId) {
+            return {
+              image: getYouTubeThumbnailUrl(videoId),
+              videoUrl: firstVideoUrl,
+            };
+          }
+        }
+        // images 배열의 첫 번째 항목 확인
+        if (template.images && template.images.length > 0) {
+          return {
+            image: urlForImage(template.images[0]),
+          };
+        }
+      }
+    }
 
-  const workProjects = contentWorks.map((work) => ({
-    id: work._id,
-    title: work.title,
-    tags: work.tags || [],
-    image: work.image ? urlForImage(work.image) : undefined,
-    category: work.category,
-    subCategory: work.subCategory,
-    slug: work.slug?.current,
-    description: work.description,
-  }));
+    // 2. clientLogo 사용
+    if (work.clientLogo) {
+      return {
+        image: urlForImage(work.clientLogo),
+      };
+    }
+
+    return {};
+  };
+
+  // 모든 콘텐츠 포함 (필터링 제거)
+  const workProjects = dummyWorks.map((work) => {
+    const thumbnail = getThumbnailUrl(work);
+    return {
+      id: work._id,
+      title: work.title,
+      tags: work.tags || [],
+      image: thumbnail.image,
+      videoUrl: thumbnail.videoUrl,
+      category: work.category,
+      subCategory: work.subCategory,
+      slug: work.slug?.current,
+      description: work.description,
+      templates: work.templates,
+    };
+  });
 
   return (
     <WorkPageClient
@@ -147,4 +219,3 @@ export default async function ContentPage() {
     />
   );
 }
-

@@ -7,8 +7,11 @@ interface WorkCardProps {
   title: string;
   tags: string[];
   image?: string;
+  videoUrl?: string; // YouTube URL (썸네일용)
   logo?: React.ReactNode;
   isSearchMode?: boolean;
+  forceSquare?: boolean; // branded에서 무조건 정사각형으로 표시
+  forceFullHeight?: boolean; // content에서 무조건 h-full로 표시
   onTagClick?: (tag: string) => void;
 }
 
@@ -17,8 +20,11 @@ export default function WorkCard({
   title,
   tags,
   image,
+  videoUrl,
   logo,
   isSearchMode = false,
+  forceSquare = false,
+  forceFullHeight = false,
   onTagClick,
 }: WorkCardProps) {
   const tagsContainerRef = useRef<HTMLDivElement>(null);
@@ -42,10 +48,18 @@ export default function WorkCard({
       {/* 이미지/로고 영역 */}
       <div
         className={`relative w-full bg-gradient-to-br from-grey-700 to-grey-900 rounded-2xl overflow-hidden ${
-          isSearchMode ? "" : "aspect-square"
+          !image && !videoUrl
+            ? "aspect-square"
+            : forceSquare || (!isSearchMode && !forceFullHeight)
+              ? "aspect-square"
+              : ""
         }`}
         style={
-          isSearchMode && !image
+          !forceSquare &&
+          !forceFullHeight &&
+          isSearchMode &&
+          !image &&
+          !videoUrl
             ? {
                 minHeight: "200px",
                 height: `${200 + (id % 3) * 100}px`,
@@ -60,7 +74,11 @@ export default function WorkCard({
           <img
             src={image}
             alt={title}
-            className={`w-full ${isSearchMode ? "h-auto" : "aspect-square h-full"} object-cover rounded-2xl`}
+            className={`w-full ${
+              forceSquare || (!isSearchMode && !forceFullHeight)
+                ? "aspect-square h-full"
+                : "h-auto"
+            } object-cover rounded-2xl`}
           />
         ) : (
           <div className="text-grey-500 text-sm flex items-center justify-center h-full">

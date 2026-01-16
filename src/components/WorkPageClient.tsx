@@ -21,6 +21,7 @@ interface WorkProject {
   publishedAt?: string;
   videoUrl?: string;
   videoUrls?: string[];
+  templates?: any[]; // content 페이지용
 }
 
 interface WorkCategory {
@@ -73,8 +74,13 @@ export default function WorkPageClient({
       return;
     }
 
-    // 브랜디드 페이지(/branded)에서 영상 콘텐츠인 경우 팝업 열기
-    if (basePath === "/branded" && project.category === "video") {
+    // branded 페이지에서는 모든 클릭을 slug routing으로 처리
+    if (basePath === "/branded") {
+      if (project.slug) {
+        router.push(`${basePath}/${project.slug}`);
+      }
+    } else if (basePath === "/content") {
+      // content 페이지에서는 BottomPopup 표시
       setSelectedProject(project);
       setIsPopupOpen(true);
     } else {
@@ -122,8 +128,7 @@ export default function WorkPageClient({
       filtered = filtered.filter(
         (project) =>
           project.title.toLowerCase().includes(keyword) ||
-          project.tags.some((tag) => tag.toLowerCase().includes(keyword)) ||
-          project.description?.toLowerCase().includes(keyword)
+          project.tags.some((tag) => tag.toLowerCase().includes(keyword))
       );
     }
 
@@ -170,8 +175,8 @@ export default function WorkPageClient({
             </div>
           </div>
 
-          {/* 콘텐츠 영역 - 검색 모드일 때는 masonry, 아닐 때는 3열 그리드 */}
-          {isSearching ? (
+          {/* 콘텐츠 영역 - content는 항상 masonry, branded는 검색 모드일 때만 masonry */}
+          {basePath === "/content" || isSearching ? (
             <div className="columns-3 gap-6" style={{ columnGap: "1.5rem" }}>
               {filteredProjects.map((project, index) => (
                 <div
@@ -184,7 +189,10 @@ export default function WorkPageClient({
                     title={project.title}
                     tags={project.tags}
                     image={project.image}
+                    videoUrl={project.videoUrl}
                     isSearchMode={isSearching}
+                    forceSquare={basePath === "/branded"}
+                    forceFullHeight={basePath === "/content"}
                     onTagClick={handleTagClick}
                   />
                 </div>
@@ -203,7 +211,10 @@ export default function WorkPageClient({
                     title={project.title}
                     tags={project.tags}
                     image={project.image}
+                    videoUrl={project.videoUrl}
                     isSearchMode={isSearching}
+                    forceSquare={basePath === "/branded"}
+                    forceFullHeight={basePath === "/content"}
                     onTagClick={handleTagClick}
                   />
                 </div>
@@ -216,7 +227,7 @@ export default function WorkPageClient({
       {/* 하단 선 - 전체 너비, NavBar와 WorkCard 아래 */}
       <div className="w-full h-px bg-grey-700 mt-12 mb-12" />
 
-      {/* 브랜디드 영상 팝업 */}
+      {/* 브랜디드/컨텐츠 팝업 */}
       <BottomPopup
         isOpen={isPopupOpen}
         onClose={handleClosePopup}
@@ -254,12 +265,12 @@ export default function WorkPageClient({
             )}
 
             {/* Title과 PublishedAt - 같은 줄 */}
-            <div className="flex items-start justify-between mb-4">
-              <h2 className="text-2xl font-bold text-black flex-1">
+            <div className="flex items-end gap-4 mb-4">
+              <h2 className="text-2xl font-bold text-black">
                 {selectedProject.title}
               </h2>
               {selectedProject.publishedAt && (
-                <div className="text-sm text-black ml-4 whitespace-nowrap">
+                <div className="text-sm text-gray-500 whitespace-nowrap">
                   {new Date(selectedProject.publishedAt)
                     .toISOString()
                     .split("T")[0]
@@ -273,6 +284,17 @@ export default function WorkPageClient({
               <p className="text-base text-black mb-6">
                 {selectedProject.description}
               </p>
+            )}
+
+            {/* Image - description 아래 (content 페이지용) */}
+            {basePath === "/content" && selectedProject.image && !selectedProject.videoUrl && (
+              <div className="mb-6">
+                <img
+                  src={selectedProject.image}
+                  alt={selectedProject.title}
+                  className="w-full h-auto rounded-lg"
+                />
+              </div>
             )}
 
             {/* Video - description 아래 */}
@@ -323,7 +345,25 @@ export default function WorkPageClient({
               <>
                 <div className="h-px bg-grey-300 mb-4" />
                 <div className="mb-4">
-                  <div className="text-sm font-bold text-black mb-3">TAG</div>
+                  <div className="flex items-center gap-2 text-sm font-bold text-black mb-3">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M2.5 6.5L6.5 2.5H13.5V9.5L9.5 13.5L2.5 6.5Z"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <circle cx="10" cy="6" r="1" fill="currentColor" />
+                    </svg>
+                    TAG
+                  </div>
                   <div className="flex gap-2 flex-wrap">
                     {selectedProject.tags.map((tag, idx) => (
                       <button
@@ -331,7 +371,7 @@ export default function WorkPageClient({
                         onClick={() => handleTagClick(tag)}
                         className="px-4 py-1 border border-black rounded-full text-sm text-black hover:bg-black hover:text-white transition-colors cursor-pointer"
                       >
-                        {tag}
+                        # {tag}
                       </button>
                     ))}
                   </div>
@@ -340,18 +380,20 @@ export default function WorkPageClient({
               </>
             )}
 
-            {/* 관련 영상 섹션 - tags 아래 */}
-            <div className="mt-6">
-              <div className="bg-brand text-white px-6 py-3 rounded-lg mb-4">
-                <h3 className="text-lg font-bold">
-                  관련 영상을 더 찾으셨나요?
-                </h3>
+            {/* 관련 영상 섹션 - tags 아래 (branded 페이지용) */}
+            {basePath === "/branded" && (
+              <div className="mt-6">
+                <div className="bg-brand text-white px-6 py-3 rounded-lg mb-4">
+                  <h3 className="text-lg font-bold">
+                    관련 영상을 더 찾으셨나요?
+                  </h3>
+                </div>
+                {/* 관련 영상 리스트는 추후 구현 */}
+                <div className="text-sm text-grey-500">
+                  관련 영상 목록이 여기에 표시됩니다.
+                </div>
               </div>
-              {/* 관련 영상 리스트는 추후 구현 */}
-              <div className="text-sm text-grey-500">
-                관련 영상 목록이 여기에 표시됩니다.
-              </div>
-            </div>
+            )}
           </div>
         )}
       </BottomPopup>

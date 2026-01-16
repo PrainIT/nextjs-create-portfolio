@@ -7,7 +7,7 @@ const WORK_QUERY = `*[_type == "work"] | order(order asc, publishedAt desc) {
   _id,
   title,
   slug,
-  image,
+  clientLogo,
   tags,
   category,
   subCategory,
@@ -15,15 +15,13 @@ const WORK_QUERY = `*[_type == "work"] | order(order asc, publishedAt desc) {
   publishedAt,
   order,
   client,
-  "firstTemplate": templates[0] {
-    videoUrl,
-    videoUrls
-  }
+  videoUrl,
+  videoUrls
 }`;
 
 const options = { next: { revalidate: 30 } };
 
-// 영상 콘텐츠만 포함
+// 모든 콘텐츠 포함
 const brandedCategories = [
   {
     title: "영상 콘텐츠",
@@ -39,6 +37,33 @@ const brandedCategories = [
       { label: "뮤직비디오", value: "music-video" },
       { label: "LIVE", value: "live" },
     ],
+  },
+  {
+    title: "디자인 콘텐츠",
+    items: [
+      { label: "SNS 콘텐츠", value: "sns-content" },
+      { label: "브랜딩", value: "branding" },
+      { label: "인포그래픽", value: "infographic" },
+      { label: "포스터", value: "poster" },
+      { label: "배너", value: "banner" },
+      { label: "카드뉴스", value: "card-news" },
+      { label: "키비주얼", value: "key-visual" },
+      { label: "인쇄물", value: "print" },
+      { label: "상세페이지", value: "detail-page" },
+      { label: "패키지", value: "package" },
+    ],
+  },
+  {
+    title: "사진 콘텐츠",
+    items: [
+      { label: "제품", value: "product" },
+      { label: "인물", value: "portrait" },
+      { label: "스케치", value: "sketch" },
+    ],
+  },
+  {
+    title: "AI 콘텐츠",
+    items: [],
   },
 ] as const;
 
@@ -81,22 +106,20 @@ export default async function BrandedPage() {
           },
         ];
 
-  // 영상 콘텐츠만 필터링 (category === "video")
-  const videoWorks = dummyWorks.filter((work) => work.category === "video");
-
-  const workProjects = videoWorks.map((work) => ({
+  // 모든 콘텐츠 포함 (필터링 제거)
+  const workProjects = dummyWorks.map((work) => ({
     id: work._id,
     title: work.title,
     tags: work.tags || [],
-    image: work.image ? urlForImage(work.image) : undefined,
+    image: work.clientLogo ? urlForImage(work.clientLogo) : undefined,
     category: work.category,
     subCategory: work.subCategory,
     slug: work.slug?.current,
     description: work.description,
     client: work.client,
     publishedAt: work.publishedAt,
-    videoUrl: work.firstTemplate?.videoUrl,
-    videoUrls: work.firstTemplate?.videoUrls,
+    videoUrl: work.videoUrl,
+    videoUrls: work.videoUrls,
   }));
 
   return (
@@ -108,4 +131,3 @@ export default async function BrandedPage() {
     />
   );
 }
-
