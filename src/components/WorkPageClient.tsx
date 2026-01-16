@@ -287,15 +287,17 @@ export default function WorkPageClient({
             )}
 
             {/* Image - description 아래 (content 페이지용) */}
-            {basePath === "/content" && selectedProject.image && !selectedProject.videoUrl && (
-              <div className="mb-6">
-                <img
-                  src={selectedProject.image}
-                  alt={selectedProject.title}
-                  className="w-full h-auto rounded-lg"
-                />
-              </div>
-            )}
+            {basePath === "/content" &&
+              selectedProject.image &&
+              !selectedProject.videoUrl && (
+                <div className="mb-6">
+                  <img
+                    src={selectedProject.image}
+                    alt={selectedProject.title}
+                    className="w-full h-auto rounded-lg"
+                  />
+                </div>
+              )}
 
             {/* Video - description 아래 */}
             {selectedProject.videoUrl && (
