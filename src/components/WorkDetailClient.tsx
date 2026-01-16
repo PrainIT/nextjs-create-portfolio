@@ -5,10 +5,10 @@ import { motion } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Template1 from "./templates/Template1";
-import Template2 from "./templates/Template2";
-import Template3 from "./templates/Template3";
-import Template4 from "./templates/Template4";
+import Template1 from "@/components/work-templates/Template1";
+import Template2 from "@/components/work-templates/Template2";
+import Template3 from "@/components/work-templates/Template3";
+import Template4 from "@/components/work-templates/Template4";
 import SearchBar from "@/components/SearchBar";
 
 interface Template {
@@ -34,6 +34,8 @@ interface WorkDetailClientProps {
     templates?: Template[];
   };
   workImageUrl: string | null;
+  basePath: string; // "/branded" 또는 "/content"
+  pageName?: string; // 페이지 이름 (기본값: basePath에 따라 결정)
 }
 
 const workCategories = [
@@ -91,14 +93,18 @@ const categoryLabels: Record<string, string> = {
 export default function WorkDetailClient({
   work,
   workImageUrl,
+  basePath,
+  pageName,
 }: WorkDetailClientProps) {
   const router = useRouter();
   const templateRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const [activeTemplate, setActiveTemplate] = useState<number | null>(null);
   const [showStickyNav, setShowStickyNav] = useState(false);
 
+  const displayPageName = pageName || (basePath === "/branded" ? "BRANDED" : "CONTENT");
+
   const handleBack = () => {
-    router.push("/work");
+    router.push(basePath);
   };
 
   const getSubCategoryLabel = (category: string, subCategory: string) => {
@@ -235,7 +241,7 @@ export default function WorkDetailClient({
                 HOME
               </Link>
               <span className="text-grey-600">|</span>
-              <span className="text-grey-200 font-medium">WORK</span>
+              <span className="text-grey-200 font-medium">{displayPageName}</span>
             </div>
 
             {/* 뒤로가기 버튼 */}
@@ -385,3 +391,4 @@ export default function WorkDetailClient({
     </main>
   );
 }
+

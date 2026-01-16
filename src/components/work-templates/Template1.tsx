@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { getYouTubeEmbedUrl } from "@/app/work/[slug]/utils/youtube";
+import { getYouTubeEmbedUrl } from "@/components/work-utils/youtube";
 
 interface Template1Props {
   category?: string;
@@ -177,3 +177,4 @@ export default function Template1({
     </motion.div>
   );
 }
+

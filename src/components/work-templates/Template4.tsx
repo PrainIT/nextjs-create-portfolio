@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-interface Template3Props {
+interface Template4Props {
   category?: string;
   subCategory?: string;
   date?: string;
@@ -65,14 +65,14 @@ function formatDate(dateString?: string) {
   return new Date(dateString).toLocaleDateString("ko-KR");
 }
 
-export default function Template3({
+export default function Template4({
   category,
   subCategory,
   date,
   title,
   description,
   images,
-}: Template3Props) {
+}: Template4Props) {
   const categoryLabel = category ? categoryLabels[category] || category : "";
   const subCategoryLabel =
     category && subCategory ? getSubCategoryLabel(category, subCategory) : "";
@@ -105,7 +105,7 @@ export default function Template3({
         </p>
       )}
 
-      {/* Square Image Grid (2x2) */}
+      {/* Oblong Image Grid (2x2) */}
       {images.length > 0 && (
         <div className="grid grid-cols-2 gap-4">
           {images.slice(0, 4).map((image, index) => (
@@ -115,7 +115,7 @@ export default function Template3({
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="relative aspect-square rounded-lg overflow-hidden"
+              className="relative aspect-[4/3] rounded-lg overflow-hidden"
             >
               <img
                 src={image}
@@ -129,3 +129,4 @@ export default function Template3({
     </motion.div>
   );
 }
+

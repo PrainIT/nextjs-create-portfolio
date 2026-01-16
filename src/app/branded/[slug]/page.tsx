@@ -1,7 +1,7 @@
 import { type SanityDocument } from "next-sanity";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/utils";
-import WorkDetailClient from "./WorkDetailClient";
+import WorkDetailClient from "@/components/WorkDetailClient";
 
 const WORK_QUERY = `*[_type == "work" && slug.current == $slug][0] {
   _id,
@@ -35,7 +35,7 @@ const WORK_QUERY = `*[_type == "work" && slug.current == $slug][0] {
 
 const options = { next: { revalidate: 30 } };
 
-export default async function WorkDetailPage({
+export default async function BrandedDetailPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -72,6 +72,8 @@ export default async function WorkDetailPage({
         templates: templatesWithImageUrls,
       }}
       workImageUrl={workImageUrl}
+      basePath="/branded"
     />
   );
 }
+

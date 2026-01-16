@@ -40,12 +40,20 @@ export default function Header() {
             ABOUT
           </Link>
           <Link
-            href="/work"
+            href="/branded"
             className={`text-secondary-4 text-base transition-opacity ${
-              isActive("/work") ? "opacity-100" : "opacity-50 hover:opacity-100"
+              isActive("/branded") ? "opacity-100" : "opacity-50 hover:opacity-100"
             }`}
           >
-            WORK
+            BRANDED
+          </Link>
+          <Link
+            href="/content"
+            className={`text-secondary-4 text-base transition-opacity ${
+              isActive("/content") ? "opacity-100" : "opacity-50 hover:opacity-100"
+            }`}
+          >
+            CONTENT
           </Link>
           <Link
             href="/contact"

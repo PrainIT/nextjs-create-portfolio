@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState, useRef } from "react";
-import { getYouTubeEmbedUrl } from "@/app/work/[slug]/utils/youtube";
+import { getYouTubeEmbedUrl } from "@/components/work-utils/youtube";
 
 interface Template2Props {
   category?: string;
@@ -246,3 +246,4 @@ export default function Template2({
     </motion.div>
   );
 }
+

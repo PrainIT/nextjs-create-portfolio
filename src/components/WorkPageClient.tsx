@@ -26,11 +26,17 @@ interface WorkCategory {
 interface WorkPageClientProps {
   workProjects: WorkProject[];
   workCategories: readonly WorkCategory[];
+  basePath: string; // "/branded" 또는 "/content"
+  pageTitle?: string; // 페이지 제목 (기본값: "전체 프로젝트")
+  onProjectClick?: (project: WorkProject) => void; // 커스텀 클릭 핸들러
 }
 
 export default function WorkPageClient({
   workProjects,
   workCategories,
+  basePath,
+  pageTitle = "전체 프로젝트",
+  onProjectClick,
 }: WorkPageClientProps) {
   const router = useRouter();
   const [isSearching, setIsSearching] = useState(false);
@@ -56,14 +62,20 @@ export default function WorkPageClient({
   };
 
   const handleProjectClick = (project: WorkProject) => {
-    // 브랜디드 영상인 경우 팝업 열기
-    if (project.subCategory === "branded-video") {
+    // 커스텀 핸들러가 있으면 사용
+    if (onProjectClick) {
+      onProjectClick(project);
+      return;
+    }
+
+    // 브랜디드 페이지(/branded)에서 영상 콘텐츠인 경우 팝업 열기
+    if (basePath === "/branded" && project.category === "video") {
       setSelectedProject(project);
       setIsPopupOpen(true);
     } else {
-      // 그 외의 경우 기존처럼 라우팅
+      // 그 외의 경우 라우팅
       if (project.slug) {
-        router.push(`/work/${project.slug}`);
+        router.push(`${basePath}/${project.slug}`);
       }
     }
   };
@@ -113,8 +125,8 @@ export default function WorkPageClient({
         {/* NavBar - 고정 너비 */}
         <div className="w-64 flex-shrink-0">
           <NavBar
-            pageName="WORK"
-            title="전체 프로젝트"
+            pageName={basePath === "/branded" ? "BRANDED" : "CONTENT"}
+            title={pageTitle}
             categories={workCategories}
             showBackButton={true}
             selectedValue={selectedCategory}

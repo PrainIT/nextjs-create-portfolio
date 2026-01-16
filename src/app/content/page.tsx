@@ -1,8 +1,5 @@
 import { type SanityDocument } from "next-sanity";
-import NavBar from "@/components/NavBar";
-import WorkCard from "@/components/WorkCard";
-import SearchBar from "@/components/SearchBar";
-import WorkPageClient from "./WorkPageClient";
+import WorkPageClient from "@/components/WorkPageClient";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/utils";
 
@@ -21,22 +18,8 @@ const WORK_QUERY = `*[_type == "work"] | order(order asc, publishedAt desc) {
 
 const options = { next: { revalidate: 30 } };
 
-const workCategories = [
-  {
-    title: "영상 콘텐츠",
-    items: [
-      { label: "브랜디드 영상", value: "branded-video" },
-      { label: "캠페인 영상", value: "campaign-video" },
-      { label: "숏폼", value: "short-form" },
-      { label: "웹예능", value: "web-entertainment" },
-      { label: "스케치 영상", value: "sketch-video" },
-      { label: "드라마", value: "drama" },
-      { label: "인터뷰 영상", value: "interview-video" },
-      { label: "모션그래픽", value: "motion-graphics" },
-      { label: "뮤직비디오", value: "music-video" },
-      { label: "LIVE", value: "live" },
-    ],
-  },
+// 디자인 콘텐츠, 사진 콘텐츠, AI 콘텐츠만 포함
+const contentCategories = [
   {
     title: "디자인 콘텐츠",
     items: [
@@ -66,7 +49,7 @@ const workCategories = [
   },
 ] as const;
 
-export default async function WorkPage() {
+export default async function ContentPage() {
   const works = await client.fetch<SanityDocument[]>(WORK_QUERY, {}, options);
 
   // 더미 데이터 생성
@@ -88,21 +71,6 @@ export default async function WorkPage() {
             description:
               "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             order: 1,
-          },
-          {
-            _id: "dummy-work-2",
-            _rev: "dummy-rev-2",
-            _type: "work",
-            _createdAt: new Date().toISOString(),
-            _updatedAt: new Date().toISOString(),
-            title: "Consectetur Adipiscing Elit",
-            slug: { current: "lorem-ipsum-2" },
-            tags: ["Video", "Motion Graphics"],
-            category: "video",
-            subCategory: "branded-video",
-            description:
-              "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            order: 2,
           },
           {
             _id: "dummy-work-3",
@@ -135,20 +103,6 @@ export default async function WorkPage() {
             order: 4,
           },
           {
-            _id: "dummy-work-5",
-            _rev: "dummy-rev-5",
-            _type: "work",
-            _createdAt: new Date().toISOString(),
-            _updatedAt: new Date().toISOString(),
-            title: "Quis Nostrud Exercitation",
-            slug: { current: "lorem-ipsum-5" },
-            tags: ["Video", "Short Form"],
-            category: "video",
-            subCategory: "short-form",
-            description: "Excepteur sint occaecat cupidatat non proident.",
-            order: 5,
-          },
-          {
             _id: "dummy-work-6",
             _rev: "dummy-rev-6",
             _type: "work",
@@ -165,7 +119,15 @@ export default async function WorkPage() {
           },
         ];
 
-  const workProjects = dummyWorks.map((work) => ({
+  // 디자인, 사진, AI 콘텐츠만 필터링
+  const contentWorks = dummyWorks.filter(
+    (work) =>
+      work.category === "design" ||
+      work.category === "photo" ||
+      work.category === "ai"
+  );
+
+  const workProjects = contentWorks.map((work) => ({
     id: work._id,
     title: work.title,
     tags: work.tags || [],
@@ -179,7 +141,10 @@ export default async function WorkPage() {
   return (
     <WorkPageClient
       workProjects={workProjects}
-      workCategories={workCategories}
+      workCategories={contentCategories}
+      basePath="/content"
+      pageTitle="전체 프로젝트"
     />
   );
 }
+
