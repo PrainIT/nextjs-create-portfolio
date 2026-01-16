@@ -78,7 +78,7 @@ const BottomPopup = ({
       const scrollY = document.body.style.top;
       document.body.style.overflow = bodyOverflowRef.current;
       document.body.style.top = topRef.current;
-      
+
       // 스크롤 위치 복원
       if (scrollY) {
         window.scrollTo(0, parseInt(scrollY || "0") * -1);
@@ -116,11 +116,13 @@ const BottomPopup = ({
             animate={{ height: `${measuredHeight}px` }}
             exit={{ height: 0 }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 left-0 w-full max-h-[90vh] bg-white rounded-t-2xl shadow-[0_-4px_10px_rgba(0,0,0,0.2)] z-[1000] overflow-y-auto pb-[env(safe-area-inset-bottom)]"
+            className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[1440px] max-h-[90vh] bg-white rounded-t-2xl shadow-[0_-4px_10px_rgba(0,0,0,0.2)] z-[1000] overflow-y-auto scrollbar-hide pb-[env(safe-area-inset-bottom)]"
             style={{ WebkitOverflowScrolling: "touch" }}
             onClick={handleContentClick}
           >
-            <div ref={contentRef}>{children}</div>
+            <div ref={contentRef} className="relative">
+              {children}
+            </div>
           </motion.div>
         </>
       )}
@@ -129,4 +131,3 @@ const BottomPopup = ({
 };
 
 export default BottomPopup;
-

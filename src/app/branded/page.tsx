@@ -13,7 +13,12 @@ const WORK_QUERY = `*[_type == "work"] | order(order asc, publishedAt desc) {
   subCategory,
   description,
   publishedAt,
-  order
+  order,
+  client,
+  "firstTemplate": templates[0] {
+    videoUrl,
+    videoUrls
+  }
 }`;
 
 const options = { next: { revalidate: 30 } };
@@ -88,6 +93,10 @@ export default async function BrandedPage() {
     subCategory: work.subCategory,
     slug: work.slug?.current,
     description: work.description,
+    client: work.client,
+    publishedAt: work.publishedAt,
+    videoUrl: work.firstTemplate?.videoUrl,
+    videoUrls: work.firstTemplate?.videoUrls,
   }));
 
   return (

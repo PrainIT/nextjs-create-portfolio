@@ -9,6 +9,7 @@ interface WorkCardProps {
   image?: string;
   logo?: React.ReactNode;
   isSearchMode?: boolean;
+  onTagClick?: (tag: string) => void;
 }
 
 export default function WorkCard({
@@ -18,6 +19,7 @@ export default function WorkCard({
   image,
   logo,
   isSearchMode = false,
+  onTagClick,
 }: WorkCardProps) {
   const tagsContainerRef = useRef<HTMLDivElement>(null);
   const [needsAnimation, setNeedsAnimation] = useState(false);
@@ -85,12 +87,16 @@ export default function WorkCard({
             style={{ width: "fit-content" }}
           >
             {duplicatedTags.map((tag, index) => (
-              <span
+              <button
                 key={`${tag}-${index}`}
-                className="flex-shrink-0 px-2 py-1 text-xs text-grey-400 bg-grey-700 rounded whitespace-nowrap"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onTagClick?.(tag);
+                }}
+                className="flex-shrink-0 px-2 py-1 text-xs text-grey-400 bg-grey-700 rounded whitespace-nowrap hover:bg-grey-600 hover:text-grey-200 transition-colors cursor-pointer"
               >
                 {tag}
-              </span>
+              </button>
             ))}
           </div>
         </div>
