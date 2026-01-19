@@ -13,15 +13,57 @@ export default function ContactPage() {
     projectInfo: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: "success" | "error" | null;
+    message: string;
+  }>({ type: null, message: "" });
 
   const handleSearch = (keyword: string) => {
     setSearchKeyword(keyword);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // 폼 제출 로직 추가 가능
-    console.log("Form submitted:", formData);
+    setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: "" });
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmitStatus({
+          type: "success",
+          message: data.message || "문의가 성공적으로 전송되었습니다.",
+        });
+        // 폼 초기화
+        setFormData({
+          name: "",
+          projectInfo: "",
+          message: "",
+        });
+      } else {
+        setSubmitStatus({
+          type: "error",
+          message: data.error || "문의 전송 중 오류가 발생했습니다.",
+        });
+      }
+    } catch (error) {
+      setSubmitStatus({
+        type: "error",
+        message: "네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (
@@ -119,11 +161,23 @@ export default function ContactPage() {
             className="w-full h-64 rounded-xl bg-white border border-grey-600 p-2 text-grey-600 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand"
           />
         </label>
+        {submitStatus.type && (
+          <div
+            className={`px-4 py-3 rounded-xl text-sm text-center ${
+              submitStatus.type === "success"
+                ? "bg-green-100 text-green-700 border border-green-300"
+                : "bg-red-100 text-red-700 border border-red-300"
+            }`}
+          >
+            {submitStatus.message}
+          </div>
+        )}
         <button
           type="submit"
-          className="px-12 py-4 mt-8 rounded-full bg-brand text-white text-sm font-medium hover:opacity-80 transition-opacity whitespace-nowrap mx-auto"
+          disabled={isSubmitting}
+          className="px-12 py-4 mt-8 rounded-full bg-brand text-white text-sm font-medium hover:opacity-80 transition-opacity whitespace-nowrap mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          CONTACT &gt;
+          {isSubmitting ? "전송 중..." : "CONTACT >"}
         </button>
       </form>
 
