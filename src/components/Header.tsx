@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { client } from "@/sanity/client";
 
 export default function Header() {
   const pathname = usePathname();
@@ -12,32 +11,22 @@ export default function Header() {
   const [fileName, setFileName] = useState<string>("portfolio");
 
   useEffect(() => {
-    // Sanity에서 포트폴리오 다운로드 파일 가져오기
+    // API 라우트를 통해 포트폴리오 다운로드 파일 가져오기
     const fetchPortfolioFile = async () => {
       try {
-        const portfolio = await client.fetch(
-          `*[_type == "portfolioDownload"][0] {
-            title,
-            file {
-              asset-> {
-                url,
-                originalFilename
-              },
-              originalFilename
-            }
-          }`
-        );
+        const response = await fetch("/api/portfolio-download");
         
-        if (portfolio?.file?.asset?.url) {
+        if (!response.ok) {
+          throw new Error("포트폴리오 파일을 가져올 수 없습니다.");
+        }
+
+        const data = await response.json();
+        
+        if (data.fileUrl) {
           // 다운로드를 위해 ?dl 파라미터 추가
-          const fileUrl = `${portfolio.file.asset.url}?dl`;
+          const fileUrl = `${data.fileUrl}?dl`;
           setDownloadUrl(fileUrl);
-          setFileName(
-            portfolio.file.asset.originalFilename || 
-            portfolio.file.originalFilename || 
-            portfolio.title || 
-            "portfolio"
-          );
+          setFileName(data.fileName || "portfolio");
         }
       } catch (error) {
         console.error("포트폴리오 파일을 가져오는 중 오류:", error);
