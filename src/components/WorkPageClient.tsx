@@ -275,8 +275,10 @@ export default function WorkPageClient({
       const keyword = searchKeyword.toLowerCase();
       filtered = filtered.filter(
         (project) =>
-          project.title.toLowerCase().includes(keyword) ||
-          project.tags.some((tag) => tag.toLowerCase().includes(keyword))
+          (project.title?.toLowerCase() || "").includes(keyword) ||
+          (project.tags || []).some((tag) => 
+            (tag?.toLowerCase() || "").includes(keyword)
+          )
       );
     }
 
