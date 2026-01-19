@@ -215,8 +215,8 @@ export default async function ContentPage() {
         tags: work.tags || [],
         image: thumbnail.image,
         videoUrl: thumbnail.videoUrl,
-        category: template.category || work.category,
-        subCategory: template.subCategory || work.subCategory,
+        category: template.category || work.category, // 템플릿의 category 우선 사용
+        subCategory: template.subCategory || work.subCategory, // 템플릿의 subCategory 우선 사용
         slug: work.slug?.current,
         description: template.description || work.description,
         templates: [template], // 단일 template을 배열로 유지 (팝업에서 사용 가능)

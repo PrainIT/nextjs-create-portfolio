@@ -175,14 +175,8 @@ export default function WorkDetailClient({
           <Template1
             key={index}
             {...commonProps}
-            videoUrl={
-              template.subCategory === "youtube" ? template.videoUrl : undefined
-            }
-            videoUrls={
-              template.subCategory === "short-form"
-                ? template.videoUrls
-                : undefined
-            }
+            videoUrl={template.videoUrl}
+            videoUrls={undefined}
             images={template.images || []}
           />
         );
@@ -191,14 +185,8 @@ export default function WorkDetailClient({
           <Template2
             key={index}
             {...commonProps}
-            videoUrl={
-              template.subCategory === "youtube" ? template.videoUrl : undefined
-            }
-            videoUrls={
-              template.subCategory === "short-form"
-                ? template.videoUrls
-                : undefined
-            }
+            videoUrl={undefined}
+            videoUrls={template.videoUrls}
           />
         );
       case 3:

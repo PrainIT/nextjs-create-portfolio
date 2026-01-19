@@ -16,20 +16,29 @@ interface Template1Props {
 
 const categoryLabels: Record<string, string> = {
   video: "영상 콘텐츠",
-  image: "이미지 콘텐츠",
+  design: "디자인 콘텐츠",
   photo: "사진 콘텐츠",
+  ai: "AI 콘텐츠",
 };
 
 const workCategories = [
   {
     title: "영상 콘텐츠",
     items: [
-      { label: "유튜브", value: "youtube" },
+      { label: "브랜디드 영상", value: "branded-video" },
+      { label: "캠페인 영상", value: "campaign-video" },
       { label: "숏폼", value: "short-form" },
+      { label: "웹예능", value: "web-entertainment" },
+      { label: "스케치 영상", value: "sketch-video" },
+      { label: "드라마", value: "drama" },
+      { label: "인터뷰 영상", value: "interview-video" },
+      { label: "모션그래픽", value: "motion-graphics" },
+      { label: "뮤직비디오", value: "music-video" },
+      { label: "LIVE", value: "live" },
     ],
   },
   {
-    title: "이미지 콘텐츠",
+    title: "디자인 콘텐츠",
     items: [
       { label: "SNS 콘텐츠", value: "sns-content" },
       { label: "브랜딩", value: "branding" },
@@ -50,6 +59,10 @@ const workCategories = [
       { label: "인물", value: "portrait" },
       { label: "스케치", value: "sketch" },
     ],
+  },
+  {
+    title: "AI 콘텐츠",
+    items: [],
   },
 ] as const;
 
@@ -121,34 +134,6 @@ export default function Template1({
               allowFullScreen
               className="w-full h-full"
             />
-          </div>
-        </div>
-      )}
-
-      {/* Video - 숏폼 (여러 개) */}
-      {videoUrls && videoUrls.length > 0 && (
-        <div className="mb-8">
-          <div className="grid grid-cols-2 gap-4">
-            {videoUrls
-              .filter((url) => url && getYouTubeEmbedUrl(url)) // 유효한 URL만 필터링
-              .map((url, index) => {
-                const embedUrl = getYouTubeEmbedUrl(url);
-                if (!embedUrl) return null;
-                return (
-                  <div
-                    key={index}
-                    className="relative w-full aspect-video rounded-lg overflow-hidden"
-                  >
-                    <iframe
-                      src={embedUrl}
-                      title={`${title} - Video ${index + 1}`}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="w-full h-full"
-                    />
-                  </div>
-                );
-              })}
           </div>
         </div>
       )}

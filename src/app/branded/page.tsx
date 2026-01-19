@@ -19,49 +19,20 @@ const WORK_QUERY = `*[_type == "work"] | order(order asc, publishedAt desc) {
 
 const options = { next: { revalidate: 30 } };
 
-// 모든 콘텐츠 포함
+// Industry 카테고리
 const brandedCategories = [
   {
-    title: "영상 콘텐츠",
+    title: "Industry",
     items: [
-      { label: "브랜디드 영상", value: "branded-video" },
-      { label: "캠페인 영상", value: "campaign-video" },
-      { label: "숏폼", value: "short-form" },
-      { label: "웹예능", value: "web-entertainment" },
-      { label: "스케치 영상", value: "sketch-video" },
-      { label: "드라마", value: "drama" },
-      { label: "인터뷰 영상", value: "interview-video" },
-      { label: "모션그래픽", value: "motion-graphics" },
-      { label: "뮤직비디오", value: "music-video" },
-      { label: "LIVE", value: "live" },
+      { label: "금융", value: "finance" },
+      { label: "기업PR/정부·공공기관", value: "corporate-pr-government" },
+      { label: "IT·정보통신/서비스", value: "it-communication-service" },
+      { label: "패션·뷰티/생활용품", value: "fashion-beauty-household" },
+      { label: "가전/전자", value: "appliance-electronics" },
+      { label: "식음료/제약", value: "food-beverage-pharmaceutical" },
+      { label: "자동차/건설", value: "automotive-construction" },
+      { label: "유통/기타", value: "distribution-other" },
     ],
-  },
-  {
-    title: "디자인 콘텐츠",
-    items: [
-      { label: "SNS 콘텐츠", value: "sns-content" },
-      { label: "브랜딩", value: "branding" },
-      { label: "인포그래픽", value: "infographic" },
-      { label: "포스터", value: "poster" },
-      { label: "배너", value: "banner" },
-      { label: "카드뉴스", value: "card-news" },
-      { label: "키비주얼", value: "key-visual" },
-      { label: "인쇄물", value: "print" },
-      { label: "상세페이지", value: "detail-page" },
-      { label: "패키지", value: "package" },
-    ],
-  },
-  {
-    title: "사진 콘텐츠",
-    items: [
-      { label: "제품", value: "product" },
-      { label: "인물", value: "portrait" },
-      { label: "스케치", value: "sketch" },
-    ],
-  },
-  {
-    title: "AI 콘텐츠",
-    items: [],
   },
 ] as const;
 
