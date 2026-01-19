@@ -153,7 +153,7 @@ export default async function ContentPage() {
   const getTemplateThumbnailUrl = (
     template: any
   ): { image?: string; videoUrl?: string } => {
-    // 1. videoUrl이 있으면 우선 사용
+    // 1. videoUrl이 있으면 우선 사용 (템플릿 1, 2에서 사용)
     if (template.videoUrl) {
       const videoId = getYouTubeVideoId(template.videoUrl);
       if (videoId) {
@@ -162,8 +162,13 @@ export default async function ContentPage() {
           videoUrl: template.videoUrl,
         };
       }
+      // videoUrl이 있지만 videoId 추출 실패 시에도 videoUrl 반환 (나중에 처리 가능)
+      return {
+        videoUrl: template.videoUrl,
+      };
     }
-    // 2. videoUrls 배열의 첫 번째 항목 확인
+    
+    // 2. videoUrls 배열의 첫 번째 항목 확인 (템플릿 1, 2에서 사용)
     if (template.videoUrls && template.videoUrls.length > 0) {
       const firstVideoUrl = template.videoUrls[0];
       const videoId = getYouTubeVideoId(firstVideoUrl);
@@ -173,8 +178,13 @@ export default async function ContentPage() {
           videoUrl: firstVideoUrl,
         };
       }
+      // videoUrl이 있지만 videoId 추출 실패 시에도 videoUrl 반환
+      return {
+        videoUrl: firstVideoUrl,
+      };
     }
-    // 3. images 배열의 첫 번째 항목 확인
+    
+    // 3. images 배열의 첫 번째 항목 확인 (템플릿 3, 4 또는 영상이 없을 때 fallback)
     if (template.images && template.images.length > 0) {
       return {
         image: urlForImage(template.images[0]),
@@ -194,6 +204,11 @@ export default async function ContentPage() {
     // 각 template을 개별 카드로 변환
     return work.templates.map((template: any, templateIndex: number) => {
       const thumbnail = getTemplateThumbnailUrl(template);
+      // 템플릿의 images 배열을 URL로 변환 (템플릿 3, 4용)
+      const templateImages = template.images
+        ? template.images.map((img: any) => urlForImage(img))
+        : [];
+      
       return {
         id: `${work._id}-template-${templateIndex}`,
         title: template.title || work.title,
@@ -205,6 +220,8 @@ export default async function ContentPage() {
         slug: work.slug?.current,
         description: template.description || work.description,
         templates: [template], // 단일 template을 배열로 유지 (팝업에서 사용 가능)
+        templateType: template.templateType, // 템플릿 타입 추가
+        templateImages: templateImages, // 이미지 URL 배열 추가
         workTitle: work.title, // 원본 work title도 보관
         templateDate: template.date,
       };

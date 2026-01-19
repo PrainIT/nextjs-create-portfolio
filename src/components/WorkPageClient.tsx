@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import WorkCard from "@/components/WorkCard";
@@ -22,11 +22,159 @@ interface WorkProject {
   videoUrl?: string;
   videoUrls?: string[];
   templates?: any[]; // content 페이지용
+  templateType?: number; // 템플릿 타입 (3, 4용)
+  templateImages?: string[]; // 템플릿 이미지 URL 배열 (3, 4용)
 }
 
 interface WorkCategory {
   readonly title: string;
   readonly items: readonly { readonly label: string; readonly value: string }[];
+}
+
+// 이미지 슬라이드 컴포넌트 (템플릿 3, 4용)
+function ImageSlider({ images, title }: { images: string[]; title: string }) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handlePrevious = () => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const scrollWidth = container.scrollWidth / images.length;
+      container.scrollTo({
+        left: container.scrollLeft - scrollWidth,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const handleNext = () => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const scrollWidth = container.scrollWidth / images.length;
+      container.scrollTo({
+        left: container.scrollLeft + scrollWidth,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const updateIndex = () => {
+      const scrollWidth = container.scrollWidth / images.length;
+      const index = Math.round(container.scrollLeft / scrollWidth);
+      setCurrentIndex(index);
+    };
+
+    container.addEventListener("scroll", updateIndex);
+    return () => container.removeEventListener("scroll", updateIndex);
+  }, [images.length]);
+
+  if (images.length === 0) return null;
+
+  return (
+    <div className="mb-6 relative">
+      <div
+        ref={scrollContainerRef}
+        className="w-full overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
+        <div className="flex gap-4">
+          {images.map((imageUrl, index) => (
+            <div
+              key={index}
+              className="flex-shrink-0 w-full snap-center"
+            >
+              <img
+                src={imageUrl}
+                alt={`${title} - 이미지 ${index + 1}`}
+                className="w-full h-auto rounded-lg"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 네비게이션 버튼 */}
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={handlePrevious}
+            disabled={currentIndex === 0}
+            className={`absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all ${
+              currentIndex === 0 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            aria-label="이전 이미지"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M15 18L9 12L15 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <button
+            onClick={handleNext}
+            disabled={currentIndex === images.length - 1}
+            className={`absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all ${
+              currentIndex === images.length - 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            aria-label="다음 이미지"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+
+          {/* 인디케이터 */}
+          <div className="flex gap-2 justify-center mt-4">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  if (scrollContainerRef.current) {
+                    const container = scrollContainerRef.current;
+                    const scrollWidth = container.scrollWidth / images.length;
+                    container.scrollTo({
+                      left: scrollWidth * index,
+                      behavior: "smooth",
+                    });
+                  }
+                }}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  currentIndex === index ? "bg-black w-6" : "bg-grey-300"
+                }`}
+                aria-label={`이미지 ${index + 1}로 이동`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
 interface WorkPageClientProps {
@@ -286,10 +434,23 @@ export default function WorkPageClient({
               </p>
             )}
 
-            {/* Image - description 아래 (content 페이지용) */}
+            {/* Image Slider - 템플릿 3, 4용 (content 페이지용) */}
+            {basePath === "/content" &&
+              selectedProject.templateType &&
+              (selectedProject.templateType === 3 || selectedProject.templateType === 4) &&
+              selectedProject.templateImages &&
+              selectedProject.templateImages.length > 0 && (
+                <ImageSlider images={selectedProject.templateImages} title={selectedProject.title} />
+              )}
+
+            {/* Single Image - 템플릿 1, 2 또는 일반 이미지 (content 페이지용) */}
             {basePath === "/content" &&
               selectedProject.image &&
-              !selectedProject.videoUrl && (
+              !selectedProject.videoUrl &&
+              (!selectedProject.templateType || 
+               (selectedProject.templateType !== 3 && selectedProject.templateType !== 4) ||
+               !selectedProject.templateImages ||
+               selectedProject.templateImages.length === 0) && (
                 <div className="mb-6">
                   <img
                     src={selectedProject.image}
