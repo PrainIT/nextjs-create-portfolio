@@ -3,9 +3,49 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { client } from "@/sanity/client";
 
 export default function Header() {
   const pathname = usePathname();
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string>("portfolio");
+
+  useEffect(() => {
+    // Sanity에서 포트폴리오 다운로드 파일 가져오기
+    const fetchPortfolioFile = async () => {
+      try {
+        const portfolio = await client.fetch(
+          `*[_type == "portfolioDownload"][0] {
+            title,
+            file {
+              asset-> {
+                url,
+                originalFilename
+              },
+              originalFilename
+            }
+          }`
+        );
+        
+        if (portfolio?.file?.asset?.url) {
+          // 다운로드를 위해 ?dl 파라미터 추가
+          const fileUrl = `${portfolio.file.asset.url}?dl`;
+          setDownloadUrl(fileUrl);
+          setFileName(
+            portfolio.file.asset.originalFilename || 
+            portfolio.file.originalFilename || 
+            portfolio.title || 
+            "portfolio"
+          );
+        }
+      } catch (error) {
+        console.error("포트폴리오 파일을 가져오는 중 오류:", error);
+      }
+    };
+
+    fetchPortfolioFile();
+  }, []);
 
   // 현재 경로가 링크와 일치하는지 확인하는 함수
   const isActive = (href: string) => {
@@ -65,16 +105,19 @@ export default function Header() {
           >
             CONTACT
           </Link>
-          <Link
-            href="/portfolio-download"
-            className={`text-brand text-base transition-opacity ${
-              isActive("/portfolio-download")
-                ? "opacity-100"
-                : "opacity-100 hover:opacity-80"
-            }`}
-          >
-            PORTFOLIO DOWNLOAD
-          </Link>
+          {downloadUrl ? (
+            <a
+              href={downloadUrl}
+              download={fileName}
+              className={`text-brand text-base transition-opacity opacity-100 hover:opacity-80 cursor-pointer`}
+            >
+              PORTFOLIO DOWNLOAD
+            </a>
+          ) : (
+            <span className="text-brand text-base opacity-50 cursor-not-allowed">
+              PORTFOLIO DOWNLOAD
+            </span>
+          )}
         </div>
       </nav>
     </header>
