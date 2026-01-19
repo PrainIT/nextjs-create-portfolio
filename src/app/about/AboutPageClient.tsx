@@ -183,7 +183,7 @@ export default function AboutPageClient({
   return (
     <main className="w-full">
       <div className="w-full h-px bg-grey-700 mt-12" />
-      <NavBar
+      {/* <NavBar
         pageName="ABOUT"
         title=""
         showBackButton={true}
@@ -192,10 +192,10 @@ export default function AboutPageClient({
         }}
         categories={[]}
         absolute={true}
-      />
+      /> */}
 
       {/* 검색바 - 오른쪽 위 */}
-      <div className="pl-64 pr-8 py-8">
+      {/* <div className="pl-64 pr-8 py-8">
         <div className="flex justify-end mb-8">
           <div className="w-full max-w-[850px]">
             <SearchBar
@@ -209,9 +209,9 @@ export default function AboutPageClient({
             />
           </div>
         </div>
-      </div>
+      </div> */}
 
-      <div className="flex flex-col gap-4 max-w-[850px] mb-8 mx-auto">
+      <div className="flex flex-col gap-4 max-w-[850px] mb-8 pt-20 mx-auto">
         {about.subtitle && (
           <h2 className="text-white text-2xl font-bold text-center break-words">
             {about.subtitle}

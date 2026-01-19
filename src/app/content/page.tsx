@@ -22,6 +22,9 @@ const WORK_QUERY = `*[_type == "work"] | order(order asc, publishedAt desc) {
     templateType,
     category,
     subCategory,
+    date,
+    title,
+    description,
     videoUrl,
     videoUrls,
     images[]
@@ -146,68 +149,66 @@ export default async function ContentPage() {
           },
         ];
 
-  // 썸네일 URL 추출 함수 (영상 우선, 이미지 차순, clientLogo 최후)
-  const getThumbnailUrl = (
-    work: any
+  // template 썸네일 URL 추출 함수 (영상 우선, 이미지 차순)
+  const getTemplateThumbnailUrl = (
+    template: any
   ): { image?: string; videoUrl?: string } => {
-    // 1. Template에서 첫 번째 영상 URL 찾기
-    if (work.templates && work.templates.length > 0) {
-      for (const template of work.templates) {
-        // videoUrl이 있으면 우선 사용
-        if (template.videoUrl) {
-          const videoId = getYouTubeVideoId(template.videoUrl);
-          if (videoId) {
-            return {
-              image: getYouTubeThumbnailUrl(videoId),
-              videoUrl: template.videoUrl,
-            };
-          }
-        }
-        // videoUrls 배열의 첫 번째 항목 확인
-        if (template.videoUrls && template.videoUrls.length > 0) {
-          const firstVideoUrl = template.videoUrls[0];
-          const videoId = getYouTubeVideoId(firstVideoUrl);
-          if (videoId) {
-            return {
-              image: getYouTubeThumbnailUrl(videoId),
-              videoUrl: firstVideoUrl,
-            };
-          }
-        }
-        // images 배열의 첫 번째 항목 확인
-        if (template.images && template.images.length > 0) {
-          return {
-            image: urlForImage(template.images[0]),
-          };
-        }
+    // 1. videoUrl이 있으면 우선 사용
+    if (template.videoUrl) {
+      const videoId = getYouTubeVideoId(template.videoUrl);
+      if (videoId) {
+        return {
+          image: getYouTubeThumbnailUrl(videoId),
+          videoUrl: template.videoUrl,
+        };
       }
     }
-
-    // 2. clientLogo 사용
-    if (work.clientLogo) {
+    // 2. videoUrls 배열의 첫 번째 항목 확인
+    if (template.videoUrls && template.videoUrls.length > 0) {
+      const firstVideoUrl = template.videoUrls[0];
+      const videoId = getYouTubeVideoId(firstVideoUrl);
+      if (videoId) {
+        return {
+          image: getYouTubeThumbnailUrl(videoId),
+          videoUrl: firstVideoUrl,
+        };
+      }
+    }
+    // 3. images 배열의 첫 번째 항목 확인
+    if (template.images && template.images.length > 0) {
       return {
-        image: urlForImage(work.clientLogo),
+        image: urlForImage(template.images[0]),
       };
     }
 
     return {};
   };
 
-  // 모든 콘텐츠 포함 (필터링 제거)
-  const workProjects = dummyWorks.map((work) => {
-    const thumbnail = getThumbnailUrl(work);
-    return {
-      id: work._id,
-      title: work.title,
-      tags: work.tags || [],
-      image: thumbnail.image,
-      videoUrl: thumbnail.videoUrl,
-      category: work.category,
-      subCategory: work.subCategory,
-      slug: work.slug?.current,
-      description: work.description,
-      templates: work.templates,
-    };
+  // 모든 콘텐츠 포함 - templates를 개별 카드로 펼치기
+  const workProjects = dummyWorks.flatMap((work) => {
+    // templates가 없거나 빈 배열이면 빈 배열 반환 (카드 표시 안 함)
+    if (!work.templates || work.templates.length === 0) {
+      return [];
+    }
+
+    // 각 template을 개별 카드로 변환
+    return work.templates.map((template: any, templateIndex: number) => {
+      const thumbnail = getTemplateThumbnailUrl(template);
+      return {
+        id: `${work._id}-template-${templateIndex}`,
+        title: template.title || work.title,
+        tags: work.tags || [],
+        image: thumbnail.image,
+        videoUrl: thumbnail.videoUrl,
+        category: template.category || work.category,
+        subCategory: template.subCategory || work.subCategory,
+        slug: work.slug?.current,
+        description: template.description || work.description,
+        templates: [template], // 단일 template을 배열로 유지 (팝업에서 사용 가능)
+        workTitle: work.title, // 원본 work title도 보관
+        templateDate: template.date,
+      };
+    });
   });
 
   return (

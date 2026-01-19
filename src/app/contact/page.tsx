@@ -37,7 +37,7 @@ export default function ContactPage() {
   return (
     <main className="w-full">
       <div className="w-full h-px bg-grey-700 mt-12" />
-      <NavBar
+      {/* <NavBar
         pageName="CONTACT"
         title=""
         showBackButton={true}
@@ -46,10 +46,10 @@ export default function ContactPage() {
         }}
         categories={[]}
         absolute={true}
-      />
+      /> */}
 
       {/* 검색바 - 오른쪽 위 */}
-      <div className="pl-64 pr-8 py-8">
+      {/* <div className="pl-64 pr-8 py-8">
         <div className="flex justify-end mb-8">
           <div className="w-full max-w-[850px]">
             <SearchBar
@@ -63,9 +63,10 @@ export default function ContactPage() {
             />
           </div>
         </div>
-      </div>
+      </div> */}
+
       {/* 제목 섹션 */}
-      <div className="flex flex-col gap-4 max-w-[850px] mb-8 mx-auto">
+      <div className="flex flex-col gap-4 max-w-[850px] mb-8 mx-auto pt-20">
         <h3 className="text-white text-2xl font-bold text-center">
           NICE TO MEET YOU
         </h3>
@@ -86,7 +87,7 @@ export default function ContactPage() {
       {/* 폼 */}
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-6 max-w-[550px] mx-auto mt-40"
+        className="flex flex-col gap-6 max-w-[550px] mx-auto mt-20"
       >
         <label className="flex flex-col gap-2">
           <span className="text-grey-400 text-sm">이름(필수)</span>
@@ -109,7 +110,8 @@ export default function ContactPage() {
             className="w-full h-12 rounded-xl bg-white border border-grey-600 p-2 text-grey-600 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand"
           />
         </label>
-        <label className="flex flex-col gap-2 mt-24">
+        <label className="flex flex-col gap-2 mt-12">
+          <span className="text-grey-400 text-sm">메시지</span>
           <textarea
             name="message"
             value={formData.message}
@@ -126,7 +128,7 @@ export default function ContactPage() {
       </form>
 
       {/* 하단 선 - 전체 너비 */}
-      <div className="w-full h-px bg-grey-700 mt-12" />
+      <div className="w-full h-px bg-grey-700 mt-24" />
 
       {/* 저작권 텍스트 - 전체 너비 (navbar 영역 포함) */}
       <div className="w-full text-center py-6">
