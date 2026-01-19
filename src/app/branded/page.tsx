@@ -14,9 +14,7 @@ const WORK_QUERY = `*[_type == "work"] | order(order asc, publishedAt desc) {
   description,
   publishedAt,
   order,
-  client,
-  videoUrl,
-  videoUrls
+  client
 }`;
 
 const options = { next: { revalidate: 30 } };
@@ -118,8 +116,6 @@ export default async function BrandedPage() {
     description: work.description,
     client: work.client,
     publishedAt: work.publishedAt,
-    videoUrl: work.videoUrl,
-    videoUrls: work.videoUrls,
   }));
 
   return (
