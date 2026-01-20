@@ -32,6 +32,13 @@ const CLIENT_QUERY = `*[_type == "client"] | order(order asc) {
   order
 }`;
 
+const WORK_QUERY = `*[_type == "work"] {
+  _id,
+  title,
+  slug,
+  client
+}`;
+
 const SOCIAL_LINK_QUERY = `*[_type == "socialLink"] | order(order asc) {
   _id,
   name,
@@ -54,6 +61,7 @@ export default async function IndexPage() {
     {},
     options
   );
+  const works = await client.fetch<SanityDocument[]>(WORK_QUERY, {}, options);
   const socialLinks = await client.fetch<SanityDocument[]>(
     SOCIAL_LINK_QUERY,
     {},
@@ -116,6 +124,23 @@ export default async function IndexPage() {
     filters: brand.filters || [],
   }));
 
+  // 클라이언트와 work를 매칭하여 slug 찾기
+  const getWorkSlugForClient = (clientName: string): string | null => {
+    const matchingWork = works.find(
+      (work) => work.client && work.client.toLowerCase() === clientName.toLowerCase()
+    );
+    return matchingWork?.slug?.current || null;
+  };
+
+  // 클라이언트 데이터에서 5개 무작위 선별
+  const getRandomClients = (count: number = 5) => {
+    if (clients.length === 0) return [];
+    
+    // 배열 복사 후 셔플
+    const shuffled = [...clients].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, Math.min(count, clients.length));
+  };
+
   // floatText 데이터를 HeroSection 형식으로 변환
   // 높이는 랜덤하게 생성 (10vh ~ 90vh 사이)
   const generateRandomTop = (index: number, total: number) => {
@@ -125,8 +150,20 @@ export default async function IndexPage() {
     return `${Math.max(5, Math.min(95, basePosition + randomOffset))}vh`;
   };
 
+  // 클라이언트에서 5개 무작위 선별하여 companies 생성
+  const selectedClients = getRandomClients(5);
   const companies =
-    floatTexts.length > 0
+    selectedClients.length > 0
+      ? selectedClients.map((client, index) => {
+          const workSlug = getWorkSlugForClient(client.name);
+          return {
+            name: client.name || "",
+            highlighted: false,
+            top: generateRandomTop(index, selectedClients.length),
+            slug: workSlug ? `/branded/${workSlug}` : "",
+          };
+        })
+      : floatTexts.length > 0
       ? floatTexts.map((item, index) => ({
           name: item.floatText || "",
           highlighted: item.highlighted || false,

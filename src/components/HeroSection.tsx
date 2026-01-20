@@ -118,7 +118,11 @@ function CompanyCard({
         onHoverEnd={() => setIsHovered(false)}
         onClick={() => {
           if (company.slug) {
-            router.push(`/${company.slug}`);
+            // slug가 이미 경로로 시작하는 경우 그대로 사용, 아니면 / 추가
+            const path = company.slug.startsWith("/") 
+              ? company.slug 
+              : `/${company.slug}`;
+            router.push(path);
           }
         }}
         whileHover={{
