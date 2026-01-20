@@ -177,6 +177,129 @@ function ImageSlider({ images, title }: { images: string[]; title: string }) {
   );
 }
 
+// 숏폼 비디오 슬라이드 컴포넌트 (Template2 스타일)
+function ShortFormSlider({ videoUrls, title }: { videoUrls: string[]; title: string }) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // 유튜브는 단일, 숏폼은 배열로 처리
+  const allVideoUrls =
+    videoUrls && videoUrls.length > 0
+      ? videoUrls.filter((url) => url && url.trim()) // 빈 URL 필터링
+      : [];
+
+  // 유효한 URL만 필터링
+  const validUrls = allVideoUrls.filter((url) => {
+    const embedUrl = getYouTubeEmbedUrl(url);
+    return embedUrl && embedUrl.length > 0;
+  });
+
+  const handlePrev = () => {
+    if (!scrollContainerRef.current) return;
+    const container = scrollContainerRef.current;
+    const scrollAmount = container.clientWidth / 3; // 3개 중 1개씩 스크롤
+    container.scrollBy({
+      left: -scrollAmount,
+      behavior: "smooth",
+    });
+  };
+
+  const handleNext = () => {
+    if (!scrollContainerRef.current) return;
+    const container = scrollContainerRef.current;
+    const scrollAmount = container.clientWidth / 3; // 3개 중 1개씩 스크롤
+    container.scrollBy({
+      left: scrollAmount,
+      behavior: "smooth",
+    });
+  };
+
+  if (validUrls.length === 0) return null;
+
+  return (
+    <div className="mb-6 relative">
+      <div
+        ref={scrollContainerRef}
+        className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
+        style={{
+          scrollSnapType: "x mandatory",
+        }}
+      >
+        {validUrls.map((url, index) => {
+          const embedUrl = getYouTubeEmbedUrl(url);
+          if (!embedUrl) return null;
+          return (
+            <div
+              key={index}
+              className="flex-shrink-0 w-[calc(33.333%-0.67rem)] min-w-[calc(33.333%-0.67rem)]"
+              style={{
+                scrollSnapAlign: "start",
+              }}
+            >
+              <div className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden bg-grey-800">
+                <iframe
+                  src={embedUrl}
+                  title={`${title} - Video ${index + 1}`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Carousel Controls */}
+      {validUrls.length > 3 && (
+        <>
+          <button
+            onClick={handlePrev}
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-grey-900/80 hover:bg-grey-800 flex items-center justify-center transition-colors z-10"
+            aria-label="이전 비디오"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10 12L6 8L10 4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <button
+            onClick={handleNext}
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-grey-900/80 hover:bg-grey-800 flex items-center justify-center transition-colors z-10"
+            aria-label="다음 비디오"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 4L10 8L6 12"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
 interface WorkPageClientProps {
   workProjects: WorkProject[];
   workCategories: readonly WorkCategory[];
@@ -463,47 +586,70 @@ export default function WorkPageClient({
               )}
 
             {/* Video - description 아래 */}
-            {selectedProject.videoUrl && (
-              <div className="mb-6">
-                <div className="relative w-full aspect-video rounded-lg overflow-hidden">
-                  <iframe
-                    src={getYouTubeEmbedUrl(selectedProject.videoUrl)}
-                    title={selectedProject.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full h-full"
-                  />
-                </div>
-              </div>
-            )}
-
-            {selectedProject.videoUrls &&
-              selectedProject.videoUrls.length > 0 && (
-                <div className="mb-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    {selectedProject.videoUrls
-                      .filter((url) => url && getYouTubeEmbedUrl(url))
-                      .map((url, index) => {
-                        const embedUrl = getYouTubeEmbedUrl(url);
-                        if (!embedUrl) return null;
-                        return (
-                          <div
-                            key={index}
-                            className="relative w-full aspect-video rounded-lg overflow-hidden"
-                          >
-                            <iframe
-                              src={embedUrl}
-                              title={`${selectedProject.title} - Video ${index + 1}`}
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                              className="w-full h-full"
-                            />
-                          </div>
-                        );
-                      })}
+            {/* 숏폼인 경우 */}
+            {selectedProject.subCategory === "short-form" ? (
+              <>
+                {/* 숏폼 비디오 - videoUrls 우선, 없으면 videoUrl 사용 */}
+                {(() => {
+                  // videoUrls가 있으면 사용, 없으면 videoUrl을 배열로 변환
+                  const videoUrls = selectedProject.videoUrls && selectedProject.videoUrls.length > 0
+                    ? selectedProject.videoUrls
+                    : selectedProject.videoUrl
+                      ? [selectedProject.videoUrl]
+                      : [];
+                  
+                  if (videoUrls.length === 0) return null;
+                  
+                  // Template2 스타일로 항상 표시
+                  return <ShortFormSlider videoUrls={videoUrls} title={selectedProject.title} />;
+                })()}
+              </>
+            ) : (
+              <>
+                {/* 일반 비디오 - 단일 */}
+                {selectedProject.videoUrl && !selectedProject.videoUrls && (
+                  <div className="mb-6">
+                    <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+                      <iframe
+                        src={getYouTubeEmbedUrl(selectedProject.videoUrl)}
+                        title={selectedProject.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="w-full h-full"
+                      />
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+                {/* 일반 비디오 - 여러 개 */}
+                {selectedProject.videoUrls &&
+                  selectedProject.videoUrls.length > 0 && (
+                    <div className="mb-6">
+                      <div className="grid grid-cols-2 gap-4">
+                        {selectedProject.videoUrls
+                          .filter((url) => url && getYouTubeEmbedUrl(url))
+                          .map((url, index) => {
+                            const embedUrl = getYouTubeEmbedUrl(url);
+                            if (!embedUrl) return null;
+                            return (
+                              <div
+                                key={index}
+                                className="relative w-full aspect-video rounded-lg overflow-hidden"
+                              >
+                                <iframe
+                                  src={embedUrl}
+                                  title={`${selectedProject.title} - Video ${index + 1}`}
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                  className="w-full h-full"
+                                />
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  )}
+              </>
+            )}
 
             {/* Tags - video 아래, 위아래 divider */}
             {selectedProject.tags && selectedProject.tags.length > 0 && (
