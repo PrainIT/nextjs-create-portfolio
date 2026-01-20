@@ -607,19 +607,30 @@ export default function WorkPageClient({
             ) : (
               <>
                 {/* 일반 비디오 - 단일 */}
-                {selectedProject.videoUrl && !selectedProject.videoUrls && (
-                  <div className="mb-6">
-                    <div className="relative w-full aspect-video rounded-lg overflow-hidden">
-                      <iframe
-                        src={getYouTubeEmbedUrl(selectedProject.videoUrl)}
-                        title={selectedProject.title}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        className="w-full h-full"
-                      />
-                    </div>
-                  </div>
-                )}
+                {(() => {
+                  if (!selectedProject.videoUrl) return null;
+                  
+                  const embedUrl = getYouTubeEmbedUrl(selectedProject.videoUrl);
+                  const hasVideoUrls = selectedProject.videoUrls && selectedProject.videoUrls.length > 0;
+                  
+                  // videoUrl이 있고 videoUrls가 없거나 비어있을 때 단일 비디오 표시
+                  if (embedUrl && !hasVideoUrls) {
+                    return (
+                      <div className="mb-6">
+                        <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+                          <iframe
+                            src={embedUrl}
+                            title={selectedProject.title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full h-full"
+                          />
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
                 {/* 일반 비디오 - 여러 개 */}
                 {selectedProject.videoUrls &&
                   selectedProject.videoUrls.length > 0 && (

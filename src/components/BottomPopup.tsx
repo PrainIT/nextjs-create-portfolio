@@ -66,9 +66,37 @@ const BottomPopup = ({
   useEffect(() => {
     if (isInDOM) {
       if (wrapChildren && contentRef.current) {
-        // 자식 요소의 실제 높이를 측정
-        const h = contentRef.current.offsetHeight;
-        if (h > 0) setMeasuredHeight(h);
+        // 높이 측정 함수
+        const measureHeight = () => {
+          if (contentRef.current) {
+            const h = contentRef.current.offsetHeight;
+            if (h > 0) setMeasuredHeight(h);
+          }
+        };
+
+        // 즉시 측정
+        measureHeight();
+
+        // iframe 등 비동기 콘텐츠 로드를 위해 약간의 지연 후 재측정
+        const timeoutId = setTimeout(measureHeight, 100);
+        const timeoutId2 = setTimeout(measureHeight, 500);
+
+        // ResizeObserver로 크기 변경 감지
+        let resizeObserver: ResizeObserver | null = null;
+        if (typeof ResizeObserver !== 'undefined' && contentRef.current) {
+          resizeObserver = new ResizeObserver(() => {
+            measureHeight();
+          });
+          resizeObserver.observe(contentRef.current);
+        }
+
+        return () => {
+          clearTimeout(timeoutId);
+          clearTimeout(timeoutId2);
+          if (resizeObserver) {
+            resizeObserver.disconnect();
+          }
+        };
       } else if (_heightPixel) {
         // heightOption에 주어진 정적인 높이 사용
         setMeasuredHeight(_heightPixel);
