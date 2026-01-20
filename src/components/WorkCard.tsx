@@ -1,13 +1,14 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
+import { getYouTubeEmbedUrl, isYouTubeShorts } from "@/components/work-utils/youtube";
 
 interface WorkCardProps {
   id: number;
   title: string;
   tags: string[];
   image?: string;
-  videoUrl?: string; // YouTube URL (썸네일용)
+  videoUrl?: string; // YouTube URL (영상 표시용)
   logo?: React.ReactNode;
   isSearchMode?: boolean;
   forceSquare?: boolean; // branded에서 무조건 정사각형으로 표시
@@ -70,7 +71,17 @@ export default function WorkCard({
             : {}
         }
       >
-        {image ? (
+        {videoUrl ? (
+          <div className={`relative w-full ${isYouTubeShorts(videoUrl) ? "aspect-[9/16]" : "aspect-video"}`}>
+            <iframe
+              src={getYouTubeEmbedUrl(videoUrl)}
+              title={title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute inset-0 w-full h-full rounded-2xl"
+            />
+          </div>
+        ) : image ? (
           <img
             src={image}
             alt={title}

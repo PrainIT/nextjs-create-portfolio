@@ -126,3 +126,10 @@ export function getYouTubeThumbnailUrl(videoId: string): string {
   return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
 }
 
+/**
+ * YouTube URL이 Shorts인지 확인
+ */
+export function isYouTubeShorts(url: string): boolean {
+  if (!url) return false;
+  return url.includes("/shorts/") || url.includes("youtube.com/shorts/") || url.includes("m.youtube.com/shorts/");
+}
