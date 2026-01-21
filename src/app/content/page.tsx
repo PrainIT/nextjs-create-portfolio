@@ -16,6 +16,7 @@ const CONTENT_QUERY = `*[_type == "content"] | order(date desc, _createdAt desc)
   title,
   descriptionBranded,
   descriptionContent,
+  tags,
   videoUrl,
   videoUrls,
   images[],
@@ -130,7 +131,7 @@ export default async function ContentPage() {
     return {
       id: content._id,
       title: content.title || '제목 없음',
-      tags: [], // content는 tags가 없으므로 빈 배열
+      tags: content.tags || [], // Content 팝업에서 표시될 태그들
       image: thumbnail.image,
       videoUrl: thumbnail.videoUrl,
       videoUrls: content.videoUrls || [],

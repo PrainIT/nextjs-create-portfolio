@@ -8,13 +8,14 @@ const WORK_QUERY = `*[_type == "branded" && slug.current == $slug][0] {
   title,
   slug,
   image,
+  clientLogo,
   tags,
   category,
   subCategory,
   publishedAt,
   order,
   "client": clientRef->name,
-  "clientLogo": clientRef->logo,
+  "clientRefLogo": clientRef->logo,
   summary,
   award {
     title,
@@ -59,6 +60,13 @@ export default async function BrandedDetailPage({
   }
 
   const workImageUrl = work?.image ? urlForImage(work.image) : null;
+  
+  // clientLogo 우선, 없으면 clientRef 로고 사용
+  const clientLogoUrl = work?.clientLogo 
+    ? urlForImage(work.clientLogo) 
+    : work?.clientRefLogo 
+      ? urlForImage(work.clientRefLogo) 
+      : null;
 
   // 콘텐츠 이미지 URL 변환
   const contentsWithImageUrls =
@@ -71,6 +79,7 @@ export default async function BrandedDetailPage({
     <WorkDetailClient
       work={{
         ...work,
+        clientLogoUrl,
         contents: contentsWithImageUrls,
       }}
       workImageUrl={workImageUrl}

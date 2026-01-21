@@ -7,13 +7,14 @@ const WORK_QUERY = `*[_type == "branded"] | order(order asc, publishedAt desc) {
   _id,
   title,
   slug,
+  clientLogo,
   tags,
   category,
   subCategory,
   publishedAt,
   order,
   "client": clientRef->name,
-  "clientLogo": clientRef->logo
+  "clientRefLogo": clientRef->logo
 }`;
 
 const options = { next: { revalidate: 30 } };
@@ -72,17 +73,21 @@ export default async function BrandedPage() {
         ];
 
   // 모든 콘텐츠 포함 (필터링 제거)
-  const workProjects = dummyWorks.map((work) => ({
-    id: work._id,
-    title: work.title,
-    tags: work.tags || [],
-    image: work.clientLogo ? urlForImage(work.clientLogo) : undefined,
-    category: work.category,
-    subCategory: work.subCategory,
-    slug: work.slug?.current,
-    client: work.client,
-    publishedAt: work.publishedAt,
-  }));
+  const workProjects = dummyWorks.map((work) => {
+    // clientLogo 우선, 없으면 clientRef 로고 사용
+    const logoImage = work.clientLogo || work.clientRefLogo;
+    return {
+      id: work._id,
+      title: work.title,
+      tags: work.tags || [],
+      image: logoImage ? urlForImage(logoImage) : undefined,
+      category: work.category,
+      subCategory: work.subCategory,
+      slug: work.slug?.current,
+      client: work.client,
+      publishedAt: work.publishedAt,
+    };
+  });
 
   return (
     <WorkPageClient
