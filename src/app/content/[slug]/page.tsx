@@ -3,7 +3,7 @@ import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/utils";
 import WorkDetailClient from "@/components/WorkDetailClient";
 
-const WORK_QUERY = `*[_type == "work" && slug.current == $slug][0] {
+const WORK_QUERY = `*[_type == "branded" && slug.current == $slug][0] {
   _id,
   title,
   slug,

@@ -14,10 +14,13 @@ const CONTENT_QUERY = `*[_type == "content"] | order(date desc, _createdAt desc)
   subCategory,
   date,
   title,
-  description,
+  descriptionBranded,
+  descriptionContent,
   videoUrl,
   videoUrls,
-  images[]
+  images[],
+  "client": clientRef->name,
+  "clientLogo": clientRef->logo
 }`;
 
 const options = { next: { revalidate: 30 } };
@@ -134,7 +137,9 @@ export default async function ContentPage() {
       category: content.category,
       subCategory: content.subCategory,
       slug: undefined, // content는 slug가 없음
-      description: content.description,
+      description: content.descriptionContent, // Content 팝업용 설명
+      descriptionBranded: content.descriptionBranded, // Branded 상세용 설명
+      client: content.client, // 클라이언트 이름
       contents: [content], // 단일 content를 배열로 유지 (팝업에서 사용 가능)
       contentType: content.contentType,
       contentImages: contentImages,

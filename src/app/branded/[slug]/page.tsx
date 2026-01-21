@@ -3,7 +3,7 @@ import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/utils";
 import WorkDetailClient from "@/components/WorkDetailClient";
 
-const WORK_QUERY = `*[_type == "work" && slug.current == $slug][0] {
+const WORK_QUERY = `*[_type == "branded" && slug.current == $slug][0] {
   _id,
   title,
   slug,
@@ -13,7 +13,8 @@ const WORK_QUERY = `*[_type == "work" && slug.current == $slug][0] {
   subCategory,
   publishedAt,
   order,
-  client,
+  "client": clientRef->name,
+  "clientLogo": clientRef->logo,
   summary,
   award {
     title,
@@ -26,10 +27,11 @@ const WORK_QUERY = `*[_type == "work" && slug.current == $slug][0] {
     subCategory,
     date,
     title,
-    description,
+    "description": descriptionBranded,
     videoUrl,
     videoUrls,
-    images[]
+    images[],
+    "client": clientRef->name
   }
 }`;
 

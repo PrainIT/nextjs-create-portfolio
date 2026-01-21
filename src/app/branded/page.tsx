@@ -3,17 +3,17 @@ import WorkPageClient from "@/components/WorkPageClient";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/utils";
 
-const WORK_QUERY = `*[_type == "work"] | order(order asc, publishedAt desc) {
+const WORK_QUERY = `*[_type == "branded"] | order(order asc, publishedAt desc) {
   _id,
   title,
   slug,
-  clientLogo,
   tags,
   category,
   subCategory,
   publishedAt,
   order,
-  client
+  "client": clientRef->name,
+  "clientLogo": clientRef->logo
 }`;
 
 const options = { next: { revalidate: 30 } };
@@ -46,7 +46,7 @@ export default async function BrandedPage() {
           {
             _id: "dummy-work-2",
             _rev: "dummy-rev-2",
-            _type: "work",
+            _type: "branded",
             _createdAt: new Date().toISOString(),
             _updatedAt: new Date().toISOString(),
             title: "Consectetur Adipiscing Elit",
@@ -59,7 +59,7 @@ export default async function BrandedPage() {
           {
             _id: "dummy-work-5",
             _rev: "dummy-rev-5",
-            _type: "work",
+            _type: "branded",
             _createdAt: new Date().toISOString(),
             _updatedAt: new Date().toISOString(),
             title: "Quis Nostrud Exercitation",

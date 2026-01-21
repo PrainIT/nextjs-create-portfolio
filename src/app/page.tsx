@@ -5,7 +5,7 @@ import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/utils";
 import { type SanityDocument } from "next-sanity";
 
-const BRAND_QUERY = `*[_type == "brand"] | order(order asc, publishedAt desc) {
+const BRAND_QUERY = `*[_type == "dashboardCard"] | order(order asc, publishedAt desc) {
   _id,
   title,
   slug,
@@ -32,7 +32,7 @@ const CLIENT_QUERY = `*[_type == "client"] | order(order asc) {
   order
 }`;
 
-const WORK_QUERY = `*[_type == "work"] {
+const WORK_QUERY = `*[_type == "branded"] {
   _id,
   title,
   slug,
@@ -76,7 +76,7 @@ export default async function IndexPage() {
           {
             _id: "dummy-brand-1",
             _rev: "dummy-rev-1",
-            _type: "brand",
+            _type: "dashboardCard",
             _createdAt: new Date().toISOString(),
             _updatedAt: new Date().toISOString(),
             title: "11번가 공식 인스타그램 운영",
@@ -89,7 +89,7 @@ export default async function IndexPage() {
           {
             _id: "dummy-brand-2",
             _rev: "dummy-rev-2",
-            _type: "brand",
+            _type: "dashboardCard",
             _createdAt: new Date().toISOString(),
             _updatedAt: new Date().toISOString(),
             title: "제스프리 코리아 DPR",
@@ -102,7 +102,7 @@ export default async function IndexPage() {
           {
             _id: "dummy-brand-3",
             _rev: "dummy-rev-3",
-            _type: "brand",
+            _type: "dashboardCard",
             _createdAt: new Date().toISOString(),
             _updatedAt: new Date().toISOString(),
             title: "롯데월드 공식 유튜브",

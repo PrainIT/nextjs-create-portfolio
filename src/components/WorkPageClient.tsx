@@ -534,7 +534,7 @@ export default function WorkPageClient({
 
             {/* Client 이름 - title 상단 */}
             {selectedProject.client && (
-              <div className="text-sm text-black mb-2">
+              <div className="text-lg text-black mb-2">
                 {selectedProject.client}
               </div>
             )}
