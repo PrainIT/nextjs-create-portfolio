@@ -466,6 +466,7 @@ export default function WorkPageClient({
                     isSearchMode={isSearching}
                     forceSquare={basePath === "/branded"}
                     forceFullHeight={basePath === "/content"}
+                    disableVideoInteraction={basePath === "/content"}
                     onTagClick={handleTagClick}
                   />
                 </div>
@@ -488,6 +489,7 @@ export default function WorkPageClient({
                     isSearchMode={isSearching}
                     forceSquare={basePath === "/branded"}
                     forceFullHeight={basePath === "/content"}
+                    disableVideoInteraction={basePath === "/content"}
                     onTagClick={handleTagClick}
                   />
                 </div>

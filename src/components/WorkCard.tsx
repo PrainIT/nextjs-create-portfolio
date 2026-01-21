@@ -13,6 +13,7 @@ interface WorkCardProps {
   isSearchMode?: boolean;
   forceSquare?: boolean; // branded에서 무조건 정사각형으로 표시
   forceFullHeight?: boolean; // content에서 무조건 h-full로 표시
+  disableVideoInteraction?: boolean; // 유튜브 재생 버튼 숨김 및 클릭 방지
   onTagClick?: (tag: string) => void;
 }
 
@@ -26,6 +27,7 @@ export default function WorkCard({
   isSearchMode = false,
   forceSquare = false,
   forceFullHeight = false,
+  disableVideoInteraction = false,
   onTagClick,
 }: WorkCardProps) {
   const tagsContainerRef = useRef<HTMLDivElement>(null);
@@ -74,11 +76,13 @@ export default function WorkCard({
         {videoUrl ? (
           <div className={`relative w-full ${isYouTubeShorts(videoUrl) ? "aspect-[9/16]" : "aspect-video"}`}>
             <iframe
-              src={getYouTubeEmbedUrl(videoUrl)}
+              src={getYouTubeEmbedUrl(videoUrl, { disableControls: disableVideoInteraction })}
               title={title}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-              className="absolute inset-0 w-full h-full rounded-2xl"
+              className={`absolute inset-0 w-full h-full rounded-2xl ${
+                disableVideoInteraction ? "pointer-events-none" : ""
+              }`}
             />
           </div>
         ) : image ? (

@@ -1,11 +1,18 @@
 /**
  * YouTube URL을 embed URL로 변환
+ * @param url YouTube URL
+ * @param options 옵션 객체 (disableControls: 재생 버튼 숨김)
  */
-export function getYouTubeEmbedUrl(url: string): string {
+export function getYouTubeEmbedUrl(url: string, options?: { disableControls?: boolean }): string {
   if (!url) return "";
 
   // 이미 embed URL인 경우
   if (url.includes("youtube.com/embed/") || url.includes("youtu.be/embed/")) {
+    // 기존 URL에 파라미터가 있는지 확인하고 추가
+    const separator = url.includes("?") ? "&" : "?";
+    if (options?.disableControls) {
+      return `${url}${separator}controls=0`;
+    }
     return url;
   }
 
@@ -60,7 +67,11 @@ export function getYouTubeEmbedUrl(url: string): string {
 
   // video ID를 찾았으면 embed URL 반환
   if (videoId) {
-    return `https://www.youtube.com/embed/${videoId}`;
+    const baseUrl = `https://www.youtube.com/embed/${videoId}`;
+    if (options?.disableControls) {
+      return `${baseUrl}?controls=0`;
+    }
+    return baseUrl;
   }
 
   // video ID를 찾지 못한 경우 빈 문자열 반환 (에러 방지)
