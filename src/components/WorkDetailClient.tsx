@@ -11,8 +11,8 @@ import Template3 from "@/components/work-templates/Template3";
 import Template4 from "@/components/work-templates/Template4";
 import SearchBar from "@/components/SearchBar";
 
-interface Template {
-  templateType: number;
+interface Content {
+  contentType: number;
   category?: string;
   subCategory?: string;
   date?: string;
@@ -31,7 +31,7 @@ interface WorkDetailClientProps {
       title?: string;
       description?: string;
     };
-    templates?: Template[];
+    contents?: Content[];
   };
   workImageUrl: string | null;
   basePath: string; // "/branded" 또는 "/content"
@@ -97,8 +97,8 @@ export default function WorkDetailClient({
   pageName,
 }: WorkDetailClientProps) {
   const router = useRouter();
-  const templateRefs = useRef<Record<number, HTMLDivElement | null>>({});
-  const [activeTemplate, setActiveTemplate] = useState<number | null>(null);
+  const contentRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const [activeContent, setActiveContent] = useState<number | null>(null);
   const [showStickyNav, setShowStickyNav] = useState(false);
 
   const displayPageName = pageName || (basePath === "/branded" ? "BRANDED" : "CONTENT");
@@ -117,17 +117,17 @@ export default function WorkDetailClient({
     );
   };
 
-  const scrollToTemplate = (templateIndex: number) => {
-    const template = work.templates?.[templateIndex];
-    if (template && templateRefs.current[templateIndex]) {
-      templateRefs.current[templateIndex]?.scrollIntoView({
+  const scrollToContent = (contentIndex: number) => {
+    const content = work.contents?.[contentIndex];
+    if (content && contentRefs.current[contentIndex]) {
+      contentRefs.current[contentIndex]?.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
     }
   };
 
-  // 스크롤 감지로 activeTemplate 업데이트 및 sticky nav 표시
+  // 스크롤 감지로 activeContent 업데이트 및 sticky nav 표시
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + window.innerHeight / 2;
@@ -135,15 +135,15 @@ export default function WorkDetailClient({
       // 첫 화면을 벗어났는지 확인 (스크롤이 100px 이상)
       setShowStickyNav(window.scrollY > 700);
 
-      work.templates?.forEach((_, index) => {
-        const element = templateRefs.current[index];
+      work.contents?.forEach((_, index) => {
+        const element = contentRefs.current[index];
         if (element) {
           const { offsetTop, offsetHeight } = element;
           if (
             scrollPosition >= offsetTop &&
             scrollPosition < offsetTop + offsetHeight
           ) {
-            setActiveTemplate(index);
+            setActiveContent(index);
           }
         }
       });
@@ -153,31 +153,31 @@ export default function WorkDetailClient({
     handleScroll(); // 초기 실행
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [work.templates]);
+  }, [work.contents]);
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "";
     return new Date(dateString).toLocaleDateString("ko-KR");
   };
 
-  const renderTemplate = (template: Template, index: number) => {
+  const renderContent = (content: Content, index: number) => {
     const commonProps = {
-      category: template.category,
-      subCategory: template.subCategory,
-      date: template.date,
-      title: template.title || "",
-      description: template.description || "",
+      category: content.category,
+      subCategory: content.subCategory,
+      date: content.date,
+      title: content.title || "",
+      description: content.description || "",
     };
 
-    switch (template.templateType) {
+    switch (content.contentType) {
       case 1:
         return (
           <Template1
             key={index}
             {...commonProps}
-            videoUrl={template.videoUrl}
+            videoUrl={content.videoUrl}
             videoUrls={undefined}
-            images={template.images || []}
+            images={content.images || []}
           />
         );
       case 2:
@@ -186,7 +186,7 @@ export default function WorkDetailClient({
             key={index}
             {...commonProps}
             videoUrl={undefined}
-            videoUrls={template.videoUrls}
+            videoUrls={content.videoUrls}
           />
         );
       case 3:
@@ -194,7 +194,7 @@ export default function WorkDetailClient({
           <Template3
             key={index}
             {...commonProps}
-            images={template.images || []}
+            images={content.images || []}
           />
         );
       case 4:
@@ -202,7 +202,7 @@ export default function WorkDetailClient({
           <Template4
             key={index}
             {...commonProps}
-            images={template.images || []}
+            images={content.images || []}
           />
         );
       default:
@@ -309,20 +309,20 @@ export default function WorkDetailClient({
               </div>
             )}
           </div>
-          {/* Template Navigation */}
-          {work.templates && work.templates.length > 0 && (
+          {/* Content Navigation */}
+          {work.contents && work.contents.length > 0 && (
             <div className="sticky top-[0%] flex flex-col gap-2 py-2.5">
-              {work.templates.map((template, index) => (
+              {work.contents.map((content, index) => (
                 <button
                   key={index}
-                  onClick={() => scrollToTemplate(index)}
+                  onClick={() => scrollToContent(index)}
                   className={`w-full text-center px-4 py-2 rounded-full text-xl font-medium transition-all ${
-                    activeTemplate === index
+                    activeContent === index
                       ? "bg-brand text-white border-none"
                       : "border border-grey-700 text-grey-700 hover:text-white hover:border-white"
                   }`}
                 >
-                  Template {template.templateType}
+                  Content {content.contentType}
                 </button>
               ))}
             </div>
@@ -355,17 +355,17 @@ export default function WorkDetailClient({
               </motion.div>
             )}
 
-            {/* Templates */}
-            {work.templates && work.templates.length > 0 && (
+            {/* Contents */}
+            {work.contents && work.contents.length > 0 && (
               <div className="space-y-24">
-                {work.templates.map((template, index) => (
+                {work.contents.map((content, index) => (
                   <div
                     key={index}
                     ref={(el) => {
-                      templateRefs.current[index] = el;
+                      contentRefs.current[index] = el;
                     }}
                   >
-                    {renderTemplate(template, index)}
+                    {renderContent(content, index)}
                   </div>
                 ))}
               </div>

@@ -21,9 +21,9 @@ interface WorkProject {
   publishedAt?: string;
   videoUrl?: string;
   videoUrls?: string[];
-  templates?: any[]; // content 페이지용
-  templateType?: number; // 템플릿 타입 (3, 4용)
-  templateImages?: string[]; // 템플릿 이미지 URL 배열 (3, 4용)
+  contents?: any[]; // content 페이지용
+  contentType?: number; // 콘텐츠 타입 (3, 4용)
+  contentImages?: string[]; // 콘텐츠 이미지 URL 배열 (3, 4용)
 }
 
 interface WorkCategory {
@@ -561,23 +561,23 @@ export default function WorkPageClient({
               </p>
             )}
 
-            {/* Image Slider - 템플릿 3, 4용 (content 페이지용) */}
+            {/* Image Slider - 콘텐츠 3, 4용 (content 페이지용) */}
             {basePath === "/content" &&
-              selectedProject.templateType &&
-              (selectedProject.templateType === 3 || selectedProject.templateType === 4) &&
-              selectedProject.templateImages &&
-              selectedProject.templateImages.length > 0 && (
-                <ImageSlider images={selectedProject.templateImages} title={selectedProject.title} />
+              selectedProject.contentType &&
+              (selectedProject.contentType === 3 || selectedProject.contentType === 4) &&
+              selectedProject.contentImages &&
+              selectedProject.contentImages.length > 0 && (
+                <ImageSlider images={selectedProject.contentImages} title={selectedProject.title} />
               )}
 
-            {/* Single Image - 템플릿 1, 2 또는 일반 이미지 (content 페이지용) */}
+            {/* Single Image - 콘텐츠 1, 2 또는 일반 이미지 (content 페이지용) */}
             {basePath === "/content" &&
               selectedProject.image &&
               !selectedProject.videoUrl &&
-              (!selectedProject.templateType || 
-               (selectedProject.templateType !== 3 && selectedProject.templateType !== 4) ||
-               !selectedProject.templateImages ||
-               selectedProject.templateImages.length === 0) && (
+              (!selectedProject.contentType || 
+               (selectedProject.contentType !== 3 && selectedProject.contentType !== 4) ||
+               !selectedProject.contentImages ||
+               selectedProject.contentImages.length === 0) && (
                 <div className="mb-6">
                   <img
                     src={selectedProject.image}

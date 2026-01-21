@@ -7,27 +7,17 @@ import {
   getYouTubeThumbnailUrl,
 } from "@/components/work-utils/youtube";
 
-const WORK_QUERY = `*[_type == "work"] | order(order asc, publishedAt desc) {
+const CONTENT_QUERY = `*[_type == "content"] | order(date desc, _createdAt desc) {
   _id,
-  title,
-  slug,
-  clientLogo,
-  tags,
+  contentType,
   category,
   subCategory,
-  publishedAt,
-  order,
-  templates[] {
-    templateType,
-    category,
-    subCategory,
-    date,
-    title,
-    description,
-    videoUrl,
-    videoUrls,
-    images[]
-  }
+  date,
+  title,
+  description,
+  videoUrl,
+  videoUrls,
+  images[]
 }`;
 
 const options = { next: { revalidate: 30 } };
@@ -79,89 +69,30 @@ const contentCategories = [
 ] as const;
 
 export default async function ContentPage() {
-  const works = await client.fetch<SanityDocument[]>(WORK_QUERY, {}, options);
+  const contents = await client.fetch<SanityDocument[]>(CONTENT_QUERY, {}, options);
 
-  // 더미 데이터 생성
-  const dummyWorks: SanityDocument[] =
-    works.length > 0
-      ? works
-      : [
-          {
-            _id: "dummy-work-1",
-            _rev: "dummy-rev-1",
-            _type: "work",
-            _createdAt: new Date().toISOString(),
-            _updatedAt: new Date().toISOString(),
-            title: "Lorem Ipsum Dolor Sit Amet",
-            slug: { current: "lorem-ipsum-1" },
-            tags: ["0.5 Photo", "0.5 Video"],
-            category: "design",
-            subCategory: "sns-content",
-            order: 1,
-          },
-          {
-            _id: "dummy-work-3",
-            _rev: "dummy-rev-3",
-            _type: "work",
-            _createdAt: new Date().toISOString(),
-            _updatedAt: new Date().toISOString(),
-            title: "Sed Do Eiusmod Tempor",
-            slug: { current: "lorem-ipsum-3" },
-            tags: ["Photo", "Product"],
-            category: "photo",
-            subCategory: "product",
-            order: 3,
-          },
-          {
-            _id: "dummy-work-4",
-            _rev: "dummy-rev-4",
-            _type: "work",
-            _createdAt: new Date().toISOString(),
-            _updatedAt: new Date().toISOString(),
-            title: "Ut Enim Ad Minim Veniam",
-            slug: { current: "lorem-ipsum-4" },
-            tags: ["Design", "Branding"],
-            category: "design",
-            subCategory: "branding",
-            order: 4,
-          },
-          {
-            _id: "dummy-work-6",
-            _rev: "dummy-rev-6",
-            _type: "work",
-            _createdAt: new Date().toISOString(),
-            _updatedAt: new Date().toISOString(),
-            title: "Duis Aute Irure Dolor",
-            slug: { current: "lorem-ipsum-6" },
-            tags: ["Photo", "Portrait"],
-            category: "photo",
-            subCategory: "portrait",
-            order: 6,
-          },
-        ];
-
-  // template 썸네일 URL 추출 함수 (영상 우선, 이미지 차순)
-  const getTemplateThumbnailUrl = (
-    template: any
+  // 콘텐츠 썸네일 URL 추출 함수 (영상 우선, 이미지 차순)
+  const getContentThumbnailUrl = (
+    content: any
   ): { image?: string; videoUrl?: string } => {
-    // 1. videoUrl이 있으면 우선 사용 (템플릿 1, 2에서 사용)
-    if (template.videoUrl) {
-      const videoId = getYouTubeVideoId(template.videoUrl);
+    // 1. videoUrl이 있으면 우선 사용 (콘텐츠 1, 2에서 사용)
+    if (content.videoUrl) {
+      const videoId = getYouTubeVideoId(content.videoUrl);
       if (videoId) {
         return {
           image: getYouTubeThumbnailUrl(videoId),
-          videoUrl: template.videoUrl,
+          videoUrl: content.videoUrl,
         };
       }
       // videoUrl이 있지만 videoId 추출 실패 시에도 videoUrl 반환 (나중에 처리 가능)
       return {
-        videoUrl: template.videoUrl,
+        videoUrl: content.videoUrl,
       };
     }
     
-    // 2. videoUrls 배열의 첫 번째 항목 확인 (템플릿 1, 2에서 사용)
-    if (template.videoUrls && template.videoUrls.length > 0) {
-      const firstVideoUrl = template.videoUrls[0];
+    // 2. videoUrls 배열의 첫 번째 항목 확인 (콘텐츠 1, 2에서 사용)
+    if (content.videoUrls && content.videoUrls.length > 0) {
+      const firstVideoUrl = content.videoUrls[0];
       const videoId = getYouTubeVideoId(firstVideoUrl);
       if (videoId) {
         return {
@@ -175,49 +106,40 @@ export default async function ContentPage() {
       };
     }
     
-    // 3. images 배열의 첫 번째 항목 확인 (템플릿 3, 4 또는 영상이 없을 때 fallback)
-    if (template.images && template.images.length > 0) {
+    // 3. images 배열의 첫 번째 항목 확인 (콘텐츠 3, 4 또는 영상이 없을 때 fallback)
+    if (content.images && content.images.length > 0) {
       return {
-        image: urlForImage(template.images[0]),
+        image: urlForImage(content.images[0]),
       };
     }
 
     return {};
   };
 
-  // 모든 콘텐츠 포함 - templates를 개별 카드로 펼치기
-  const workProjects = dummyWorks.flatMap((work) => {
-    // templates가 없거나 빈 배열이면 빈 배열 반환 (카드 표시 안 함)
-    if (!work.templates || work.templates.length === 0) {
-      return [];
-    }
-
-    // 각 template을 개별 카드로 변환
-    return work.templates.map((template: any, templateIndex: number) => {
-      const thumbnail = getTemplateThumbnailUrl(template);
-      // 템플릿의 images 배열을 URL로 변환 (템플릿 3, 4용)
-      const templateImages = template.images
-        ? template.images.map((img: any) => urlForImage(img))
-        : [];
-      
-      return {
-        id: `${work._id}-template-${templateIndex}`,
-        title: template.title || work.title,
-        tags: work.tags || [],
-        image: thumbnail.image,
-        videoUrl: thumbnail.videoUrl,
-        videoUrls: template.videoUrls || [], // 템플릿의 videoUrls 배열 추가
-        category: template.category || work.category, // 템플릿의 category 우선 사용
-        subCategory: template.subCategory || work.subCategory, // 템플릿의 subCategory 우선 사용
-        slug: work.slug?.current,
-        description: template.description,
-        templates: [template], // 단일 template을 배열로 유지 (팝업에서 사용 가능)
-        templateType: template.templateType, // 템플릿 타입 추가
-        templateImages: templateImages, // 이미지 URL 배열 추가
-        workTitle: work.title, // 원본 work title도 보관
-        templateDate: template.date,
-      };
-    });
+  // 각 content를 개별 카드로 변환
+  const workProjects = contents.map((content: any) => {
+    const thumbnail = getContentThumbnailUrl(content);
+    // 콘텐츠의 images 배열을 URL로 변환 (콘텐츠 3, 4용)
+    const contentImages = content.images
+      ? content.images.map((img: any) => urlForImage(img))
+      : [];
+    
+    return {
+      id: content._id,
+      title: content.title || '제목 없음',
+      tags: [], // content는 tags가 없으므로 빈 배열
+      image: thumbnail.image,
+      videoUrl: thumbnail.videoUrl,
+      videoUrls: content.videoUrls || [],
+      category: content.category,
+      subCategory: content.subCategory,
+      slug: undefined, // content는 slug가 없음
+      description: content.description,
+      contents: [content], // 단일 content를 배열로 유지 (팝업에서 사용 가능)
+      contentType: content.contentType,
+      contentImages: contentImages,
+      contentDate: content.date,
+    };
   });
 
   return (

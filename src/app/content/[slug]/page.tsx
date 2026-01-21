@@ -19,8 +19,9 @@ const WORK_QUERY = `*[_type == "work" && slug.current == $slug][0] {
     title,
     description
   },
-  templates[] {
-    templateType,
+  contents[]-> {
+    _id,
+    contentType,
     category,
     subCategory,
     date,
@@ -57,18 +58,18 @@ export default async function ContentDetailPage({
 
   const workImageUrl = work?.image ? urlForImage(work.image) : null;
 
-  // 템플릿 이미지 URL 변환
-  const templatesWithImageUrls =
-    work?.templates?.map((template: any) => ({
-      ...template,
-      images: template.images?.map((img: any) => urlForImage(img)) || [],
+  // 콘텐츠 이미지 URL 변환
+  const contentsWithImageUrls =
+    work?.contents?.map((content: any) => ({
+      ...content,
+      images: content.images?.map((img: any) => urlForImage(img)) || [],
     })) || [];
 
   return (
     <WorkDetailClient
       work={{
         ...work,
-        templates: templatesWithImageUrls,
+        contents: contentsWithImageUrls,
       }}
       workImageUrl={workImageUrl}
       basePath="/content"
