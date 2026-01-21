@@ -2,22 +2,30 @@
 
 import React from "react";
 
-export const filters = [
-  { name: "전체", count: 0 },
-  { name: "릴스 Reels", count: 0 },
-  { name: "숏품 Short-form", count: 0 },
-  { name: "숏츠 Shorts", count: 0 },
-  { name: "브이로그 Vlog", count: 0 },
-  { name: "브랜디드 영상 Branded Film", count: 0 },
-  { name: "예능 Entertainment", count: 0 },
-  { name: "스케치 영상 Sketch Film", count: 0 },
-  { name: "드라마 Drama", count: 0 },
-  { name: "인터뷰 Interview", count: 0 },
-  { name: "바이럴영상 Viral", count: 0 },
+// Industry 서브카테고리 필터 (value와 label 매핑)
+export const industrySubCategories = [
+  { value: "finance", label: "금융" },
+  { value: "corporate-pr-government", label: "기업PR/정부·공공기관" },
+  { value: "it-communication-service", label: "IT·정보통신/서비스" },
+  { value: "fashion-beauty-household", label: "패션·뷰티/생활용품" },
+  { value: "appliance-electronics", label: "가전/전자" },
+  { value: "food-beverage-pharmaceutical", label: "식음료/제약" },
+  { value: "automotive-construction", label: "자동차/건설" },
+  { value: "distribution-other", label: "유통/기타" },
 ];
+
+// 기본 필터 (Industry 서브카테고리 기반)
+export const defaultFilters = [
+  { name: "전체", value: "all", count: 0 },
+  ...industrySubCategories.map(cat => ({ name: cat.label, value: cat.value, count: 0 }))
+];
+
+// 호환성을 위해 filters도 export
+export const filters = defaultFilters;
 
 interface FilterWithCount {
   name: string;
+  value: string;
   count: number;
 }
 
@@ -25,7 +33,7 @@ interface SearchAndFilterProps {
   searchKeyword: string;
   onSearchChange: (keyword: string) => void;
   selectedFilter: string;
-  onFilterChange: (filter: string) => void;
+  onFilterChange: (filterValue: string) => void;
   filtersWithCount: FilterWithCount[];
 }
 
@@ -88,12 +96,12 @@ export default function SearchAndFilter({
           {filtersWithCount.map((filter, index) => {
             const isNewRow = index > 0 && index % 5 === 0;
             return (
-              <React.Fragment key={filter.name}>
+              <React.Fragment key={filter.value}>
                 {isNewRow && <div className="w-full basis-full" />}
                 <button
-                  onClick={() => onFilterChange(filter.name)}
+                  onClick={() => onFilterChange(filter.value)}
                   className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all border ${
-                    selectedFilter === filter.name
+                    selectedFilter === filter.value
                       ? "border-[#FF6B35] text-[#FF6B35]"
                       : "border-grey-600 text-grey-600 hover:border-grey-100 hover:text-grey-100"
                   }`}

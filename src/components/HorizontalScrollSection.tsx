@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
 export interface ContentCard {
@@ -10,7 +11,7 @@ export interface ContentCard {
   subDescription: string;
   image?: string;
   slug?: string;
-  filters?: string[];
+  subCategory?: string; // Industry 서브카테고리
 }
 
 interface HorizontalScrollSectionProps {
@@ -20,8 +21,15 @@ interface HorizontalScrollSectionProps {
 export default function HorizontalScrollSection({
   cards,
 }: HorizontalScrollSectionProps) {
+  const router = useRouter();
   const carouselRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
+
+  const handleCardClick = (slug?: string) => {
+    if (slug) {
+      router.push(`/branded/${slug}`);
+    }
+  };
 
   // 섹션 높이 및 가로 스크롤 효과
   useEffect(() => {
@@ -159,8 +167,9 @@ export default function HorizontalScrollSection({
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05, duration: 0.3 }}
-                      className="lg:w-[407px] min-w-[307px] flex-shrink-0"
+                      className={`lg:w-[407px] min-w-[307px] flex-shrink-0 ${card.slug ? 'cursor-pointer' : ''}`}
                       style={{ willChange: "transform, opacity" }}
+                      onClick={() => handleCardClick(card.slug)}
                     >
                       <div className="bg-grey-800 rounded-2xl overflow-hidden aspect-[407/878] relative">
                         {card.image ? (

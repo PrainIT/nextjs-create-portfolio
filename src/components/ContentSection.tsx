@@ -1,39 +1,38 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import SearchAndFilter, { filters } from "./SearchAndFilter";
+import SearchAndFilter, { defaultFilters } from "./SearchAndFilter";
 import HorizontalScrollSection, {
   ContentCard,
 } from "./HorizontalScrollSection";
 
 interface ContentSectionProps {
   contentCards: ContentCard[];
+  subCategoryCounts?: Record<string, number>; // 서브카테고리별 카운트
 }
 
-export default function ContentSection({ contentCards }: ContentSectionProps) {
-  const [selectedFilter, setSelectedFilter] = useState(filters[0].name);
+export default function ContentSection({ contentCards, subCategoryCounts }: ContentSectionProps) {
+  const [selectedFilter, setSelectedFilter] = useState("all");
   const [searchKeyword, setSearchKeyword] = useState("");
 
-  // 필터별 카운트 계산
+  // 필터별 카운트 계산 (Industry 서브카테고리 기반)
   const filtersWithCount = useMemo(() => {
-    return filters.map((filter) => {
-      if (filter.name === "전체") {
+    return defaultFilters.map((filter) => {
+      if (filter.value === "all") {
         return { ...filter, count: contentCards.length };
       }
-      const count = contentCards.filter((card) =>
-        card.filters?.includes(filter.name)
-      ).length;
+      const count = subCategoryCounts?.[filter.value] || 0;
       return { ...filter, count };
     });
-  }, [contentCards]);
+  }, [contentCards, subCategoryCounts]);
 
   // 필터링된 카드
   const filteredCards = useMemo(() => {
     let filtered = contentCards;
 
-    if (selectedFilter && selectedFilter !== "전체") {
+    if (selectedFilter && selectedFilter !== "all") {
       filtered = filtered.filter((card) =>
-        card.filters?.includes(selectedFilter)
+        card.subCategory === selectedFilter
       );
     }
 
