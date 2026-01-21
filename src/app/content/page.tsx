@@ -15,7 +15,6 @@ const WORK_QUERY = `*[_type == "work"] | order(order asc, publishedAt desc) {
   tags,
   category,
   subCategory,
-  description,
   publishedAt,
   order,
   templates[] {
@@ -98,8 +97,6 @@ export default async function ContentPage() {
             tags: ["0.5 Photo", "0.5 Video"],
             category: "design",
             subCategory: "sns-content",
-            description:
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             order: 1,
           },
           {
@@ -113,8 +110,6 @@ export default async function ContentPage() {
             tags: ["Photo", "Product"],
             category: "photo",
             subCategory: "product",
-            description:
-              "Ut enim ad minim veniam, quis nostrud exercitation ullamco.",
             order: 3,
           },
           {
@@ -128,8 +123,6 @@ export default async function ContentPage() {
             tags: ["Design", "Branding"],
             category: "design",
             subCategory: "branding",
-            description:
-              "Duis aute irure dolor in reprehenderit in voluptate velit esse.",
             order: 4,
           },
           {
@@ -143,8 +136,6 @@ export default async function ContentPage() {
             tags: ["Photo", "Portrait"],
             category: "photo",
             subCategory: "portrait",
-            description:
-              "Sunt in culpa qui officia deserunt mollit anim id est laborum.",
             order: 6,
           },
         ];
@@ -219,7 +210,7 @@ export default async function ContentPage() {
         category: template.category || work.category, // 템플릿의 category 우선 사용
         subCategory: template.subCategory || work.subCategory, // 템플릿의 subCategory 우선 사용
         slug: work.slug?.current,
-        description: template.description || work.description,
+        description: template.description,
         templates: [template], // 단일 template을 배열로 유지 (팝업에서 사용 가능)
         templateType: template.templateType, // 템플릿 타입 추가
         templateImages: templateImages, // 이미지 URL 배열 추가

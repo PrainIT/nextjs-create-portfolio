@@ -11,7 +11,6 @@ const WORK_QUERY = `*[_type == "work"] | order(order asc, publishedAt desc) {
   tags,
   category,
   subCategory,
-  description,
   publishedAt,
   order,
   client
@@ -55,8 +54,6 @@ export default async function BrandedPage() {
             tags: ["Video", "Motion Graphics"],
             category: "video",
             subCategory: "branded-video",
-            description:
-              "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             order: 2,
           },
           {
@@ -70,7 +67,6 @@ export default async function BrandedPage() {
             tags: ["Video", "Short Form"],
             category: "video",
             subCategory: "short-form",
-            description: "Excepteur sint occaecat cupidatat non proident.",
             order: 5,
           },
         ];
@@ -84,7 +80,6 @@ export default async function BrandedPage() {
     category: work.category,
     subCategory: work.subCategory,
     slug: work.slug?.current,
-    description: work.description,
     client: work.client,
     publishedAt: work.publishedAt,
   }));

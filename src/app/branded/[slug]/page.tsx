@@ -11,7 +11,6 @@ const WORK_QUERY = `*[_type == "work" && slug.current == $slug][0] {
   tags,
   category,
   subCategory,
-  description,
   publishedAt,
   order,
   client,
