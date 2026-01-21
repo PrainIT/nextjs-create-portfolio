@@ -16,14 +16,6 @@ const BRAND_QUERY = `*[_type == "branded"] | order(order asc, publishedAt desc) 
   order
 }`;
 
-const FLOAT_TEXT_QUERY = `*[_type == "floatText"] | order(order asc) {
-  _id,
-  floatText,
-  slug,
-  highlighted,
-  order
-}`;
-
 const CLIENT_QUERY = `*[_type == "client"] | order(order asc) {
   _id,
   name,
@@ -50,11 +42,6 @@ const options = { next: { revalidate: 30 } };
 
 export default async function IndexPage() {
   const brands = await client.fetch<SanityDocument[]>(BRAND_QUERY, {}, options);
-  const floatTexts = await client.fetch<SanityDocument[]>(
-    FLOAT_TEXT_QUERY,
-    {},
-    options
-  );
   const clients = await client.fetch<SanityDocument[]>(
     CLIENT_QUERY,
     {},
@@ -145,7 +132,6 @@ export default async function IndexPage() {
     return shuffled.slice(0, Math.min(count, clients.length));
   };
 
-  // floatText 데이터를 HeroSection 형식으로 변환
   // 높이는 랜덤하게 생성 (10vh ~ 90vh 사이)
   const generateRandomTop = (index: number, total: number) => {
     // 각 항목이 고르게 분산되도록 하되 약간의 랜덤성 추가
@@ -167,14 +153,8 @@ export default async function IndexPage() {
             slug: workSlug ? `/branded/${workSlug}` : "",
           };
         })
-      : floatTexts.length > 0
-      ? floatTexts.map((item, index) => ({
-          name: item.floatText || "",
-          highlighted: item.highlighted || false,
-          top: generateRandomTop(index, floatTexts.length),
-          slug: item.slug?.current || "",
-        }))
       : [
+          // 클라이언트 데이터가 없을 때 더미 데이터
           {
             name: "ZESPRI",
             highlighted: false,
