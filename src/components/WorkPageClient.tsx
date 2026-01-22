@@ -588,10 +588,10 @@ export default function WorkPageClient({
               )}
 
             {/* Video - description 아래 */}
-            {/* 숏폼인 경우 */}
-            {selectedProject.subCategory === "short-form" ? (
+            {/* content2이거나 숏폼인 경우 */}
+            {selectedProject.contentType === 2 || selectedProject.subCategory === "short-form" ? (
               <>
-                {/* 숏폼 비디오 - videoUrls 우선, 없으면 videoUrl 사용 */}
+                {/* content2 또는 숏폼 비디오 - videoUrls 우선, 없으면 videoUrl 사용 */}
                 {(() => {
                   // videoUrls가 있으면 사용, 없으면 videoUrl을 배열로 변환
                   const videoUrls = selectedProject.videoUrls && selectedProject.videoUrls.length > 0
