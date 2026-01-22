@@ -178,7 +178,15 @@ function ImageSlider({ images, title }: { images: string[]; title: string }) {
 }
 
 // 숏폼 비디오 슬라이드 컴포넌트 (Template2 스타일)
-function ShortFormSlider({ videoUrls, title }: { videoUrls: string[]; title: string }) {
+function ShortFormSlider({ 
+  videoUrls, 
+  title, 
+  singleView = false 
+}: { 
+  videoUrls: string[]; 
+  title: string; 
+  singleView?: boolean;
+}) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // 유튜브는 단일, 숏폼은 배열로 처리
@@ -196,7 +204,9 @@ function ShortFormSlider({ videoUrls, title }: { videoUrls: string[]; title: str
   const handlePrev = () => {
     if (!scrollContainerRef.current) return;
     const container = scrollContainerRef.current;
-    const scrollAmount = container.clientWidth / 3; // 3개 중 1개씩 스크롤
+    const scrollAmount = singleView 
+      ? container.clientWidth 
+      : container.clientWidth / 3; // 하나씩 보일 때는 전체 너비, 아니면 3개 중 1개씩
     container.scrollBy({
       left: -scrollAmount,
       behavior: "smooth",
@@ -206,7 +216,9 @@ function ShortFormSlider({ videoUrls, title }: { videoUrls: string[]; title: str
   const handleNext = () => {
     if (!scrollContainerRef.current) return;
     const container = scrollContainerRef.current;
-    const scrollAmount = container.clientWidth / 3; // 3개 중 1개씩 스크롤
+    const scrollAmount = singleView 
+      ? container.clientWidth 
+      : container.clientWidth / 3; // 하나씩 보일 때는 전체 너비, 아니면 3개 중 1개씩
     container.scrollBy({
       left: scrollAmount,
       behavior: "smooth",
@@ -230,7 +242,11 @@ function ShortFormSlider({ videoUrls, title }: { videoUrls: string[]; title: str
           return (
             <div
               key={index}
-              className="flex-shrink-0 w-[calc(33.333%-0.67rem)] min-w-[calc(33.333%-0.67rem)]"
+              className={`flex-shrink-0 ${
+                singleView 
+                  ? "w-full min-w-full" 
+                  : "w-[calc(33.333%-0.67rem)] min-w-[calc(33.333%-0.67rem)]"
+              }`}
               style={{
                 scrollSnapAlign: "start",
               }}
@@ -250,7 +266,7 @@ function ShortFormSlider({ videoUrls, title }: { videoUrls: string[]; title: str
       </div>
 
       {/* Carousel Controls */}
-      {validUrls.length > 3 && (
+      {validUrls.length > (singleView ? 1 : 3) && (
         <>
           <button
             onClick={handlePrev}
@@ -591,19 +607,31 @@ export default function WorkPageClient({
             {/* content2이거나 숏폼인 경우 */}
             {selectedProject.contentType === 2 || selectedProject.subCategory === "short-form" ? (
               <>
-                {/* content2 또는 숏폼 비디오 - videoUrls 우선, 없으면 videoUrl 사용 */}
+                {/* content2 또는 숏폼 비디오 - BottomPopup에서는 첫 번째 하나만 표시 */}
                 {(() => {
-                  // videoUrls가 있으면 사용, 없으면 videoUrl을 배열로 변환
-                  const videoUrls = selectedProject.videoUrls && selectedProject.videoUrls.length > 0
-                    ? selectedProject.videoUrls
-                    : selectedProject.videoUrl
-                      ? [selectedProject.videoUrl]
-                      : [];
+                  // videoUrls가 있으면 첫 번째만 사용, 없으면 videoUrl 사용
+                  const firstVideoUrl = selectedProject.videoUrls && selectedProject.videoUrls.length > 0
+                    ? selectedProject.videoUrls[0]
+                    : selectedProject.videoUrl;
                   
-                  if (videoUrls.length === 0) return null;
+                  if (!firstVideoUrl) return null;
                   
-                  // Template2 스타일로 항상 표시
-                  return <ShortFormSlider videoUrls={videoUrls} title={selectedProject.title} />;
+                  const embedUrl = getYouTubeEmbedUrl(firstVideoUrl);
+                  if (!embedUrl) return null;
+                  
+                  return (
+                    <div className="mb-6">
+                      <div className="relative w-full max-w-sm mx-auto aspect-[9/16] rounded-2xl overflow-hidden bg-grey-800">
+                        <iframe
+                          src={embedUrl}
+                          title={selectedProject.title}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          className="w-full h-full"
+                        />
+                      </div>
+                    </div>
+                  );
                 })()}
               </>
             ) : (
