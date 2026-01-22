@@ -2,7 +2,7 @@
 
 import { type SanityDocument } from "next-sanity";
 import { motion } from "framer-motion";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Template1 from "@/components/work-templates/Template1";
@@ -12,6 +12,7 @@ import Template4 from "@/components/work-templates/Template4";
 import SearchBar from "@/components/SearchBar";
 
 interface Content {
+  _id?: string;
   contentType: number;
   category?: string;
   subCategory?: string;
@@ -21,6 +22,8 @@ interface Content {
   videoUrl?: string;
   videoUrls?: string[];
   images?: string[];
+  content2Role?: 'base' | 'attach' | null;
+  attachToContentId?: string | null;
 }
 
 interface WorkDetailClientProps {
@@ -117,8 +120,79 @@ export default function WorkDetailClient({
     );
   };
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "";
+    return new Date(dateString).toLocaleDateString("ko-KR");
+  };
+
+  // Content2 그룹화 및 videoUrls 병합 로직 (branded 페이지에서만)
+  const processedContents = useMemo(() => {
+    if (basePath !== "/branded" || !work.contents) {
+      return work.contents || [];
+    }
+
+    const baseContent2Map = new Map<string, Content>(); // _id -> 기준 Content2
+    const attachContent2List: Content[] = []; // 보조 Content2 목록
+
+    // 1단계: Content2를 기준/보조로 분류
+    work.contents.forEach((content) => {
+      if (content.contentType === 2) {
+        if (content.content2Role === 'base') {
+          // 기준 Content2
+          if (content._id) {
+            baseContent2Map.set(content._id, { ...content });
+          }
+        } else if (content.content2Role === 'attach') {
+          // 보조 Content2
+          attachContent2List.push(content);
+        } else {
+          // content2Role이 없는 경우 (기존 데이터 호환성) - 기준으로 처리
+          if (content._id) {
+            baseContent2Map.set(content._id, { ...content });
+          }
+        }
+      }
+    });
+
+    // 2단계: 보조 Content2의 videoUrls를 기준 Content2에 병합
+    attachContent2List.forEach((attachContent) => {
+      if (attachContent.attachToContentId) {
+        const baseContent = baseContent2Map.get(attachContent.attachToContentId);
+        if (baseContent) {
+          // videoUrls 병합
+          const baseUrls = baseContent.videoUrls || [];
+          const attachUrls = attachContent.videoUrls || [];
+          baseContent.videoUrls = [...baseUrls, ...attachUrls];
+        }
+      }
+    });
+
+    // 3단계: 최종 배열 구성 (보조 Content2는 제외)
+    const finalContents: Content[] = [];
+    work.contents.forEach((content) => {
+      if (content.contentType === 2 && content.content2Role === 'attach') {
+        // 보조 Content2는 제외
+        return;
+      }
+      
+      // 기준 Content2인 경우 병합된 videoUrls 사용
+      if (content.contentType === 2 && content._id) {
+        const mergedContent = baseContent2Map.get(content._id);
+        if (mergedContent) {
+          finalContents.push(mergedContent);
+          return;
+        }
+      }
+      
+      // 그 외는 그대로 추가
+      finalContents.push(content);
+    });
+
+    return finalContents;
+  }, [basePath, work.contents]);
+
   const scrollToContent = (contentIndex: number) => {
-    const content = work.contents?.[contentIndex];
+    const content = processedContents?.[contentIndex];
     if (content && contentRefs.current[contentIndex]) {
       contentRefs.current[contentIndex]?.scrollIntoView({
         behavior: "smooth",
@@ -135,7 +209,7 @@ export default function WorkDetailClient({
       // 첫 화면을 벗어났는지 확인 (스크롤이 100px 이상)
       setShowStickyNav(window.scrollY > 700);
 
-      work.contents?.forEach((_, index) => {
+      processedContents?.forEach((_, index) => {
         const element = contentRefs.current[index];
         if (element) {
           const { offsetTop, offsetHeight } = element;
@@ -153,12 +227,7 @@ export default function WorkDetailClient({
     handleScroll(); // 초기 실행
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [work.contents]);
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return "";
-    return new Date(dateString).toLocaleDateString("ko-KR");
-  };
+  }, [processedContents]);
 
   const renderContent = (content: Content, index: number) => {
     const commonProps = {
@@ -310,9 +379,9 @@ export default function WorkDetailClient({
             )}
           </div>
           {/* Content Navigation */}
-          {work.contents && work.contents.length > 0 && (
+          {processedContents && processedContents.length > 0 && (
             <div className="sticky top-[0%] flex flex-col gap-2 py-2.5">
-              {work.contents.map((content, index) => (
+              {processedContents.map((content, index) => (
                 <button
                   key={index}
                   onClick={() => scrollToContent(index)}
@@ -356,11 +425,11 @@ export default function WorkDetailClient({
             )}
 
             {/* Contents */}
-            {work.contents && work.contents.length > 0 && (
+            {processedContents && processedContents.length > 0 && (
               <div className="space-y-24">
-                {work.contents.map((content, index) => (
+                {processedContents.map((content, index) => (
                   <div
-                    key={index}
+                    key={content._id || index}
                     ref={(el) => {
                       contentRefs.current[index] = el;
                     }}

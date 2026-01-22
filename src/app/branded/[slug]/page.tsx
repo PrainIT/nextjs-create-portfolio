@@ -21,18 +21,26 @@ const WORK_QUERY = `*[_type == "branded" && slug.current == $slug][0] {
     title,
     description
   },
-  contents[]-> {
-    _id,
-    contentType,
-    category,
-    subCategory,
-    date,
-    title,
-    "description": descriptionBranded,
-    videoUrl,
-    videoUrls,
-    images[],
-    "client": clientRef->name
+  contents[] {
+    content2Role,
+    "content": contentRef-> {
+      _id,
+      contentType,
+      category,
+      subCategory,
+      date,
+      title,
+      "description": descriptionBranded,
+      videoUrl,
+      videoUrls,
+      images[],
+      "client": clientRef->name
+    },
+    "attachToContent": attachToContentRef-> {
+      _id,
+      contentType,
+      title
+    }
   }
 }`;
 
@@ -68,12 +76,21 @@ export default async function BrandedDetailPage({
       ? urlForImage(work.clientRefLogo) 
       : null;
 
-  // 콘텐츠 이미지 URL 변환
+  // 콘텐츠 이미지 URL 변환 및 구조 변환
   const contentsWithImageUrls =
-    work?.contents?.map((content: any) => ({
-      ...content,
-      images: content.images?.map((img: any) => urlForImage(img)) || [],
-    })) || [];
+    work?.contents?.map((item: any) => {
+      if (!item.content) return null;
+      
+      const content = {
+        ...item.content,
+        images: item.content.images?.map((img: any) => urlForImage(img)) || [],
+        // Content2 역할 정보 추가
+        content2Role: item.content2Role || null,
+        attachToContentId: item.attachToContent?._id || null,
+      };
+      
+      return content;
+    }).filter(Boolean) || [];
 
   return (
     <WorkDetailClient
