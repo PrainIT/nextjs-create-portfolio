@@ -19,6 +19,7 @@ const CONTENT_QUERY = `*[_type == "content"] | order(date desc, _createdAt desc)
   tags,
   videoUrl,
   videoUrls,
+  thumbnailImage,
   images[],
   "client": clientRef->name,
   "clientLogo": clientRef->logo
@@ -75,11 +76,18 @@ const contentCategories = [
 export default async function ContentPage() {
   const contents = await client.fetch<SanityDocument[]>(CONTENT_QUERY, {}, options);
 
-  // 콘텐츠 썸네일 URL 추출 함수 (영상 우선, 이미지 차순)
+  // 콘텐츠 썸네일 URL 추출 함수 (썸네일 이미지 우선, 영상 차순)
   const getContentThumbnailUrl = (
     content: any
   ): { image?: string; videoUrl?: string } => {
-    // 1. videoUrl이 있으면 우선 사용 (콘텐츠 1, 2에서 사용)
+    // 1. thumbnailImage가 있으면 우선 사용 (Content 1, 2용)
+    if (content.thumbnailImage) {
+      return {
+        image: urlForImage(content.thumbnailImage),
+      };
+    }
+    
+    // 2. videoUrl이 있으면 사용 (콘텐츠 1, 2에서 사용)
     if (content.videoUrl) {
       const videoId = getYouTubeVideoId(content.videoUrl);
       if (videoId) {
@@ -88,13 +96,13 @@ export default async function ContentPage() {
           videoUrl: content.videoUrl,
         };
       }
-      // videoUrl이 있지만 videoId 추출 실패 시에도 videoUrl 반환 (나중에 처리 가능)
+      // videoUrl이 있지만 videoId 추출 실패 시에도 videoUrl 반환
       return {
         videoUrl: content.videoUrl,
       };
     }
     
-    // 2. videoUrls 배열의 첫 번째 항목 확인 (콘텐츠 1, 2에서 사용)
+    // 3. videoUrls 배열의 첫 번째 항목 확인 (콘텐츠 1, 2에서 사용)
     if (content.videoUrls && content.videoUrls.length > 0) {
       const firstVideoUrl = content.videoUrls[0];
       const videoId = getYouTubeVideoId(firstVideoUrl);
@@ -110,7 +118,7 @@ export default async function ContentPage() {
       };
     }
     
-    // 3. images 배열의 첫 번째 항목 확인 (콘텐츠 3, 4 또는 영상이 없을 때 fallback)
+    // 4. images 배열의 첫 번째 항목 확인 (콘텐츠 3, 4 또는 영상이 없을 때 fallback)
     if (content.images && content.images.length > 0) {
       return {
         image: urlForImage(content.images[0]),
@@ -145,6 +153,7 @@ export default async function ContentPage() {
       contentType: content.contentType,
       contentImages: contentImages,
       contentDate: content.date,
+      hasThumbnailImage: !!content.thumbnailImage, // 썸네일 이미지 여부
     };
   });
 

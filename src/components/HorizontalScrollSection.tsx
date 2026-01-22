@@ -3,6 +3,7 @@
 import { useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { getYouTubeEmbedUrl } from "@/components/work-utils/youtube";
 
 export interface ContentCard {
   id: string;
@@ -10,6 +11,8 @@ export interface ContentCard {
   description: string;
   subDescription: string;
   image?: string;
+  videoUrl?: string; // 유튜브 영상 URL (이미지가 없을 때 사용)
+  contentType?: number; // 1: 유튜브, 2: 숏폼
   slug?: string;
   subCategory?: string; // Industry 서브카테고리
 }
@@ -171,12 +174,26 @@ export default function HorizontalScrollSection({
                       style={{ willChange: "transform, opacity" }}
                       onClick={() => handleCardClick(card.slug)}
                     >
-                      <div className="bg-grey-800 rounded-2xl overflow-hidden aspect-[407/878] relative">
+                      <div className={`bg-grey-800 rounded-2xl overflow-hidden relative ${
+                        card.contentType === 1 
+                          ? 'aspect-video' // Content1: 16:9
+                          : card.contentType === 2
+                          ? 'aspect-[9/16]' // Content2: 9:16
+                          : 'aspect-[407/878]' // 기타: 기본 비율
+                      }`}>
                         {card.image ? (
                           <img
                             src={card.image}
                             alt={card.title}
                             className="absolute inset-0 w-full h-full object-cover"
+                          />
+                        ) : card.videoUrl ? (
+                          <iframe
+                            src={getYouTubeEmbedUrl(card.videoUrl, { disableControls: true })}
+                            title={card.title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="absolute inset-0 w-full h-full rounded-2xl pointer-events-none"
                           />
                         ) : (
                           <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">

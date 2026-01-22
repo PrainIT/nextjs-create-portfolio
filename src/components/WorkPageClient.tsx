@@ -24,6 +24,7 @@ interface WorkProject {
   contents?: any[]; // content 페이지용
   contentType?: number; // 콘텐츠 타입 (3, 4용)
   contentImages?: string[]; // 콘텐츠 이미지 URL 배열 (3, 4용)
+  hasThumbnailImage?: boolean; // 썸네일 이미지 여부
 }
 
 interface WorkCategory {
@@ -587,9 +588,11 @@ export default function WorkPageClient({
               )}
 
             {/* Single Image - 콘텐츠 1, 2 또는 일반 이미지 (content 페이지용) */}
+            {/* 썸네일 이미지가 아닌 경우만 표시 */}
             {basePath === "/content" &&
               selectedProject.image &&
               !selectedProject.videoUrl &&
+              !selectedProject.hasThumbnailImage &&
               (!selectedProject.contentType || 
                (selectedProject.contentType !== 3 && selectedProject.contentType !== 4) ||
                !selectedProject.contentImages ||
