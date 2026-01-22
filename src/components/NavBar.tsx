@@ -21,7 +21,7 @@ interface NavBarProps {
   categories: readonly Category[];
   showBackButton?: boolean;
   backButtonHref?: string;
-  selectedValue?: string;
+  selectedValue?: string[];
   onSelect?: (value: string) => void;
   onTitleClick?: () => void;
   absolute?: boolean;
@@ -39,11 +39,11 @@ export default function NavBar({
   absolute = false,
 }: NavBarProps) {
   const router = useRouter();
-  const [selected, setSelected] = useState(selectedValue || "");
+  const [selected, setSelected] = useState<string[]>(selectedValue || []);
 
   // selectedValue prop이 변경되면 내부 state도 업데이트
   useEffect(() => {
-    setSelected(selectedValue || "");
+    setSelected(selectedValue || []);
   }, [selectedValue]);
 
   const handleBack = () => {
@@ -55,7 +55,15 @@ export default function NavBar({
   };
 
   const handleSelect = (value: string) => {
-    setSelected(value);
+    setSelected((prev) => {
+      if (prev.includes(value)) {
+        // 이미 선택된 것이면 제거
+        return prev.filter((cat) => cat !== value);
+      } else {
+        // 선택되지 않은 것이면 추가
+        return [...prev, value];
+      }
+    });
     onSelect?.(value);
   };
 
@@ -123,7 +131,7 @@ export default function NavBar({
               {/* 카테고리 아이템들 */}
               <div className="flex flex-col gap-3">
                 {category.items.map((item, itemIndex) => {
-                  const isSelected = selected === item.value;
+                  const isSelected = selected.includes(item.value);
 
                   return (
                     <motion.button

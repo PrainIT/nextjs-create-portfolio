@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 type HeightOption = {
   heightPixel?: number; // 정적인 높이 (px)
+  heightVh?: number; // 뷰포트 높이 기준 퍼센트 (vh)
   wrapChildren?: boolean; // 자식 콘텐츠의 높이를 기준으로 자동 계산할지 여부
 };
 
@@ -29,7 +30,7 @@ const BottomPopup = ({
   const bodyOverflowRef = useRef<string>("auto");
   const topRef = useRef<string>("0px");
 
-  const { heightPixel: _heightPixel, wrapChildren } = heightOption || {};
+  const { heightPixel: _heightPixel, heightVh: _heightVh, wrapChildren } = heightOption || {};
 
   // 오버레이 클릭 시 팝업 닫기
   const handleOverlayClick = useCallback(() => onClose(), [onClose]);
@@ -97,6 +98,10 @@ const BottomPopup = ({
             resizeObserver.disconnect();
           }
         };
+      } else if (_heightVh) {
+        // heightVh 옵션이 있으면 vh 단위로 계산
+        const vhInPixels = (window.innerHeight * _heightVh) / 100;
+        setMeasuredHeight(vhInPixels);
       } else if (_heightPixel) {
         // heightOption에 주어진 정적인 높이 사용
         setMeasuredHeight(_heightPixel);
@@ -112,7 +117,7 @@ const BottomPopup = ({
         window.scrollTo(0, parseInt(scrollY || "0") * -1);
       }
     }
-  }, [isInDOM, wrapChildren, _heightPixel]);
+  }, [isInDOM, wrapChildren, _heightPixel, _heightVh]);
 
   // 컴포넌트 언마운트 시 body 스타일 복원
   useEffect(() => {
@@ -144,8 +149,11 @@ const BottomPopup = ({
             animate={{ height: `${measuredHeight}px` }}
             exit={{ height: 0 }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[1440px] max-h-[90vh] bg-white rounded-t-2xl shadow-[0_-4px_10px_rgba(0,0,0,0.2)] z-[1000] overflow-y-auto scrollbar-hide pb-[env(safe-area-inset-bottom)] px-6 sm:px-12 md:px-32 lg:px-48 xl:px-72"
-            style={{ WebkitOverflowScrolling: "touch" }}
+            className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[1440px] bg-white rounded-t-2xl shadow-[0_-4px_10px_rgba(0,0,0,0.2)] z-[1000] overflow-y-auto scrollbar-hide pb-[env(safe-area-inset-bottom)] px-6 sm:px-12 md:px-32 lg:px-48 xl:px-72"
+            style={{ 
+              WebkitOverflowScrolling: "touch",
+              maxHeight: _heightVh ? `${_heightVh}vh` : "90vh"
+            }}
             onClick={handleContentClick}
           >
             <div ref={contentRef} className="relative">

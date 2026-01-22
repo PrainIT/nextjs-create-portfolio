@@ -334,7 +334,7 @@ export default function WorkPageClient({
 }: WorkPageClientProps) {
   const router = useRouter();
   const [isSearching, setIsSearching] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedProject, setSelectedProject] = useState<WorkProject | null>(
     null
@@ -342,7 +342,15 @@ export default function WorkPageClient({
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const handleSelect = (value: string) => {
-    setSelectedCategory(value);
+    setSelectedCategory((prev) => {
+      if (prev.includes(value)) {
+        // 이미 선택된 것이면 제거
+        return prev.filter((cat) => cat !== value);
+      } else {
+        // 선택되지 않은 것이면 추가
+        return [...prev, value];
+      }
+    });
   };
 
   const handleSearch = (keyword: string) => {
@@ -350,7 +358,7 @@ export default function WorkPageClient({
   };
 
   const handleTitleClick = () => {
-    setSelectedCategory("");
+    setSelectedCategory([]);
     setSearchKeyword("");
     setIsSearching(false);
   };
@@ -394,19 +402,18 @@ export default function WorkPageClient({
     setSearchKeyword(tag);
     setIsSearching(true);
     // 카테고리 필터 초기화
-    setSelectedCategory("");
+    setSelectedCategory([]);
   };
 
   // 필터링된 프로젝트
   const filteredProjects = useMemo(() => {
     let filtered = workProjects;
 
-    // 카테고리 필터
-    if (selectedCategory) {
+    // 카테고리 필터 (여러 개 선택 지원)
+    if (selectedCategory.length > 0) {
       filtered = filtered.filter((project) => {
-        // selectedCategory가 서브 카테고리 값이면 정확히 일치하는 것만 필터링
-        // 예: "branded-video"를 선택하면 subCategory가 "branded-video"인 것만 표시
-        return project.subCategory === selectedCategory;
+        // selectedCategory 배열에 포함된 subCategory를 가진 프로젝트만 표시
+        return selectedCategory.includes(project.subCategory || "");
       });
     }
 
@@ -442,7 +449,7 @@ export default function WorkPageClient({
             title={pageTitle}
             categories={workCategories}
             showBackButton={true}
-            selectedValue={selectedCategory}
+            selectedValue={selectedCategory as string[]}
             onSelect={handleSelect}
             onTitleClick={handleTitleClick}
           />
@@ -525,7 +532,9 @@ export default function WorkPageClient({
       <BottomPopup
         isOpen={isPopupOpen}
         onClose={handleClosePopup}
-        heightOption={{ wrapChildren: true }}
+        heightOption={{ 
+          heightVh: 90 
+        }}
       >
         {selectedProject && (
           <div className="p-8">
