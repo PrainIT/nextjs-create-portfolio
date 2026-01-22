@@ -14,6 +14,7 @@ interface WorkCardProps {
   forceSquare?: boolean; // branded에서 무조건 정사각형으로 표시
   forceFullHeight?: boolean; // content에서 무조건 h-full로 표시
   disableVideoInteraction?: boolean; // 유튜브 재생 버튼 숨김 및 클릭 방지
+  contentType?: number; // 1: 유튜브, 2: 숏폼
   onTagClick?: (tag: string) => void;
 }
 
@@ -28,6 +29,7 @@ export default function WorkCard({
   forceSquare = false,
   forceFullHeight = false,
   disableVideoInteraction = false,
+  contentType,
   onTagClick,
 }: WorkCardProps) {
   const tagsContainerRef = useRef<HTMLDivElement>(null);
@@ -70,6 +72,14 @@ export default function WorkCard({
                 alignItems: "center",
                 justifyContent: "center",
               }
+            : contentType === 1 && image
+            ? {
+                aspectRatio: '16 / 9'
+              }
+            : contentType === 2 && image
+            ? {
+                aspectRatio: '9 / 16'
+              }
             : {}
         }
       >
@@ -92,6 +102,8 @@ export default function WorkCard({
             className={`w-full ${
               forceSquare || (!isSearchMode && !forceFullHeight)
                 ? "aspect-square h-full"
+                : contentType === 1 || contentType === 2
+                ? "h-full"
                 : "h-auto"
             } object-cover rounded-2xl`}
           />

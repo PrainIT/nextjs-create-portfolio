@@ -4,10 +4,6 @@ import LogoSlider from "@/components/LogoSlider";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/utils";
 import { type SanityDocument } from "next-sanity";
-import {
-  getYouTubeVideoId,
-  getYouTubeThumbnailUrl,
-} from "@/components/work-utils/youtube";
 
 const BRAND_QUERY = `*[_type == "branded"] | order(order asc, publishedAt desc) {
   _id,
@@ -42,20 +38,6 @@ const SOCIAL_LINK_QUERY = `*[_type == "socialLink"] | order(order asc) {
   order
 }`;
 
-const CONTENT_QUERY = `*[_type == "content" && (contentType == 1 || contentType == 2)] | order(date desc, _createdAt desc) {
-  _id,
-  contentType,
-  category,
-  subCategory,
-  date,
-  title,
-  descriptionContent,
-  videoUrl,
-  videoUrls,
-  thumbnailImage,
-  "client": clientRef->name
-}`;
-
 const options = { next: { revalidate: 30 } };
 
 export default async function IndexPage() {
@@ -71,7 +53,6 @@ export default async function IndexPage() {
     {},
     options
   );
-  const contents = await client.fetch<SanityDocument[]>(CONTENT_QUERY, {}, options);
 
   // 더미 데이터 생성 (Sanity에 데이터가 없을 경우)
   const dummyBrands: SanityDocument[] =
@@ -116,67 +97,8 @@ export default async function IndexPage() {
           },
         ];
 
-  // Content 썸네일 URL 추출 함수
-  const getContentThumbnailUrl = (
-    content: any
-  ): { image?: string; videoUrl?: string } => {
-    // 1. thumbnailImage가 있으면 우선 사용
-    if (content.thumbnailImage) {
-      return {
-        image: urlForImage(content.thumbnailImage),
-      };
-    }
-    
-    // 2. videoUrl이 있으면 사용
-    if (content.videoUrl) {
-      const videoId = getYouTubeVideoId(content.videoUrl);
-      if (videoId) {
-        return {
-          image: getYouTubeThumbnailUrl(videoId),
-          videoUrl: content.videoUrl,
-        };
-      }
-      return {
-        videoUrl: content.videoUrl,
-      };
-    }
-    
-    // 3. videoUrls 배열의 첫 번째 항목 확인
-    if (content.videoUrls && content.videoUrls.length > 0) {
-      const firstVideoUrl = content.videoUrls[0];
-      const videoId = getYouTubeVideoId(firstVideoUrl);
-      if (videoId) {
-        return {
-          image: getYouTubeThumbnailUrl(videoId),
-          videoUrl: firstVideoUrl,
-        };
-      }
-      return {
-        videoUrl: firstVideoUrl,
-      };
-    }
-
-    return {};
-  };
-
-  // Content를 ContentCard로 변환
-  const contentCardsFromContent = contents.map((content: any) => {
-    const thumbnail = getContentThumbnailUrl(content);
-    return {
-      id: content._id,
-      title: content.title || '제목 없음',
-      description: content.descriptionContent || "",
-      subDescription: content.client || "",
-      image: thumbnail.image,
-      videoUrl: thumbnail.videoUrl,
-      contentType: content.contentType,
-      slug: undefined, // content는 slug가 없음
-      subCategory: content.subCategory || "",
-    };
-  });
-
-  // Branded를 ContentCard로 변환
-  const contentCardsFromBranded = dummyBrands.map((brand) => ({
+  // Branded를 ContentCard로 변환 (원래대로 dashboardImage 사용)
+  const contentCards = dummyBrands.map((brand) => ({
     id: brand._id,
     title: brand.title,
     description: brand.dashboardDescription || "",
@@ -186,14 +108,11 @@ export default async function IndexPage() {
     subCategory: brand.subCategory || "", // Industry 서브카테고리
   }));
 
-  // Content와 Branded를 합쳐서 contentCards 생성
-  const contentCards = [...contentCardsFromContent, ...contentCardsFromBranded];
-
-  // 각 서브카테고리별 카운트 계산 (Content + Branded)
+  // 각 서브카테고리별 카운트 계산
   const subCategoryCounts: Record<string, number> = {};
-  [...contents, ...dummyBrands].forEach((item) => {
-    if (item.subCategory) {
-      subCategoryCounts[item.subCategory] = (subCategoryCounts[item.subCategory] || 0) + 1;
+  dummyBrands.forEach((brand) => {
+    if (brand.subCategory) {
+      subCategoryCounts[brand.subCategory] = (subCategoryCounts[brand.subCategory] || 0) + 1;
     }
   });
 

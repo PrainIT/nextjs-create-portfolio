@@ -484,6 +484,7 @@ export default function WorkPageClient({
                     forceSquare={basePath === "/branded"}
                     forceFullHeight={basePath === "/content"}
                     disableVideoInteraction={basePath === "/content"}
+                    contentType={project.contentType}
                     onTagClick={handleTagClick}
                   />
                 </div>
@@ -507,6 +508,7 @@ export default function WorkPageClient({
                     forceSquare={basePath === "/branded"}
                     forceFullHeight={basePath === "/content"}
                     disableVideoInteraction={basePath === "/content"}
+                    contentType={project.contentType}
                     onTagClick={handleTagClick}
                   />
                 </div>
