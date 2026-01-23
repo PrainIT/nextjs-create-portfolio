@@ -7,33 +7,29 @@ import { useEffect, useState } from "react";
 
 export default function Header() {
   const pathname = usePathname();
-  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
-  const [fileName, setFileName] = useState<string>("portfolio");
+  const [portfolioUrl, setPortfolioUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    // API 라우트를 통해 포트폴리오 다운로드 파일 가져오기
-    const fetchPortfolioFile = async () => {
+    // API 라우트를 통해 포트폴리오 링크 가져오기
+    const fetchPortfolioLink = async () => {
       try {
         const response = await fetch("/api/portfolio-download");
         
         if (!response.ok) {
-          throw new Error("포트폴리오 파일을 가져올 수 없습니다.");
+          throw new Error("포트폴리오 링크를 가져올 수 없습니다.");
         }
 
         const data = await response.json();
         
-        if (data.fileUrl) {
-          // 다운로드를 위해 ?dl 파라미터 추가
-          const fileUrl = `${data.fileUrl}?dl`;
-          setDownloadUrl(fileUrl);
-          setFileName(data.fileName || "portfolio");
+        if (data.url) {
+          setPortfolioUrl(data.url);
         }
       } catch (error) {
-        console.error("포트폴리오 파일을 가져오는 중 오류:", error);
+        console.error("포트폴리오 링크를 가져오는 중 오류:", error);
       }
     };
 
-    fetchPortfolioFile();
+    fetchPortfolioLink();
   }, []);
 
   // 현재 경로가 링크와 일치하는지 확인하는 함수
@@ -94,10 +90,11 @@ export default function Header() {
           >
             CONTACT
           </Link>
-          {downloadUrl ? (
+          {portfolioUrl ? (
             <a
-              href={downloadUrl}
-              download={fileName}
+              href={portfolioUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className={`text-brand text-base transition-opacity opacity-100 hover:opacity-80 cursor-pointer`}
             >
               PORTFOLIO DOWNLOAD
