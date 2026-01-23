@@ -16,7 +16,6 @@ interface Content {
   contentType: number;
   category?: string;
   subCategory?: string;
-  date?: string;
   title?: string;
   description?: string;
   videoUrl?: string;
@@ -233,7 +232,6 @@ export default function WorkDetailClient({
     const commonProps = {
       category: content.category,
       subCategory: content.subCategory,
-      date: content.date,
       title: content.title || "",
       description: content.description || "",
     };

@@ -7,12 +7,11 @@ import {
   getYouTubeThumbnailUrl,
 } from "@/components/work-utils/youtube";
 
-const CONTENT_QUERY = `*[_type == "content"] | order(date desc, _createdAt desc) {
+const CONTENT_QUERY = `*[_type == "content"] | order(_createdAt desc) {
   _id,
   contentType,
   category,
   subCategory,
-  date,
   title,
   descriptionBranded,
   descriptionContent,
@@ -152,7 +151,6 @@ export default async function ContentPage() {
       contents: [content], // 단일 content를 배열로 유지 (팝업에서 사용 가능)
       contentType: content.contentType,
       contentImages: contentImages,
-      contentDate: content.date,
       hasThumbnailImage: !!content.thumbnailImage, // 썸네일 이미지 여부
     };
   });

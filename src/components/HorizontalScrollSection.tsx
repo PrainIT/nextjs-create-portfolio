@@ -14,7 +14,7 @@ export interface ContentCard {
   videoUrl?: string; // 유튜브 영상 URL (이미지가 없을 때 사용)
   contentType?: number; // 1: 유튜브, 2: 숏폼
   slug?: string;
-  subCategory?: string; // Industry 서브카테고리
+  subCategory?: string | string[]; // Industry 서브카테고리 (단일 또는 배열)
 }
 
 interface HorizontalScrollSectionProps {

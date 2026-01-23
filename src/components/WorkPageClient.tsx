@@ -14,7 +14,7 @@ interface WorkProject {
   tags: string[];
   image?: string;
   category?: string;
-  subCategory?: string;
+  subCategory?: string | string[]; // 단일 또는 배열
   slug?: string;
   description?: string;
   client?: string;
@@ -412,7 +412,12 @@ export default function WorkPageClient({
     // 카테고리 필터 (여러 개 선택 지원)
     if (selectedCategory.length > 0) {
       filtered = filtered.filter((project) => {
-        // selectedCategory 배열에 포함된 subCategory를 가진 프로젝트만 표시
+        // subCategory가 배열인 경우와 문자열인 경우 모두 처리
+        if (Array.isArray(project.subCategory)) {
+          // 배열 중 하나라도 selectedCategory에 포함되면 표시
+          return project.subCategory.some((subCat) => selectedCategory.includes(subCat));
+        }
+        // 문자열인 경우 기존 로직 유지
         return selectedCategory.includes(project.subCategory || "");
       });
     }
@@ -619,7 +624,10 @@ export default function WorkPageClient({
 
             {/* Video - description 아래 */}
             {/* content2이거나 숏폼인 경우 */}
-            {selectedProject.contentType === 2 || selectedProject.subCategory === "short-form" ? (
+            {selectedProject.contentType === 2 || 
+             (Array.isArray(selectedProject.subCategory) 
+               ? selectedProject.subCategory.includes("short-form")
+               : selectedProject.subCategory === "short-form") ? (
               <>
                 {/* content2 또는 숏폼 비디오 - BottomPopup에서는 첫 번째 하나만 표시 */}
                 {(() => {

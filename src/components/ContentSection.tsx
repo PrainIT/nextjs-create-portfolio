@@ -31,9 +31,13 @@ export default function ContentSection({ contentCards, subCategoryCounts }: Cont
     let filtered = contentCards;
 
     if (selectedFilter && selectedFilter !== "all") {
-      filtered = filtered.filter((card) =>
-        card.subCategory === selectedFilter
-      );
+      filtered = filtered.filter((card) => {
+        // subCategory가 배열인 경우와 문자열인 경우 모두 처리
+        if (Array.isArray(card.subCategory)) {
+          return card.subCategory.includes(selectedFilter);
+        }
+        return card.subCategory === selectedFilter;
+      });
     }
 
     if (searchKeyword) {

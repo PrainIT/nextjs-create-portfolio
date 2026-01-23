@@ -24,7 +24,6 @@ const WORK_QUERY = `*[_type == "branded" && slug.current == $slug][0] {
     contentType,
     category,
     subCategory,
-    date,
     title,
     description,
     videoUrl,
