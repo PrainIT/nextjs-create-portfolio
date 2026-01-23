@@ -16,16 +16,35 @@ export default function Header() {
         const response = await fetch("/api/portfolio-download");
         
         if (!response.ok) {
-          throw new Error("포트폴리오 링크를 가져올 수 없습니다.");
+          // API에서 반환한 에러 메시지 확인
+          let errorMessage = "포트폴리오 링크를 가져올 수 없습니다.";
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.error || errorMessage;
+          } catch {
+            // JSON 파싱 실패 시 기본 메시지 사용
+            errorMessage = `포트폴리오 링크를 가져올 수 없습니다. (${response.status})`;
+          }
+          console.error("포트폴리오 링크 API 오류:", errorMessage);
+          return;
         }
 
         const data = await response.json();
         
         if (data.url) {
           setPortfolioUrl(data.url);
+        } else {
+          console.warn("포트폴리오 링크가 응답에 포함되어 있지 않습니다.");
         }
       } catch (error) {
-        console.error("포트폴리오 링크를 가져오는 중 오류:", error);
+        // 네트워크 에러 또는 기타 예외 처리
+        if (error instanceof TypeError && error.message.includes("fetch")) {
+          console.error("네트워크 오류: 포트폴리오 링크를 가져올 수 없습니다.", error);
+        } else if (error instanceof SyntaxError) {
+          console.error("JSON 파싱 오류: 서버 응답을 파싱할 수 없습니다.", error);
+        } else {
+          console.error("포트폴리오 링크를 가져오는 중 예상치 못한 오류:", error);
+        }
       }
     };
 
