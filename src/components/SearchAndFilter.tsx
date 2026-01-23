@@ -45,7 +45,7 @@ export default function SearchAndFilter({
   filtersWithCount,
 }: SearchAndFilterProps) {
   return (
-    <div className="w-full py-8 px-4 bg-[#1A1A1A]">
+    <div className="w-full py-8 px-4">
       <div className="max-w-[1440px] mx-auto">
         {/* 검색바 */}
         <div className="flex justify-center mb-6 pt-100">

@@ -153,7 +153,7 @@ export default function HorizontalScrollSection({
   }, [cards]);
 
   return (
-    <section ref={sectionRef} className="w-full bg-[#1A1A1A] relative">
+    <section ref={sectionRef} className="w-full relative">
       <div className="sticky top-0 h-screen flex items-center">
         <div className="w-full py-8 px-4">
           <div className="max-w-[1440px] mx-auto">
