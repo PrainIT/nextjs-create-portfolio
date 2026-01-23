@@ -658,15 +658,37 @@ export default function WorkPageClient({
               </>
             ) : (
               <>
-                {/* 일반 비디오 - 단일 */}
+                {/* 일반 비디오 - 단일 (Content 1용) */}
                 {(() => {
-                  if (!selectedProject.videoUrl) return null;
+                  // Content 1인 경우: videoUrl 우선, 없으면 videoUrls[0] 사용 (기존 데이터 호환성)
+                  const videoUrlToUse = selectedProject.videoUrl 
+                    || (selectedProject.videoUrls && selectedProject.videoUrls.length > 0 
+                        ? selectedProject.videoUrls[0] 
+                        : null);
                   
-                  const embedUrl = getYouTubeEmbedUrl(selectedProject.videoUrl);
-                  const hasVideoUrls = selectedProject.videoUrls && selectedProject.videoUrls.length > 0;
+                  if (!videoUrlToUse) return null;
                   
-                  // videoUrl이 있고 videoUrls가 없거나 비어있을 때 단일 비디오 표시
-                  if (embedUrl && !hasVideoUrls) {
+                  const embedUrl = getYouTubeEmbedUrl(videoUrlToUse);
+                  
+                  // Content 1인 경우 항상 큰 사이즈로 표시 (videoUrls 무시)
+                  if (embedUrl && selectedProject.contentType === 1) {
+                    return (
+                      <div className="mb-6">
+                        <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+                          <iframe
+                            src={embedUrl}
+                            title={selectedProject.title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full h-full"
+                          />
+                        </div>
+                      </div>
+                    );
+                  }
+                  
+                  // Content 1이 아니고 videoUrl이 있는 경우
+                  if (embedUrl && !selectedProject.videoUrls?.length) {
                     return (
                       <div className="mb-6">
                         <div className="relative w-full aspect-video rounded-lg overflow-hidden">
@@ -683,8 +705,9 @@ export default function WorkPageClient({
                   }
                   return null;
                 })()}
-                {/* 일반 비디오 - 여러 개 */}
-                {selectedProject.videoUrls &&
+                {/* 일반 비디오 - 여러 개 (Content 1이 아닌 경우만) */}
+                {selectedProject.contentType !== 1 &&
+                  selectedProject.videoUrls &&
                   selectedProject.videoUrls.length > 0 && (
                     <div className="mb-6">
                       <div className="grid grid-cols-2 gap-4">

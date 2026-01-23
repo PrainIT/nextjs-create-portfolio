@@ -81,9 +81,11 @@ export default async function ContentPage() {
     content: any
   ): { image?: string; videoUrl?: string } => {
     // 1. thumbnailImage가 있으면 우선 사용 (Content 1, 2용)
+    // 단, videoUrl도 함께 반환하여 BottomPopup에서 사용할 수 있도록 함
     if (content.thumbnailImage) {
       return {
         image: urlForImage(content.thumbnailImage),
+        videoUrl: content.videoUrl, // Content 1용 videoUrl도 함께 반환
       };
     }
     
@@ -141,7 +143,8 @@ export default async function ContentPage() {
       title: content.title || '제목 없음',
       tags: content.tags || [], // Content 팝업에서 표시될 태그들
       image: thumbnail.image,
-      videoUrl: thumbnail.videoUrl,
+      // videoUrl은 썸네일 함수에서 가져오되, 없으면 content에서 직접 가져오기 (Content 1용)
+      videoUrl: thumbnail.videoUrl || content.videoUrl,
       videoUrls: content.videoUrls || [],
       category: content.category,
       subCategory: content.subCategory,
