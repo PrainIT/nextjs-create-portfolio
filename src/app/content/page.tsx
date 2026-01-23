@@ -2,10 +2,6 @@ import { type SanityDocument } from "next-sanity";
 import WorkPageClient from "@/components/WorkPageClient";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/utils";
-import {
-  getYouTubeVideoId,
-  getYouTubeThumbnailUrl,
-} from "@/components/work-utils/youtube";
 
 const CONTENT_QUERY = `*[_type == "content"] | order(date desc, _createdAt desc) {
   _id,
@@ -76,48 +72,33 @@ const contentCategories = [
 export default async function ContentPage() {
   const contents = await client.fetch<SanityDocument[]>(CONTENT_QUERY, {}, options);
 
-  // 콘텐츠 썸네일 URL 추출 함수 (썸네일 이미지 우선, 영상 차순)
+  // 콘텐츠 썸네일 URL 추출 함수
   const getContentThumbnailUrl = (
     content: any
   ): { image?: string; videoUrl?: string } => {
-    // 1. thumbnailImage가 있으면 우선 사용 (Content 1, 2용)
-    // 단, videoUrl도 함께 반환하여 BottomPopup에서 사용할 수 있도록 함
+    // 1. thumbnailImage가 있으면 이미지 반환 (카드에 표시)
+    // videoUrl도 함께 반환하여 BottomPopup에서 사용할 수 있도록 함
     if (content.thumbnailImage) {
       return {
         image: urlForImage(content.thumbnailImage),
-        videoUrl: content.videoUrl, // Content 1용 videoUrl도 함께 반환
+        videoUrl: content.videoUrl || (content.videoUrls && content.videoUrls.length > 0 ? content.videoUrls[0] : undefined),
       };
     }
     
-    // 2. videoUrl이 있으면 사용 (콘텐츠 1, 2에서 사용)
-    if (content.videoUrl) {
-      const videoId = getYouTubeVideoId(content.videoUrl);
-      if (videoId) {
+    // 2. Content 1, 2에서 썸네일 이미지가 없는 경우
+    // 카드에는 빈 사각형 표시 (이미지 URL 반환하지 않음)
+    // videoUrl은 BottomPopup용으로 반환
+    if (content.contentType === 1 || content.contentType === 2) {
+      if (content.videoUrl) {
         return {
-          image: getYouTubeThumbnailUrl(videoId),
           videoUrl: content.videoUrl,
         };
       }
-      // videoUrl이 있지만 videoId 추출 실패 시에도 videoUrl 반환
-      return {
-        videoUrl: content.videoUrl,
-      };
-    }
-    
-    // 3. videoUrls 배열의 첫 번째 항목 확인 (콘텐츠 1, 2에서 사용)
-    if (content.videoUrls && content.videoUrls.length > 0) {
-      const firstVideoUrl = content.videoUrls[0];
-      const videoId = getYouTubeVideoId(firstVideoUrl);
-      if (videoId) {
+      if (content.videoUrls && content.videoUrls.length > 0) {
         return {
-          image: getYouTubeThumbnailUrl(videoId),
-          videoUrl: firstVideoUrl,
+          videoUrl: content.videoUrls[0],
         };
       }
-      // videoUrl이 있지만 videoId 추출 실패 시에도 videoUrl 반환
-      return {
-        videoUrl: firstVideoUrl,
-      };
     }
     
     // 4. images 배열의 첫 번째 항목 확인 (콘텐츠 3, 4 또는 영상이 없을 때 fallback)

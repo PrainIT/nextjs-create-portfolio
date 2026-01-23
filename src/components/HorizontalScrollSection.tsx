@@ -3,7 +3,6 @@
 import { useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { getYouTubeEmbedUrl } from "@/components/work-utils/youtube";
 
 export interface ContentCard {
   id: string;
@@ -182,25 +181,15 @@ export default function HorizontalScrollSection({
                           : 'aspect-[407/878]' // 기타: 기본 비율
                       }`}>
                         {card.image ? (
+                          // 썸네일 이미지가 있으면 이미지 표시
                           <img
                             src={card.image}
                             alt={card.title}
-                            className="absolute inset-0 w-full h-full object-cover"
-                          />
-                        ) : card.videoUrl ? (
-                          <iframe
-                            src={getYouTubeEmbedUrl(card.videoUrl, { disableControls: true })}
-                            title={card.title}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            className="absolute inset-0 w-full h-full rounded-2xl pointer-events-none"
+                            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
                           />
                         ) : (
-                          <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
-                            <span className="text-grey-500 text-sm">
-                              이미지 영역
-                            </span>
-                          </div>
+                          // 썸네일 이미지가 없으면 빈 사각형 표시 (Content 1, 2에서 영상은 표시하지 않음)
+                          <div className="absolute inset-0 bg-grey-800 pointer-events-none" />
                         )}
 
                         <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">

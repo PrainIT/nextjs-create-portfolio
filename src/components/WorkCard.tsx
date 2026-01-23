@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import { getYouTubeEmbedUrl, isYouTubeShorts } from "@/components/work-utils/youtube";
 
 interface WorkCardProps {
   id: number;
@@ -83,19 +82,8 @@ export default function WorkCard({
             : {}
         }
       >
-        {videoUrl ? (
-          <div className={`relative w-full ${isYouTubeShorts(videoUrl) ? "aspect-[9/16]" : "aspect-video"}`}>
-            <iframe
-              src={getYouTubeEmbedUrl(videoUrl, { disableControls: disableVideoInteraction })}
-              title={title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className={`absolute inset-0 w-full h-full rounded-2xl ${
-                disableVideoInteraction ? "pointer-events-none" : ""
-              }`}
-            />
-          </div>
-        ) : image ? (
+        {image ? (
+          // 썸네일 이미지가 있으면 이미지 표시 (Content 1, 2용)
           <img
             src={image}
             alt={title}
@@ -105,15 +93,20 @@ export default function WorkCard({
                 : contentType === 1 || contentType === 2
                 ? "h-full"
                 : "h-auto"
-            } object-cover rounded-2xl`}
+            } object-cover rounded-2xl pointer-events-none`}
           />
         ) : (
-          <div className="text-grey-500 text-sm flex items-center justify-center h-full">
-            이미지 영역
-          </div>
+          // 썸네일 이미지가 없으면 빈 사각형 표시 (Content 1, 2에서 영상은 표시하지 않음)
+          <div className={`w-full h-full ${
+            contentType === 1 
+              ? "aspect-video" 
+              : contentType === 2 
+              ? "aspect-[9/16]" 
+              : ""
+          } bg-grey-800 pointer-events-none`} />
         )}
         {logo && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             {logo}
           </div>
         )}
