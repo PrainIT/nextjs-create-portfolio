@@ -279,14 +279,14 @@ export default function WorkDetailClient({
 
   return (
     <main
-      className="w-full relative flex flex-col"
+      className="w-full relative flex flex-col overflow-x-hidden"
       style={{ minHeight: "100vh" }}
     >
       {/* 상단 선 */}
       <div className="w-full h-px bg-grey-700" />
 
       {/* NavBar와 콘텐츠 영역 - flex row */}
-      <div className="flex-1 flex">
+      <div className="flex-1 flex min-w-0">
         {/* NavBar - 고정 너비 */}
         <div className="w-64 flex-shrink-0 pl-8 py-8 mr-8">
           <div className="flex flex-col gap-8">
@@ -397,7 +397,7 @@ export default function WorkDetailClient({
         </div>
 
         {/* 콘텐츠 영역 - 나머지 공간 */}
-        <div className="flex-1 pr-8 py-8">
+        <div className="flex-1 pr-8 py-8 min-w-0">
           {/* 검색창 - 오른쪽 위 */}
           {/* <div className="flex justify-end mb-8">
             <SearchBar placeholder="SEARCH" />
@@ -406,7 +406,7 @@ export default function WorkDetailClient({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="max-w-4xl"
+            className="w-full max-w-4xl"
           >
             {/* Summary */}
             {work.summary && (

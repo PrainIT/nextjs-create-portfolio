@@ -135,6 +135,7 @@ export default function Template2({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.5 }}
+      className="w-full"
     >
       {/* 카테고리 / Date (우측 정렬) */}
       <div className="flex justify-between items-center mb-6">
@@ -159,10 +160,10 @@ export default function Template2({
 
       {/* Video Carousel - 숏폼 */}
       {validUrls.length > 0 && (
-        <div className="relative">
+        <div className="relative w-full">
           <div
             ref={scrollContainerRef}
-            className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
+            className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth w-full"
             style={{
               scrollSnapType: "x mandatory",
             }}

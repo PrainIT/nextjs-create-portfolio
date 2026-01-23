@@ -439,14 +439,14 @@ export default function WorkPageClient({
 
   return (
     <main
-      className="w-full relative flex flex-col"
+      className="w-full relative flex flex-col overflow-x-hidden"
       style={{ minHeight: "100vh" }}
     >
       {/* 상단 선 */}
       <div className="w-full h-px bg-grey-700" />
 
       {/* NavBar와 WorkCard 영역 - flex row */}
-      <div className="flex-1 flex">
+      <div className="flex-1 flex min-w-0">
         {/* NavBar - 고정 너비 */}
         <div className="w-64 flex-shrink-0">
           <NavBar
@@ -461,9 +461,9 @@ export default function WorkPageClient({
         </div>
 
         {/* WorkCard 영역 - 나머지 공간 */}
-        <div className="flex-1 pr-8 py-8">
+        <div className="flex-1 pr-8 py-8 min-w-0">
           {/* 검색창 */}
-          <div className="flex items-center justify-end mb-8">
+          <div className="flex items-center justify-end mb-8 w-full">
             <div className="w-full max-w-[850px]">
               <SearchBar
                 placeholder="SEARCH"

@@ -101,6 +101,7 @@ export default function Template1({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.5 }}
+      className="w-full"
     >
       {/* 카테고리 / Date (우측 정렬) */}
       <div className="flex justify-between items-center mb-6">
@@ -140,7 +141,7 @@ export default function Template1({
 
       {/* Image Grid (3x2) */}
       {images.length > 0 && (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4 w-full">
           {images.slice(0, 6).map((image, index) => (
             <motion.div
               key={index}
