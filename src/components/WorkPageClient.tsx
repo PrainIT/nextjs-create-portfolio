@@ -603,7 +603,7 @@ export default function WorkPageClient({
         }}
       >
         {selectedProject && (
-          <div className="p-8">
+          <div className="px-6 sm:px-12 md:px-16 lg:px-20 xl:px-24 py-8">
             {/* 닫기 버튼 */}
             <button
               onClick={handleClosePopup}
@@ -840,7 +840,7 @@ export default function WorkPageClient({
 
             {/* 관련 영상 섹션 - tags 아래 */}
             {relatedVideos.length > 0 && (
-              <div className="mt-6 -mx-8 -mb-8">
+              <div className="mt-6 -mx-6 sm:-mx-12 md:-mx-16 lg:-mx-20 xl:-mx-24 -mb-8">
                 <RelationContentCard
                   videos={relatedVideos}
                   title="관련 영상을 더 찾으셨나요?"

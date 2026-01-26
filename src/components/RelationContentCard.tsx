@@ -59,10 +59,7 @@ export default function RelationContentCard({
                 )}
               </div>
 
-              {/* 제목 */}
-              <h4 className="text-white text-sm font-medium mb-1 text-center line-clamp-2">
-                {video.title}
-              </h4>
+
 
               {/* 날짜 */}
               {video.date && (
