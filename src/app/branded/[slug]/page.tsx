@@ -44,6 +44,20 @@ const WORK_QUERY = `*[_type == "branded" && slug.current == $slug][0] {
   }
 }`;
 
+// 관련 branded 항목 쿼리 (같은 category와 subCategory)
+const RELATED_WORKS_QUERY = `*[_type == "branded" && category == $category && subCategory == $subCategory && slug.current != $slug] | order(order asc, publishedAt desc) {
+  _id,
+  title,
+  slug,
+  category,
+  subCategory,
+  publishedAt,
+  dashboardImage,
+  "client": clientRef->name,
+  "clientRefLogo": clientRef->logo,
+  clientLogo
+}`;
+
 const options = { next: { revalidate: 30 } };
 
 export default async function BrandedDetailPage({
@@ -92,6 +106,35 @@ export default async function BrandedDetailPage({
       return content;
     }).filter(Boolean) || [];
 
+  // 관련 branded 항목 가져오기 (같은 category와 subCategory)
+  const relatedWorks = work?.category && work?.subCategory
+    ? await client.fetch<SanityDocument[]>(
+        RELATED_WORKS_QUERY,
+        {
+          category: work.category,
+          subCategory: work.subCategory,
+          slug: slug,
+        },
+        options
+      )
+    : [];
+
+  // 관련 영상 데이터 변환
+  const relatedVideos = relatedWorks.map((relatedWork: any) => {
+    const logoImage = relatedWork.clientLogo || relatedWork.clientRefLogo;
+    return {
+      id: relatedWork._id,
+      title: relatedWork.title,
+      thumbnail: relatedWork.dashboardImage
+        ? urlForImage(relatedWork.dashboardImage)
+        : logoImage
+        ? urlForImage(logoImage)
+        : undefined,
+      date: relatedWork.publishedAt,
+      slug: relatedWork.slug?.current,
+    };
+  });
+
   return (
     <WorkDetailClient
       work={{
@@ -101,6 +144,7 @@ export default async function BrandedDetailPage({
       }}
       workImageUrl={workImageUrl}
       basePath="/branded"
+      relatedVideos={relatedVideos}
     />
   );
 }

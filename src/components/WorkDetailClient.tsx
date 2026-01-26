@@ -10,6 +10,7 @@ import Template2 from "@/components/work-templates/Template2";
 import Template3 from "@/components/work-templates/Template3";
 import Template4 from "@/components/work-templates/Template4";
 import SearchBar from "@/components/SearchBar";
+import RelationContentCard from "@/components/RelationContentCard";
 
 interface Content {
   _id?: string;
@@ -26,6 +27,15 @@ interface Content {
   attachToContentId?: string | null;
 }
 
+interface RelatedVideo {
+  id: string;
+  title: string;
+  thumbnail?: string;
+  date?: string;
+  slug?: string;
+  onClick?: () => void;
+}
+
 interface WorkDetailClientProps {
   work: SanityDocument & {
     client?: string;
@@ -39,6 +49,7 @@ interface WorkDetailClientProps {
   workImageUrl: string | null;
   basePath: string; // "/branded" 또는 "/content"
   pageName?: string; // 페이지 이름 (기본값: basePath에 따라 결정)
+  relatedVideos?: RelatedVideo[]; // 관련 영상 목록
 }
 
 const workCategories = [
@@ -98,6 +109,7 @@ export default function WorkDetailClient({
   workImageUrl,
   basePath,
   pageName,
+  relatedVideos = [],
 }: WorkDetailClientProps) {
   const router = useRouter();
   const contentRefs = useRef<Record<number, HTMLDivElement | null>>({});
@@ -445,6 +457,21 @@ export default function WorkDetailClient({
 
       {/* 하단 선 */}
       <div className="w-full h-px bg-grey-700 mt-12 mb-12" />
+
+      {/* 관련 영상 섹션 - branded 페이지용 */}
+      {basePath === "/branded" && relatedVideos && relatedVideos.length > 0 && (
+        <div className="w-full">
+          <RelationContentCard
+            videos={relatedVideos.map((video) => ({
+              ...video,
+              onClick: () => {
+                router.push(`${basePath}/${video.slug}`);
+              },
+            }))}
+            title="관련 영상을 더 찾으셨나요?"
+          />
+        </div>
+      )}
     </main>
   );
 }
