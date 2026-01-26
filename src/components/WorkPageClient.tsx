@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import WorkCard from "@/components/WorkCard";
 import SearchBar from "@/components/SearchBar";
 import BottomPopup from "@/components/BottomPopup";
+import RelationContentCard from "@/components/RelationContentCard";
 import { getYouTubeEmbedUrl } from "@/components/work-utils/youtube";
 
 interface WorkProject {
@@ -25,6 +26,7 @@ interface WorkProject {
   contentType?: number; // 콘텐츠 타입 (3, 4용)
   contentImages?: string[]; // 콘텐츠 이미지 URL 배열 (3, 4용)
   hasThumbnailImage?: boolean; // 썸네일 이미지 여부
+  contentDate?: string; // content 페이지용 날짜
 }
 
 interface WorkCategory {
@@ -363,7 +365,7 @@ export default function WorkPageClient({
     setIsSearching(false);
   };
 
-  const handleProjectClick = (project: WorkProject) => {
+  const handleProjectClick = useCallback((project: WorkProject) => {
     // 커스텀 핸들러가 있으면 사용
     if (onProjectClick) {
       onProjectClick(project);
@@ -385,7 +387,7 @@ export default function WorkPageClient({
         router.push(`${basePath}/${project.slug}`);
       }
     }
-  };
+  }, [basePath, router, onProjectClick]);
 
   const handleClosePopup = () => {
     setIsPopupOpen(false);
@@ -436,6 +438,69 @@ export default function WorkPageClient({
 
     return filtered;
   }, [workProjects, selectedCategory, searchKeyword]);
+
+  // 관련 영상 목록 계산 (같은 category와 subCategory의 다른 항목들)
+  const relatedVideos = useMemo(() => {
+    if (!selectedProject || !selectedProject.category) {
+      return [];
+    }
+
+    // subCategory 비교 헬퍼 함수
+    // 선택한 subCategory 중 하나라도 포함되어 있으면 true
+    const hasMatchingSubCategory = (
+      selectedSubCategory: string | string[] | undefined,
+      projectSubCategory: string | string[] | undefined
+    ): boolean => {
+      // 둘 다 없으면 true (subCategory 필터링 없음)
+      if (!selectedSubCategory && !projectSubCategory) {
+        return true;
+      }
+      // 선택한 항목에 subCategory가 없으면 모든 항목 표시
+      if (!selectedSubCategory) {
+        return true;
+      }
+      // 프로젝트에 subCategory가 없으면 false
+      if (!projectSubCategory) {
+        return false;
+      }
+
+      // 둘 다 배열로 변환
+      const selectedArray = Array.isArray(selectedSubCategory)
+        ? selectedSubCategory
+        : [selectedSubCategory];
+      const projectArray = Array.isArray(projectSubCategory)
+        ? projectSubCategory
+        : [projectSubCategory];
+
+      // 선택한 subCategory 중 하나라도 프로젝트에 포함되어 있으면 true
+      return selectedArray.some((subCat) => projectArray.includes(subCat));
+    };
+
+    return workProjects
+      .filter((project) => {
+        // 같은 category이고, subCategory도 일치하고, 현재 선택된 항목이 아닌 것들
+        return (
+          project.category === selectedProject.category &&
+          hasMatchingSubCategory(selectedProject.subCategory, project.subCategory) &&
+          project.id !== selectedProject.id
+        );
+      })
+      .map((project) => ({
+        id: project.id,
+        title: project.title,
+        thumbnail: project.image,
+        date: basePath === "/content" ? project.contentDate : project.publishedAt,
+        slug: project.slug,
+        onClick: () => {
+          setIsPopupOpen(false);
+          setSelectedProject(null);
+          // 약간의 지연 후 클릭 처리 (팝업 닫기 애니메이션 완료 후)
+          setTimeout(() => {
+            handleProjectClick(project);
+          }, 300);
+        },
+      }));
+  }, [selectedProject, workProjects, basePath, handleProjectClick]);
 
   return (
     <main
@@ -773,18 +838,13 @@ export default function WorkPageClient({
               </>
             )}
 
-            {/* 관련 영상 섹션 - tags 아래 (branded 페이지용) */}
-            {basePath === "/branded" && (
-              <div className="mt-6">
-                <div className="bg-brand text-white px-6 py-3 rounded-lg mb-4">
-                  <h3 className="text-lg font-bold">
-                    관련 영상을 더 찾으셨나요?
-                  </h3>
-                </div>
-                {/* 관련 영상 리스트는 추후 구현 */}
-                <div className="text-sm text-grey-500">
-                  관련 영상 목록이 여기에 표시됩니다.
-                </div>
+            {/* 관련 영상 섹션 - tags 아래 */}
+            {relatedVideos.length > 0 && (
+              <div className="mt-6 -mx-8 -mb-8">
+                <RelationContentCard
+                  videos={relatedVideos}
+                  title="관련 영상을 더 찾으셨나요?"
+                />
               </div>
             )}
           </div>

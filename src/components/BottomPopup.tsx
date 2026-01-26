@@ -149,7 +149,7 @@ const BottomPopup = ({
             animate={{ height: `${measuredHeight}px` }}
             exit={{ height: 0 }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[1440px] bg-white rounded-t-2xl shadow-[0_-4px_10px_rgba(0,0,0,0.2)] z-[1000] overflow-y-auto scrollbar-hide pb-[env(safe-area-inset-bottom)] px-6 sm:px-12 md:px-32 lg:px-48 xl:px-72"
+            className="fixed bottom-0 left-0 w-full bg-white rounded-t-2xl shadow-[0_-4px_10px_rgba(0,0,0,0.2)] z-[1000] overflow-y-auto scrollbar-hide pb-[env(safe-area-inset-bottom)]"
             style={{ 
               WebkitOverflowScrolling: "touch",
               maxHeight: _heightVh ? `${_heightVh}vh` : "90vh"
