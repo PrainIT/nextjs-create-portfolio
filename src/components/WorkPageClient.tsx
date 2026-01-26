@@ -489,7 +489,6 @@ export default function WorkPageClient({
                   <WorkCard
                     id={index + 1}
                     title={project.title}
-                    tags={project.tags}
                     image={project.image}
                     videoUrl={project.videoUrl}
                     isSearchMode={isSearching}
@@ -497,7 +496,6 @@ export default function WorkPageClient({
                     forceFullHeight={basePath === "/content"}
                     disableVideoInteraction={basePath === "/content"}
                     contentType={project.contentType}
-                    onTagClick={handleTagClick}
                   />
                 </div>
               ))}
@@ -513,7 +511,6 @@ export default function WorkPageClient({
                   <WorkCard
                     id={index + 1}
                     title={project.title}
-                    tags={project.tags}
                     image={project.image}
                     videoUrl={project.videoUrl}
                     isSearchMode={isSearching}
@@ -521,7 +518,6 @@ export default function WorkPageClient({
                     forceFullHeight={basePath === "/content"}
                     disableVideoInteraction={basePath === "/content"}
                     contentType={project.contentType}
-                    onTagClick={handleTagClick}
                   />
                 </div>
               ))}
