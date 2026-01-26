@@ -93,9 +93,9 @@ export default function WorkCard({
 
       {/* 타이틀 */}
       <div className="p-4">
-        <h3 className="text-white text-left font-medium break-words">
+        {/* <h3 className="text-white text-left font-medium break-words">
           {title}
-        </h3>
+        </h3> */}
       </div>
     </div>
   );
