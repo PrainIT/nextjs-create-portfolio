@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
-import WorkCard from "@/components/WorkCard";
+import ContentCard from "@/components/ContentCard";
 import SearchBar from "@/components/SearchBar";
 import BottomPopup from "@/components/BottomPopup";
 import RelationContentCard from "@/components/RelationContentCard";
@@ -510,7 +510,7 @@ export default function WorkPageClient({
       {/* 상단 선 */}
       <div className="w-full h-px bg-grey-700" />
 
-      {/* NavBar와 WorkCard 영역 - flex row */}
+      {/* NavBar와 ContentCard 영역 - flex row */}
       <div className="flex-1 flex min-w-0">
         {/* NavBar - 고정 너비 */}
         <div className="w-64 flex-shrink-0">
@@ -525,7 +525,7 @@ export default function WorkPageClient({
           />
         </div>
 
-        {/* WorkCard 영역 - 나머지 공간 */}
+        {/* ContentCard 영역 - 나머지 공간 */}
         <div className="flex-1 pr-8 py-8 min-w-0">
           {/* 검색창 */}
           <div className="flex items-center justify-end mb-8 w-full">
@@ -551,7 +551,7 @@ export default function WorkPageClient({
                   onClick={() => handleProjectClick(project)}
                   className="cursor-pointer hover:opacity-90 transition-opacity mb-6 break-inside-avoid"
                 >
-                  <WorkCard
+                  <ContentCard
                     id={index + 1}
                     title={project.title}
                     image={project.image}
@@ -573,7 +573,7 @@ export default function WorkPageClient({
                   onClick={() => handleProjectClick(project)}
                   className="cursor-pointer hover:opacity-90 transition-opacity"
                 >
-                  <WorkCard
+                  <ContentCard
                     id={index + 1}
                     title={project.title}
                     image={project.image}
@@ -591,7 +591,7 @@ export default function WorkPageClient({
         </div>
       </div>
 
-      {/* 하단 선 - 전체 너비, NavBar와 WorkCard 아래 */}
+      {/* 하단 선 - 전체 너비, NavBar와 ContentCard 아래 */}
       <div className="w-full h-px bg-grey-700 mt-12 mb-12" />
 
       {/* 브랜디드/컨텐츠 팝업 */}

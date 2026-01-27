@@ -1,6 +1,6 @@
 "use client";
 
-interface WorkCardProps {
+interface ContentCardProps {
   id: number;
   title: string;
   image?: string;
@@ -13,7 +13,7 @@ interface WorkCardProps {
   contentType?: number; // 1: 유튜브, 2: 숏폼
 }
 
-export default function WorkCard({
+export default function ContentCard({
   id,
   title,
   image,
@@ -24,7 +24,7 @@ export default function WorkCard({
   forceFullHeight = false,
   disableVideoInteraction = false,
   contentType,
-}: WorkCardProps) {
+}: ContentCardProps) {
 
   return (
     <div className="overflow-hidden flex flex-col">
@@ -92,11 +92,11 @@ export default function WorkCard({
       </div>
 
       {/* 타이틀 */}
-      <div className="p-4">
+      {/* <div className="p-4"> */}
         {/* <h3 className="text-white text-left font-medium break-words">
           {title}
         </h3> */}
-      </div>
+      {/* </div> */}
     </div>
   );
 }

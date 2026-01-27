@@ -62,20 +62,10 @@ export default function Header() {
   return (
     <header className="mt-[60px] mx-auto mb-[60px]">
       <nav className="flex items-center justify-between px-4">
-        <Link href="/" className="flex items-center">
-          <Image
-            src="/logo.svg"
-            alt="Logo"
-            width={180}
-            height={120}
-            priority
-            className="h-auto"
-          />
-        </Link>
-        <div className="flex items-center gap-[55px]">
+        <div className="flex items-center gap-12">
           <Link
             href="/about"
-            className={`text-secondary-4 text-base transition-opacity ${
+            className={`text-secondary-4 text-sm transition-opacity ${
               isActive("/about")
                 ? "opacity-100"
                 : "opacity-50 hover:opacity-100"
@@ -85,7 +75,7 @@ export default function Header() {
           </Link>
           <Link
             href="/branded"
-            className={`text-secondary-4 text-base transition-opacity ${
+            className={`text-secondary-4 text-sm transition-opacity ${
               isActive("/branded") ? "opacity-100" : "opacity-50 hover:opacity-100"
             }`}
           >
@@ -93,7 +83,7 @@ export default function Header() {
           </Link>
           <Link
             href="/content"
-            className={`text-secondary-4 text-base transition-opacity ${
+            className={`text-secondary-4 text-sm transition-opacity ${
               isActive("/content") ? "opacity-100" : "opacity-50 hover:opacity-100"
             }`}
           >
@@ -101,7 +91,7 @@ export default function Header() {
           </Link>
           <Link
             href="/contact"
-            className={`text-secondary-4 text-base transition-opacity ${
+            className={`text-secondary-4 text-sm transition-opacity ${
               isActive("/contact")
                 ? "opacity-100"
                 : "opacity-50 hover:opacity-100"
@@ -109,17 +99,19 @@ export default function Header() {
           >
             CONTACT
           </Link>
+        </div>
+        <div className="flex items-center">
           {portfolioUrl ? (
             <a
               href={portfolioUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={`text-brand text-base transition-opacity opacity-100 hover:opacity-80 cursor-pointer`}
+              className={`text-brand text-sm transition-opacity opacity-100 hover:opacity-80 cursor-pointer`}
             >
               PORTFOLIO DOWNLOAD
             </a>
           ) : (
-            <span className="text-brand text-base opacity-50 cursor-not-allowed">
+            <span className="text-brand text-sm opacity-50 cursor-not-allowed">
               PORTFOLIO DOWNLOAD
             </span>
           )}
