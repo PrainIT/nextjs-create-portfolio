@@ -628,13 +628,13 @@ export default function WorkPageClient({
 
             {/* Client 이름 - title 상단 */}
             {selectedProject.client && (
-              <div className="text-lg text-black mb-2">
+              <div className="text-lg text-black mb-2 px-6 sm:px-12 md:px-24 lg:px-32 xl:px-48">
                 {selectedProject.client}
               </div>
             )}
 
             {/* Title과 PublishedAt - 같은 줄 */}
-            <div className="flex items-end gap-4 mb-4">
+            <div className="flex items-end gap-4 mb-4 px-6 sm:px-12 md:px-24 lg:px-32 xl:px-48">
               <h2 className="text-2xl font-bold text-black">
                 {selectedProject.title}
               </h2>
@@ -650,7 +650,7 @@ export default function WorkPageClient({
 
             {/* Description - title 아래 */}
             {selectedProject.description && (
-              <p className="text-base text-black mb-6">
+              <p className="text-base text-black mb-6 px-6 sm:px-12 md:px-24 lg:px-32 xl:px-48">
                 {selectedProject.description}
               </p>
             )}
@@ -734,7 +734,7 @@ export default function WorkPageClient({
                   // Content 1인 경우 항상 큰 사이즈로 표시 (videoUrls 무시)
                   if (embedUrl && selectedProject.contentType === 1) {
                     return (
-                      <div className="mb-6">
+                      <div className="mb-6 px-6 sm:px-12 md:px-24 lg:px-32 xl:px-48">
                         <div className="relative w-full aspect-video rounded-lg overflow-hidden">
                           <iframe
                             src={embedUrl}
@@ -801,8 +801,8 @@ export default function WorkPageClient({
             {/* Tags - video 아래, 위아래 divider */}
             {selectedProject.tags && selectedProject.tags.length > 0 && (
               <>
-                <div className="h-px bg-grey-300 mb-4" />
-                <div className="mb-4">
+                <div className="mb-4 px-6 sm:px-12 md:px-24 lg:px-32 xl:px-48">
+                  <div className="h-px bg-grey-300 mt-4 mb-4" />
                   <div className="flex items-center gap-2 text-sm font-bold text-black mb-3">
                     <svg
                       width="16"
@@ -833,8 +833,8 @@ export default function WorkPageClient({
                       </button>
                     ))}
                   </div>
+                  <div className="h-px bg-grey-300 mt-4 mb-4" />
                 </div>
-                <div className="h-px bg-grey-300 mb-4" />
               </>
             )}
 

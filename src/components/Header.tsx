@@ -64,6 +64,16 @@ export default function Header() {
       <nav className="flex items-center justify-between px-4">
         <div className="flex items-center gap-12">
           <Link
+            href="/"
+            className={`text-secondary-4 text-sm transition-opacity ${
+              isActive("/")
+                ? "opacity-100"
+                : "opacity-50 hover:opacity-100"
+            }`}
+          >
+            HOME
+          </Link>
+          <Link
             href="/about"
             className={`text-secondary-4 text-sm transition-opacity ${
               isActive("/about")

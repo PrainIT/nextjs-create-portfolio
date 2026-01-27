@@ -142,51 +142,7 @@ export default async function IndexPage() {
   };
 
   // 클라이언트에서 5개 무작위 선별하여 companies 생성
-  const selectedClients = getRandomClients(5);
-  const companies =
-    selectedClients.length > 0
-      ? selectedClients.map((client, index) => {
-          const workSlug = getWorkSlugForClient(client.name);
-          return {
-            name: client.name || "",
-            highlighted: false,
-            top: generateRandomTop(index, selectedClients.length),
-            slug: workSlug ? `/branded/${workSlug}` : "",
-          };
-        })
-      : [
-          // 클라이언트 데이터가 없을 때 더미 데이터
-          {
-            name: "ZESPRI",
-            highlighted: false,
-            top: generateRandomTop(0, 5),
-            slug: "",
-          },
-          {
-            name: "YUHAN-KIMBERLY",
-            highlighted: false,
-            top: generateRandomTop(1, 5),
-            slug: "",
-          },
-          {
-            name: "ASTRAZENECA",
-            highlighted: false,
-            top: generateRandomTop(2, 5),
-            slug: "",
-          },
-          {
-            name: "POSCO FUTURE",
-            highlighted: false,
-            top: generateRandomTop(3, 5),
-            slug: "",
-          },
-          {
-            name: "JIMMY JOHN'S",
-            highlighted: true,
-            top: generateRandomTop(4, 5),
-            slug: "",
-          },
-        ];
+  
 
   // 고객사 데이터 변환
   const clientLogos =
@@ -206,7 +162,7 @@ export default async function IndexPage() {
 
   return (
     <main className="w-full">
-      <HeroSection companies={companies} />
+      <HeroSection />
       <ContentSection contentCards={contentCards} subCategoryCounts={subCategoryCounts} />
       <LogoSlider logos={clientLogos} socialLinks={socialLinkData} />
     </main>
