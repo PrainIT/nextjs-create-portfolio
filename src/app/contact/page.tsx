@@ -19,10 +19,6 @@ export default function ContactPage() {
     message: string;
   }>({ type: null, message: "" });
 
-  const handleSearch = (keyword: string) => {
-    setSearchKeyword(keyword);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -78,37 +74,9 @@ export default function ContactPage() {
 
   return (
     <main className="w-full">
-      <div className="w-full h-px bg-grey-700 mt-12" />
-      {/* <NavBar
-        pageName="CONTACT"
-        title=""
-        showBackButton={true}
-        onTitleClick={() => {
-          router.push("/");
-        }}
-        categories={[]}
-        absolute={true}
-      /> */}
-
-      {/* 검색바 - 오른쪽 위 */}
-      {/* <div className="pl-64 pr-8 py-8">
-        <div className="flex justify-end mb-8">
-          <div className="w-full max-w-[850px]">
-            <SearchBar
-              placeholder="SEARCH"
-              onSearch={handleSearch}
-              value={searchKeyword}
-              onChange={(value) => {
-                setSearchKeyword(value);
-                handleSearch(value);
-              }}
-            />
-          </div>
-        </div>
-      </div> */}
 
       {/* 제목 섹션 */}
-      <div className="flex flex-col gap-4 max-w-[850px] mb-8 mx-auto pt-20">
+      <div className="flex flex-col gap-4 max-w-[850px] mb-8 mx-auto pt-40">
         <h3 className="text-white text-2xl font-bold text-center">
           NICE TO MEET YOU
         </h3>

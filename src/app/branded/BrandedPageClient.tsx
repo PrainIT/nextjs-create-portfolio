@@ -35,7 +35,6 @@ export default function BrandedPageClient({
       className="w-full relative flex flex-col overflow-x-hidden pt-24"
       style={{ minHeight: "100vh" }}
     >
-      <div className="w-full h-px bg-grey-700" />
 
       <div className="flex-1 py-8 px-8 min-w-0 pt-24">
         <div className="grid grid-cols-3 gap-6">

@@ -267,7 +267,6 @@ export default function ContentPageClient({
       className="w-full relative flex flex-col overflow-x-hidden pt-24"
       style={{ minHeight: "100vh" }}
     >
-      <div className="w-full h-px bg-grey-700" />
 
       <div className="flex-1 flex min-w-0">
         <div className="w-64 flex-shrink-0">
@@ -297,7 +296,7 @@ export default function ContentPageClient({
             </div>
           </div>
 
-          <div className="columns-3 gap-6" style={{ columnGap: "1.5rem" }}>
+          <div className="columns-3 gap-6" style={{ columnGap: "1rem" }}>
             {filteredProjects.map((project, index) => (
               <div
                 key={project.id}

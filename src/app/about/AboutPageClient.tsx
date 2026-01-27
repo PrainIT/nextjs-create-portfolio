@@ -155,7 +155,7 @@ export default function AboutPageClient({
       </div>
 
       {/* 하단 선 */}
-      <div className="w-full h-px bg-white mt-12" />
+      <div className="w-full h-px bg-white mt-12 opacity-40" />
 
       {/* 저작권 텍스트 */}
       <div className="text-center py-6">
