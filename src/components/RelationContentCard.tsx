@@ -57,16 +57,7 @@ export default function RelationContentCard({
                 ) : (
                   <div className="w-full h-full bg-grey-800" />
                 )}
-              </div>
-
-
-
-              {/* 날짜 */}
-              {video.date && (
-                <p className="text-white text-xs text-center text-grey-300">
-                  {formatDate(video.date)}
-                </p>
-              )}
+              </div>        
             </div>
           ))}
         </div>

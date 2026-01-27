@@ -33,10 +33,10 @@ export default function SearchAndFilter({
   onSearchChange,
 }: SearchAndFilterProps) {
   return (
-    <div className="w-full py-8 px-4">
-      <div className="max-w-[1440px] mx-auto">
+    <div className="w-full py-28 px-4">
+      <div className="max-w-[1440px] mx-auto py-4">
         {/* 검색바 */}
-        <div className="flex justify-center mb-6 pt-100">
+        <div className="flex justify-center">
           <div className="relative max-w-[850px] w-full">
             <input
               type="text"

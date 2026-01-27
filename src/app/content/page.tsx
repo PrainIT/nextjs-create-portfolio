@@ -1,5 +1,5 @@
 import { type SanityDocument } from "next-sanity";
-import WorkPageClient from "@/components/WorkPageClient";
+import ContentPageClient from "@/app/content/ContentPageClient";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/utils";
 
@@ -142,10 +142,9 @@ export default async function ContentPage() {
   });
 
   return (
-    <WorkPageClient
+    <ContentPageClient
       workProjects={workProjects}
       workCategories={contentCategories}
-      basePath="/content"
       pageTitle="전체 프로젝트"
     />
   );

@@ -1,5 +1,5 @@
 import { type SanityDocument } from "next-sanity";
-import WorkPageClient from "@/components/WorkPageClient";
+import BrandedPageClient from "@/app/branded/BrandedPageClient";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/utils";
 
@@ -18,23 +18,6 @@ const WORK_QUERY = `*[_type == "branded"] | order(order asc, publishedAt desc) {
 }`;
 
 const options = { next: { revalidate: 30 } };
-
-// Industry 카테고리
-const brandedCategories = [
-  {
-    title: "Industry",
-    items: [
-      { label: "금융", value: "finance" },
-      { label: "기업PR/정부·공공기관", value: "corporate-pr-government" },
-      { label: "IT·정보통신/서비스", value: "it-communication-service" },
-      { label: "패션·뷰티/생활용품", value: "fashion-beauty-household" },
-      { label: "가전/전자", value: "appliance-electronics" },
-      { label: "식음료/제약", value: "food-beverage-pharmaceutical" },
-      { label: "자동차/건설", value: "automotive-construction" },
-      { label: "유통/기타", value: "distribution-other" },
-    ],
-  },
-] as const;
 
 export default async function BrandedPage() {
   const works = await client.fetch<SanityDocument[]>(WORK_QUERY, {}, options);
@@ -89,12 +72,5 @@ export default async function BrandedPage() {
     };
   });
 
-  return (
-    <WorkPageClient
-      workProjects={workProjects}
-      workCategories={brandedCategories}
-      basePath="/branded"
-      pageTitle="전체 프로젝트"
-    />
-  );
+  return <BrandedPageClient workProjects={workProjects} />;
 }

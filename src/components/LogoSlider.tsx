@@ -116,10 +116,9 @@ export default function LogoSlider({
   );
 
   return (
-    <section className="w-full py-12 border-b border-grey-800">
+    <section className="w-full">
       <div className="relative overflow-hidden">
-        {/* 상단 선 */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-grey-700" />
+       
         {/* 로고 슬라이더 */}
         <div className="flex items-center justify-center py-20">
           <div className="relative w-full overflow-hidden">
@@ -165,7 +164,6 @@ export default function LogoSlider({
                           style={{
                             maxHeight: "40px",
                             width: "auto",
-                            filter: "brightness(0.7)", // 텍스트 색상과 비슷하게
                           }}
                         />
                       ) : (
@@ -187,11 +185,11 @@ export default function LogoSlider({
           </div>
         </div>
         {/* 하단 선 */}
-        <div className="w-full h-px bg-grey-700 mb-2" />
+        <div className="w-full h-px bg-white opacity-40 mb-2" />
       </div>
 
       <div className="flex flex-row items-center items-start mt-12">
-        <div className="flex flex-col gap-12">
+        <div className="flex flex-col gap-12 px-12">
           <div className="text-3xl font-medium ">
             함께하면 더 좋은 일들,
             <br />
@@ -218,7 +216,6 @@ export default function LogoSlider({
                       style={{
                         maxHeight: "28px",
                         width: "auto",
-                        filter: "brightness(0.7)",
                       }}
                     />
                   ) : (
@@ -229,14 +226,14 @@ export default function LogoSlider({
                 </a>
               ))
             ) : (
-              <span className="text-grey-400 text-xl font-medium whitespace-nowrap">
+              <span className="text-white text-xl font-medium whitespace-nowrap">
                 준비중
               </span>
             )}
           </div>
         </div>
         <div className="flex flex-col gap-8 ml-32">
-          <div className="text-base text-grey-400">
+          <div className="text-base text-white">
             서로의 강점을 신뢰하며 아이디어를 확장시킵니다.
             <br />
             각자의 전문 분야가 하나의 완성된 결과로 자연스럽게 이어집니다.
@@ -245,7 +242,7 @@ export default function LogoSlider({
           </div>
           <button
             onClick={() => router.push("/contact")}
-            className="bg-brand text-white px-2 py-4 rounded-full min-w-40 w-[200px] hover:opacity-80 transition-all duration-300"
+            className="bg-[#272727] text-white px-2 py-4 rounded-full min-w-40 w-[200px] hover:opacity-80 transition-all duration-300"
           >
             CONTACT
           </button>
@@ -253,11 +250,11 @@ export default function LogoSlider({
       </div>
 
       {/* 하단 선 */}
-      <div className="w-full h-px bg-grey-700 mt-12" />
+      <div className="w-full h-px bg-white opacity-40 mt-12" />
 
       {/* 저작권 텍스트 */}
       <div className="text-center py-6">
-        <p className="text-grey-500 text-sm">
+        <p className="text-white opacity-40 text-sm">
           © 2025. PRAIN GLOBAL CREATIVE PART. All rights reserved.
         </p>
       </div>

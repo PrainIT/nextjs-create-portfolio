@@ -14,7 +14,10 @@ export default function BackgroundColor() {
       body.style.backgroundColor = "#FF6B00";
     } else if (pathname === "/branded") {
       body.style.backgroundColor = "#E3E3E3";
-    } else {
+    } else if (pathname === "/content") {
+      body.style.backgroundColor = "#1A1A1A";
+    }
+    else {
       body.style.backgroundColor = "white";
     }
 
