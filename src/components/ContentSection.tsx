@@ -2,9 +2,18 @@
 
 import { useState, useMemo } from "react";
 import SearchAndFilter, { defaultFilters } from "./SearchAndFilter";
-import HorizontalScrollSection, {
-  ContentCard,
-} from "./HorizontalScrollSection";
+
+interface ContentCard {
+  id: string;
+  title: string;
+  description: string;
+  subDescription: string;
+  image?: string;
+  videoUrl?: string;
+  contentType?: number;
+  slug?: string;
+  subCategory?: string | string[];
+}
 
 interface ContentSectionProps {
   contentCards: ContentCard[];
@@ -63,9 +72,6 @@ export default function ContentSection({ contentCards, subCategoryCounts }: Cont
         onFilterChange={setSelectedFilter}
         filtersWithCount={filtersWithCount}
       />
-
-      {/* 가로 스크롤 캐러셀 - sticky 섹션 */}
-      <HorizontalScrollSection cards={filteredCards} />
     </>
   );
 }
