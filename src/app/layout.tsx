@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
-import DarkVeil from "@/components/DarkVeil";
+import BackgroundColor from "@/components/BackgroundColor";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,28 +29,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased text-[#ededed]`}
       >
-        {/* 전역 배경 DarkVeil */}
-        <div 
-          style={{ 
-            position: 'fixed', 
-            top: 0, 
-            left: 0, 
-            width: '100%', 
-            height: '100%', 
-            zIndex: -1,
-            pointerEvents: 'none'
-          }}
-        >
-          <DarkVeil
-            hueShift={217}
-            noiseIntensity={0}
-            scanlineIntensity={0}
-            speed={2.1}
-            scanlineFrequency={0.5}
-            warpAmount={2.9}
-          />
-        </div>
-        <div className="max-w-[1440px] mx-auto px-8">
+        <BackgroundColor />
+        <div className="max-w-[1440px] mx-auto">
           <Header />
           <main className="relative">{children}</main>
         </div>

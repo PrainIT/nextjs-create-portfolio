@@ -209,9 +209,20 @@ import { useRouter } from "next/navigation";
 export default function HeroSection() {
   return (
     <section className="relative w-full h-screen overflow-visible">
-      {/* 글로우 효과는 globals.css의 body::before, body::after로 처리됨 */}
+      {/* 배경 비디오 */}
+      <div className="absolute inset-0 z-0">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover"
+        >
+          <source src="/preview.mp4" type="video/mp4" />
+        </video>
+      </div>
 
-      {/* 메인 텍스트 - 뒤로 이동 (z-index 낮춤) */}
+      {/* 메인 텍스트 - 영상 위에 표시 */}
       <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
         <div
           className="text-center font-extrabold text-white opacity-20"

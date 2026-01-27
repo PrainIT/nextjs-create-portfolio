@@ -23,26 +23,14 @@ export const defaultFilters = [
 // 호환성을 위해 filters도 export
 export const filters = defaultFilters;
 
-interface FilterWithCount {
-  name: string;
-  value: string;
-  count: number;
-}
-
 interface SearchAndFilterProps {
   searchKeyword: string;
   onSearchChange: (keyword: string) => void;
-  selectedFilter: string;
-  onFilterChange: (filterValue: string) => void;
-  filtersWithCount: FilterWithCount[];
 }
 
 export default function SearchAndFilter({
   searchKeyword,
   onSearchChange,
-  selectedFilter,
-  onFilterChange,
-  filtersWithCount,
 }: SearchAndFilterProps) {
   return (
     <div className="w-full py-8 px-4">
@@ -89,28 +77,6 @@ export default function SearchAndFilter({
               </svg>
             </button>
           </div>
-        </div>
-
-        {/* 필터 태그들 */}
-        <div className="flex flex-wrap gap-3 mb-12 justify-center">
-          {filtersWithCount.map((filter, index) => {
-            const isNewRow = index > 0 && index % 5 === 0;
-            return (
-              <React.Fragment key={filter.value}>
-                {isNewRow && <div className="w-full basis-full" />}
-                <button
-                  onClick={() => onFilterChange(filter.value)}
-                  className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all border ${
-                    selectedFilter === filter.value
-                      ? "border-[#FF6B35] text-[#FF6B35]"
-                      : "border-grey-600 text-grey-600 hover:border-grey-100 hover:text-grey-100"
-                  }`}
-                >
-                  {filter.name} {filter.count > 0 && `(${filter.count})`}
-                </button>
-              </React.Fragment>
-            );
-          })}
         </div>
       </div>
     </div>

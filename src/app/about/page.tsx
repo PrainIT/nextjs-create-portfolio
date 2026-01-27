@@ -1,7 +1,6 @@
 import { type SanityDocument } from "next-sanity";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/utils";
-import { PortableText } from "next-sanity";
 import AboutPageClient from "./AboutPageClient";
 
 const ABOUT_QUERY = `*[_type == "about"][0] {
@@ -59,18 +58,9 @@ export default async function AboutPage() {
     ? urlForImage(dummyAbout.mainImage)
     : null;
 
-  // 콘텐츠 카드 이미지 URL 생성
-  const contentCardImageUrls =
-    dummyAbout.contentCards?.map((card: any) =>
-      card?.image ? urlForImage(card.image) : null
-    ) || [];
-
   return (
     <AboutPageClient
       about={dummyAbout}
-      mainImageUrl={mainImageUrl}
-      contentCards={dummyAbout.contentCards}
-      contentCardImageUrls={contentCardImageUrls}
     />
   );
 }

@@ -59,54 +59,43 @@ export default function Header() {
     return pathname.startsWith(href);
   };
 
+  // Home 또는 About 페이지인지 확인
+  const isHomeOrAbout = pathname === "/" || pathname === "/about";
+
+  // 링크 스타일 클래스 생성 함수
+  const getLinkClassName = (href: string) => {
+    if (isHomeOrAbout) {
+      // Home, About 페이지일 때: 현재 색상 유지
+      return `text-secondary-4 text-sm transition-opacity ${
+        isActive(href) ? "opacity-100" : "opacity-50 hover:opacity-100"
+      }`;
+    } else {
+      // 나머지 페이지일 때: #000000 opacity-20, hover 시 #FF6B00
+      return `text-sm transition-colors ${
+        isActive(href)
+          ? "text-[#FF6B00]"
+          : "text-[#000000] opacity-20 hover:text-[#FF6B00] hover:opacity-100"
+      }`;
+    }
+  };
+
   return (
-    <header className="mt-[60px] mx-auto mb-[60px]">
-      <nav className="flex items-center justify-between px-4">
+    <header className="fixed top-10 left-0 right-0 z-50">
+      <nav className="flex items-center justify-between px-8">
         <div className="flex items-center gap-12">
-          <Link
-            href="/"
-            className={`text-secondary-4 text-sm transition-opacity ${
-              isActive("/")
-                ? "opacity-100"
-                : "opacity-50 hover:opacity-100"
-            }`}
-          >
+          <Link href="/" className={getLinkClassName("/")}>
             HOME
           </Link>
-          <Link
-            href="/about"
-            className={`text-secondary-4 text-sm transition-opacity ${
-              isActive("/about")
-                ? "opacity-100"
-                : "opacity-50 hover:opacity-100"
-            }`}
-          >
+          <Link href="/about" className={getLinkClassName("/about")}>
             ABOUT
           </Link>
-          <Link
-            href="/branded"
-            className={`text-secondary-4 text-sm transition-opacity ${
-              isActive("/branded") ? "opacity-100" : "opacity-50 hover:opacity-100"
-            }`}
-          >
+          <Link href="/branded" className={getLinkClassName("/branded")}>
             BRANDED
           </Link>
-          <Link
-            href="/content"
-            className={`text-secondary-4 text-sm transition-opacity ${
-              isActive("/content") ? "opacity-100" : "opacity-50 hover:opacity-100"
-            }`}
-          >
+          <Link href="/content" className={getLinkClassName("/content")}>
             CONTENT
           </Link>
-          <Link
-            href="/contact"
-            className={`text-secondary-4 text-sm transition-opacity ${
-              isActive("/contact")
-                ? "opacity-100"
-                : "opacity-50 hover:opacity-100"
-            }`}
-          >
+          <Link href="/contact" className={getLinkClassName("/contact")}>
             CONTACT
           </Link>
         </div>
