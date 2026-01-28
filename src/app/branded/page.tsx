@@ -7,6 +7,7 @@ const WORK_QUERY = `*[_type == "branded"] | order(order asc, publishedAt desc) {
   _id,
   title,
   slug,
+  image,
   clientLogo,
   tags,
   category,
@@ -57,13 +58,19 @@ export default async function BrandedPage() {
 
   // 모든 콘텐츠 포함 (필터링 제거)
   const workProjects = dummyWorks.map((work) => {
-    // clientLogo 우선, 없으면 clientRef 로고 사용
+    // 고객사 로고 우선, 없으면 워크 대표 이미지(클라이언트 이미지) 사용
     const logoImage = work.clientLogo || work.clientRefLogo;
+    const workImage = work.image;
+    const imageUrl = logoImage
+      ? urlForImage(logoImage)
+      : workImage
+        ? urlForImage(workImage)
+        : undefined;
     return {
       id: work._id,
       title: work.title,
       tags: work.tags || [],
-      image: logoImage ? urlForImage(logoImage) : undefined,
+      image: imageUrl,
       category: work.category,
       subCategory: work.subCategory,
       slug: work.slug?.current,
