@@ -1,7 +1,7 @@
 import { type SanityDocument } from "next-sanity";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/utils";
-import WorkDetailClient from "@/components/WorkDetailClient";
+import BrandedDetailClient from "@/app/branded/BrandedDetailClient";
 
 const WORK_QUERY = `*[_type == "branded" && slug.current == $slug][0] {
   _id,
@@ -136,14 +136,13 @@ export default async function BrandedDetailPage({
   });
 
   return (
-    <WorkDetailClient
+    <BrandedDetailClient
       work={{
         ...work,
         clientLogoUrl,
         contents: contentsWithImageUrls,
       }}
       workImageUrl={workImageUrl}
-      basePath="/branded"
       relatedVideos={relatedVideos}
     />
   );

@@ -9,7 +9,6 @@ import Template1 from "@/components/work-templates/Template1";
 import Template2 from "@/components/work-templates/Template2";
 import Template3 from "@/components/work-templates/Template3";
 import Template4 from "@/components/work-templates/Template4";
-import SearchBar from "@/components/SearchBar";
 import RelationContentCard from "@/components/RelationContentCard";
 
 interface Content {
@@ -36,10 +35,11 @@ interface RelatedVideo {
   onClick?: () => void;
 }
 
-interface WorkDetailClientProps {
+interface BrandedDetailClientProps {
   work: SanityDocument & {
     client?: string;
     summary?: string;
+    clientLogoUrl?: string | null;
     award?: {
       title?: string;
       description?: string;
@@ -47,12 +47,10 @@ interface WorkDetailClientProps {
     contents?: Content[];
   };
   workImageUrl: string | null;
-  basePath: string; // "/branded" 또는 "/content"
-  pageName?: string; // 페이지 이름 (기본값: basePath에 따라 결정)
-  relatedVideos?: RelatedVideo[]; // 관련 영상 목록
+  relatedVideos?: RelatedVideo[];
 }
 
-const workCategories = [
+const BrandedCategories = [
   {
     title: "영상 콘텐츠",
     items: [
@@ -104,26 +102,24 @@ const categoryLabels: Record<string, string> = {
   ai: "AI 콘텐츠",
 };
 
+const BASE_PATH = "/branded";
+
 export default function WorkDetailClient({
   work,
   workImageUrl,
-  basePath,
-  pageName,
   relatedVideos = [],
-}: WorkDetailClientProps) {
+}: BrandedDetailClientProps) {
   const router = useRouter();
   const contentRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const [activeContent, setActiveContent] = useState<number | null>(null);
   const [showStickyNav, setShowStickyNav] = useState(false);
 
-  const displayPageName = pageName || (basePath === "/branded" ? "BRANDED" : "CONTENT");
-
   const handleBack = () => {
-    router.push(basePath);
+    router.push(BASE_PATH);
   };
 
   const getSubCategoryLabel = (category: string, subCategory: string) => {
-    const categoryGroup = workCategories.find(
+    const categoryGroup = BrandedCategories.find(
       (cat) => cat.title === categoryLabels[category] || false
     );
     return (
@@ -137,28 +133,22 @@ export default function WorkDetailClient({
     return new Date(dateString).toLocaleDateString("ko-KR");
   };
 
-  // Content2 그룹화 및 videoUrls 병합 로직 (branded 페이지에서만)
+  // Content2 그룹화 및 videoUrls 병합 (branded 전용)
   const processedContents = useMemo(() => {
-    if (basePath !== "/branded" || !work.contents) {
-      return work.contents || [];
-    }
+    if (!work.contents) return [];
 
-    const baseContent2Map = new Map<string, Content>(); // _id -> 기준 Content2
-    const attachContent2List: Content[] = []; // 보조 Content2 목록
+    const baseContent2Map = new Map<string, Content>();
+    const attachContent2List: Content[] = [];
 
-    // 1단계: Content2를 기준/보조로 분류
     work.contents.forEach((content) => {
       if (content.contentType === 2) {
         if (content.content2Role === 'base') {
-          // 기준 Content2
           if (content._id) {
             baseContent2Map.set(content._id, { ...content });
           }
         } else if (content.content2Role === 'attach') {
-          // 보조 Content2
           attachContent2List.push(content);
         } else {
-          // content2Role이 없는 경우 (기존 데이터 호환성) - 기준으로 처리
           if (content._id) {
             baseContent2Map.set(content._id, { ...content });
           }
@@ -166,12 +156,10 @@ export default function WorkDetailClient({
       }
     });
 
-    // 2단계: 보조 Content2의 videoUrls를 기준 Content2에 병합
     attachContent2List.forEach((attachContent) => {
       if (attachContent.attachToContentId) {
         const baseContent = baseContent2Map.get(attachContent.attachToContentId);
         if (baseContent) {
-          // videoUrls 병합
           const baseUrls = baseContent.videoUrls || [];
           const attachUrls = attachContent.videoUrls || [];
           baseContent.videoUrls = [...baseUrls, ...attachUrls];
@@ -179,15 +167,11 @@ export default function WorkDetailClient({
       }
     });
 
-    // 3단계: 최종 배열 구성 (보조 Content2는 제외)
     const finalContents: Content[] = [];
     work.contents.forEach((content) => {
       if (content.contentType === 2 && content.content2Role === 'attach') {
-        // 보조 Content2는 제외
         return;
       }
-      
-      // 기준 Content2인 경우 병합된 videoUrls 사용
       if (content.contentType === 2 && content._id) {
         const mergedContent = baseContent2Map.get(content._id);
         if (mergedContent) {
@@ -195,13 +179,11 @@ export default function WorkDetailClient({
           return;
         }
       }
-      
-      // 그 외는 그대로 추가
       finalContents.push(content);
     });
 
     return finalContents;
-  }, [basePath, work.contents]);
+  }, [work.contents]);
 
   const scrollToContent = (contentIndex: number) => {
     const content = processedContents?.[contentIndex];
@@ -213,12 +195,9 @@ export default function WorkDetailClient({
     }
   };
 
-  // 스크롤 감지로 activeContent 업데이트 및 sticky nav 표시
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + window.innerHeight / 2;
-
-      // 첫 화면을 벗어났는지 확인 (스크롤이 100px 이상)
       setShowStickyNav(window.scrollY > 700);
 
       processedContents?.forEach((_, index) => {
@@ -236,7 +215,7 @@ export default function WorkDetailClient({
     };
 
     window.addEventListener("scroll", handleScroll);
-    handleScroll(); // 초기 실행
+    handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, [processedContents]);
@@ -293,27 +272,21 @@ export default function WorkDetailClient({
 
   return (
     <main
-      className="w-full relative flex flex-col overflow-x-hidden"
+      className="w-full relative flex flex-col overflow-x-hidden pt-24"
       style={{ minHeight: "100vh" }}
     >
-      {/* 상단 선 */}
-      <div className="w-full h-px bg-grey-700" />
 
-      {/* NavBar와 콘텐츠 영역 - flex row */}
       <div className="flex-1 flex min-w-0">
-        {/* NavBar - 고정 너비 */}
         <div className="w-64 flex-shrink-0 pl-8 py-8 mr-8">
           <div className="flex flex-col gap-8">
-            {/* HOME | PageName */}
             <div className="flex items-center gap-2 text-sm text-grey-400">
               <Link href="/" className="hover:text-grey-200 transition-colors">
                 HOME
               </Link>
               <span className="text-grey-600">|</span>
-              <span className="text-grey-200 font-medium">{displayPageName}</span>
+              <span className="text-grey-200 font-medium">BRANDED</span>
             </div>
 
-            {/* 뒤로가기 버튼 */}
             <motion.button
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1 }}
@@ -339,7 +312,6 @@ export default function WorkDetailClient({
               </svg>
             </motion.button>
 
-            {/* Title */}
             {work.title && (
               <div className="text-white font-bold text-lg break-words">
                 {work.title}
@@ -347,14 +319,12 @@ export default function WorkDetailClient({
             )}
 
             <div className="flex flex-col gap-2">
-              {/* Client */}
               {work.client && (
                 <div className="text-sm text-grey-500">
                   <span className="font-bold">Client</span> {work.client}
                 </div>
               )}
 
-              {/* Work */}
               {work.category && (
                 <div className="text-sm text-grey-500">
                   <span className="font-bold">Work</span>{" "}
@@ -364,7 +334,6 @@ export default function WorkDetailClient({
                 </div>
               )}
 
-              {/* Data */}
               {work.publishedAt && (
                 <div className="text-sm text-grey-500">
                   <span className="font-bold">Data</span>{" "}
@@ -373,7 +342,6 @@ export default function WorkDetailClient({
               )}
             </div>
 
-            {/* Award */}
             {work.award && (work.award.title || work.award.description) && (
               <div className="mb-4">
                 <div className="text-sm text-grey-500 mb-2">Award</div>
@@ -390,7 +358,6 @@ export default function WorkDetailClient({
               </div>
             )}
           </div>
-          {/* Content Navigation */}
           {processedContents && processedContents.length > 0 && (
             <div className="sticky top-[0%] flex flex-col gap-2 py-2.5">
               {processedContents.map((content, index) => (
@@ -410,19 +377,13 @@ export default function WorkDetailClient({
           )}
         </div>
 
-        {/* 콘텐츠 영역 - 나머지 공간 */}
         <div className="flex-1 pr-8 py-8 min-w-0">
-          {/* 검색창 - 오른쪽 위 */}
-          {/* <div className="flex justify-end mb-8">
-            <SearchBar placeholder="SEARCH" />
-          </div> */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="w-full max-w-4xl"
           >
-            {/* Summary */}
             {work.summary && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -436,7 +397,6 @@ export default function WorkDetailClient({
               </motion.div>
             )}
 
-            {/* Contents */}
             {processedContents && processedContents.length > 0 && (
               <div className="space-y-24">
                 {processedContents.map((content, index) => (
@@ -455,17 +415,15 @@ export default function WorkDetailClient({
         </div>
       </div>
 
-      {/* 하단 선 */}
       <div className="w-full h-px bg-grey-700 mt-12 mb-12" />
 
-      {/* 관련 영상 섹션 - branded 페이지용 */}
-      {basePath === "/branded" && relatedVideos && relatedVideos.length > 0 && (
+      {relatedVideos && relatedVideos.length > 0 && (
         <div className="w-full">
           <RelationContentCard
             videos={relatedVideos.map((video) => ({
               ...video,
               onClick: () => {
-                router.push(`${basePath}/${video.slug}`);
+                if (video.slug) router.push(`${BASE_PATH}/${video.slug}`);
               },
             }))}
             title="관련 영상을 더 찾으셨나요?"
@@ -475,4 +433,3 @@ export default function WorkDetailClient({
     </main>
   );
 }
-
