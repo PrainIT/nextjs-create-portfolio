@@ -365,7 +365,9 @@ export default function ContentPageClient({
               (selectedProject.contentType === 3 || selectedProject.contentType === 4) &&
               selectedProject.contentImages &&
               selectedProject.contentImages.length > 0 && (
-                <ImageSlider images={selectedProject.contentImages} title={selectedProject.title} />
+                <div className="px-6 sm:px-12 md:px-24 lg:px-32 xl:px-48">
+                  <ImageSlider images={selectedProject.contentImages} title={selectedProject.title} />
+                </div>
               )}
 
             {selectedProject.image &&
