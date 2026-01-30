@@ -81,7 +81,7 @@ export default function Header() {
 
   return (
     <header className="fixed top-10 left-0 right-0 z-50">
-      <nav className="flex items-center justify-between px-8">
+      <nav className="flex items-center justify-between px-12">
         <div className="flex items-center gap-12">
           <Link href="/" className={getLinkClassName("/")}>
             HOME
