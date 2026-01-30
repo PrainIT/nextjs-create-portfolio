@@ -1,52 +1,29 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
+import Image from "next/image";
 import SearchAndFilter from "./SearchAndFilter";
 
-interface ContentCard {
-  id: string;
-  title: string;
-  description: string;
-  subDescription: string;
-  image?: string;
-  videoUrl?: string;
-  contentType?: number;
-  slug?: string;
-  subCategory?: string | string[];
-}
-
-interface ContentSectionProps {
-  contentCards: ContentCard[];
-  subCategoryCounts?: Record<string, number>; // 서브카테고리별 카운트
-}
-
-export default function ContentSection({ contentCards, subCategoryCounts }: ContentSectionProps) {
+export default function ContentSection() {
   const [searchKeyword, setSearchKeyword] = useState("");
 
-  // 필터링된 카드 (검색어만 적용)
-  const filteredCards = useMemo(() => {
-    let filtered = contentCards;
-
-    if (searchKeyword) {
-      const keyword = searchKeyword.toLowerCase();
-      filtered = filtered.filter(
-        (card) =>
-          card.title.toLowerCase().includes(keyword) ||
-          card.description.toLowerCase().includes(keyword) ||
-          card.subDescription.toLowerCase().includes(keyword)
-      );
-    }
-
-    return filtered;
-  }, [contentCards, searchKeyword]);
-
   return (
-    <>
-      {/* 검색창 - 일반 섹션 */}
-      <SearchAndFilter
-        searchKeyword={searchKeyword}
-        onSearchChange={setSearchKeyword}
+    <div className="relative w-full">
+      <Image
+        src="/MainHeroImage.png"
+        alt="메인 히어로 콘텐츠 모음"
+        width={1440}
+        height={900}
+        className="relative z-0 w-full h-auto object-cover"
+        sizes="100vw"
+        priority
       />
-    </>
+      <div className="absolute inset-0 z-10 flex items-start justify-center pt-12 md:pt-20 lg:pt-28">
+        <SearchAndFilter
+          searchKeyword={searchKeyword}
+          onSearchChange={setSearchKeyword}
+        />
+      </div>
+    </div>
   );
 }

@@ -34,16 +34,16 @@ export default function SearchAndFilter({
 }: SearchAndFilterProps) {
   return (
     <div className="w-full py-28 px-4">
-      <div className="max-w-[1440px] mx-auto py-4">
+      <div className="mx-auto py-4">
         {/* 검색바 */}
         <div className="flex justify-center">
-          <div className="relative max-w-[850px] w-full">
+          <div className="relative max-w-[560px] w-full">
             <input
               type="text"
               placeholder="ENTER A KEYWORD"
               value={searchKeyword}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full h-[120px] px-[14px] pr-[70px] rounded-full bg-[#0f0f0f] text-grey-200 text-3xl placeholder-grey-400 placeholder:text-3xl placeholder:text-white placeholder:opacity-10 text-center focus:outline-none focus:ring-2 focus:ring-brand"
+              className="w-full h-[100px] px-[14px] pr-[70px] rounded-full bg-[#0f0f0f] text-grey-200 text-3xl placeholder-grey-400 placeholder:text-3xl placeholder:text-white placeholder:opacity-10 text-center focus:outline-none focus:ring-2 focus:ring-brand"
               style={{
                 textAlign: "center",
                 lineHeight: "120px",

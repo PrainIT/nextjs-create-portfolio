@@ -5,17 +5,6 @@ import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/utils";
 import { type SanityDocument } from "next-sanity";
 
-const BRAND_QUERY = `*[_type == "branded"] | order(order asc, publishedAt desc) {
-  _id,
-  title,
-  slug,
-  dashboardDescription,
-  dashboardImage,
-  subCategory,
-  publishedAt,
-  order
-}`;
-
 const CLIENT_QUERY = `*[_type == "client"] | order(order asc) {
   _id,
   name,
@@ -41,7 +30,6 @@ const SOCIAL_LINK_QUERY = `*[_type == "socialLink"] | order(order asc) {
 const options = { next: { revalidate: 30 } };
 
 export default async function IndexPage() {
-  const brands = await client.fetch<SanityDocument[]>(BRAND_QUERY, {}, options);
   const clients = await client.fetch<SanityDocument[]>(
     CLIENT_QUERY,
     {},
@@ -53,68 +41,6 @@ export default async function IndexPage() {
     {},
     options
   );
-
-  // 더미 데이터 생성 (Sanity에 데이터가 없을 경우)
-  const dummyBrands: SanityDocument[] =
-    brands.length > 0
-      ? brands
-      : [
-          {
-            _id: "dummy-brand-1",
-            _rev: "dummy-rev-1",
-            _type: "branded",
-            _createdAt: new Date().toISOString(),
-            _updatedAt: new Date().toISOString(),
-            title: "11번가 공식 인스타그램 운영",
-            slug: { current: "11st-instagram" },
-            dashboardDescription: "이러이러한걸 했고요 저러저러했습니다",
-            subCategory: "finance",
-            order: 1,
-          },
-          {
-            _id: "dummy-brand-2",
-            _rev: "dummy-rev-2",
-            _type: "branded",
-            _createdAt: new Date().toISOString(),
-            _updatedAt: new Date().toISOString(),
-            title: "제스프리 코리아 DPR",
-            slug: { current: "zespri-korea-dpr" },
-            dashboardDescription: "이러이러한걸 했고요 지러지러했습니다",
-            subCategory: "food-beverage-pharmaceutical",
-            order: 2,
-          },
-          {
-            _id: "dummy-brand-3",
-            _rev: "dummy-rev-3",
-            _type: "branded",
-            _createdAt: new Date().toISOString(),
-            _updatedAt: new Date().toISOString(),
-            title: "롯데월드 공식 유튜브",
-            slug: { current: "lotte-world-youtube" },
-            dashboardDescription: "이러이러한걸 했고요 저러저러했습니다.",
-            subCategory: "distribution-other",
-            order: 3,
-          },
-        ];
-
-  // Branded를 ContentCard로 변환 (원래대로 dashboardImage 사용)
-  const contentCards = dummyBrands.map((brand) => ({
-    id: brand._id,
-    title: brand.title,
-    description: brand.dashboardDescription || "",
-    subDescription: "", // branded에는 subDescription 없음
-    image: brand.dashboardImage ? urlForImage(brand.dashboardImage) : undefined,
-    slug: brand.slug?.current,
-    subCategory: brand.subCategory || "", // Industry 서브카테고리
-  }));
-
-  // 각 서브카테고리별 카운트 계산
-  const subCategoryCounts: Record<string, number> = {};
-  dummyBrands.forEach((brand) => {
-    if (brand.subCategory) {
-      subCategoryCounts[brand.subCategory] = (subCategoryCounts[brand.subCategory] || 0) + 1;
-    }
-  });
 
   // 클라이언트와 work를 매칭하여 slug 찾기
   const getWorkSlugForClient = (clientName: string): string | null => {
@@ -163,7 +89,7 @@ export default async function IndexPage() {
   return (
     <main className="w-full">
       <HeroSection />
-      <ContentSection contentCards={contentCards} subCategoryCounts={subCategoryCounts} />
+      <ContentSection />
       <LogoSlider logos={clientLogos} socialLinks={socialLinkData} />
     </main>
   );
