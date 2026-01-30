@@ -215,8 +215,12 @@ export default function BrandedPageClient({
               {workProjects.map((project) => (
                 <DockIcon
                   key={project.id}
-                  href={project.slug ? `/branded/${project.slug}` : "#"}
-                  onClick={() => handleProjectClick(project)}
+                  // href={project.slug ? `/branded/${project.slug}` : "#"}
+                  // onClick={() => handleProjectClick(project)}
+
+                  // 클릭방지 임시코드
+                  href="#"
+                  onClick={() => {}}
                 >
                   {project.image ? (
                     <img

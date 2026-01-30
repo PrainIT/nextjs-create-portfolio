@@ -25,7 +25,7 @@ export const DockIcon: React.FC<DockIconProps> = ({
   const ref = useRef<HTMLDivElement>(null);
   const defaultMouseX = useMotionValue(Infinity);
 
-  const iconSize = 228
+  const iconSize = 168
   const iconMagnification = 300;
   const iconDistance = 320;
 
