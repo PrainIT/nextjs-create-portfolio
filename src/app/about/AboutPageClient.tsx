@@ -18,12 +18,12 @@ function AnimatedNumber({ value }: { value: number | [number, number] }) {
   const motionValue = useMotionValue(0);
   const motionValue2 = useMotionValue(0);
   const spring = useSpring(motionValue, {
-    damping: 100,
-    stiffness: 100,
+    damping: 50,
+    stiffness: 450,
   });
   const spring2 = useSpring(motionValue2, {
-    damping: 100,
-    stiffness: 100,
+    damping: 50,
+    stiffness: 450,
   });
 
   // 배열인 경우 (예: [6, 50])

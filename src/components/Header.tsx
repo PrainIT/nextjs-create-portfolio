@@ -8,6 +8,31 @@ import { useEffect, useState } from "react";
 export default function Header() {
   const pathname = usePathname();
   const [portfolioUrl, setPortfolioUrl] = useState<string | null>(null);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  // 스크롤 방향 감지
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // 맨 위에서는 항상 보이게
+      if (currentScrollY < 50) {
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY) {
+        // 스크롤 내리면 숨김
+        setIsVisible(false);
+      } else {
+        // 스크롤 올리면 보임
+        setIsVisible(true);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
 
   useEffect(() => {
     // API 라우트를 통해 포트폴리오 링크 가져오기
@@ -80,7 +105,11 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-10 left-0 right-0 z-50">
+    <header
+      className={`fixed top-10 left-0 right-0 z-50 transition-transform duration-300 ease-in-out ${
+        isVisible ? "translate-y-0" : "-translate-y-[1000%]"
+      }`}
+    >
       <nav className="flex items-center justify-between px-12">
         <div className="flex items-center gap-12">
           <Link href="/" className={getLinkClassName("/")}>

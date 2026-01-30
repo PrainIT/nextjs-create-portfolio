@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 
 // Industry 서브카테고리 필터 (value와 label 매핑)
 export const industrySubCategories = [
@@ -77,12 +78,12 @@ export default function SearchAndFilter({
             </button>
           </div>
 
-          <button
-            type="button"
-            className="px-8 py-3 rounded-full border-1 border-white text-white font-medium hover:bg-black hover:text-brand hover:border-brand transition-colors"
+          <Link
+            href="/content"
+            className="inline-block px-8 py-3 rounded-full border border-white text-white font-medium hover:bg-black hover:text-brand hover:border-brand transition-colors"
           >
             전체보기
-          </button>
+          </Link>
         </div>
       </div>
     </div>
