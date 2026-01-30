@@ -134,12 +134,16 @@ export default function Header() {
               href={portfolioUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={`text-brand text-sm transition-opacity opacity-100 hover:opacity-80 cursor-pointer`}
+              className={`text-sm transition-opacity opacity-100 hover:opacity-80 cursor-pointer ${
+                isHomeOrAbout ? "text-white" : "text-brand"
+              }`}
             >
               PORTFOLIO DOWNLOAD
             </a>
           ) : (
-            <span className="text-brand text-sm opacity-50 cursor-not-allowed">
+            <span className={`text-sm opacity-50 cursor-not-allowed ${
+              isHomeOrAbout ? "text-white" : "text-brand"
+            }`}>
               PORTFOLIO DOWNLOAD
             </span>
           )}
