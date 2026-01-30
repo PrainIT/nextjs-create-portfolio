@@ -116,7 +116,7 @@ export default function LogoSlider({
   );
 
   return (
-    <section className="w-full">
+    <section className="w-full px-2 md:px-12">
       <div className="relative overflow-hidden">
        
         {/* 로고 슬라이더 */}

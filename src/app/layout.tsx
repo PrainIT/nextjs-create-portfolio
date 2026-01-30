@@ -30,7 +30,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased text-[#ededed]`}
       >
         <BackgroundColor />
-        <div className="max-w-[1440px] mx-auto">
+        <div className="mx-auto">
           <Header />
           <main className="relative">{children}</main>
         </div>
