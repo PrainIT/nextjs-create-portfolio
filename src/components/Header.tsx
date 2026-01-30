@@ -10,6 +10,12 @@ export default function Header() {
   const [portfolioUrl, setPortfolioUrl] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  // 마운트 상태 추적
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 스크롤 방향 감지
   useEffect(() => {
@@ -84,8 +90,8 @@ export default function Header() {
     return pathname.startsWith(href);
   };
 
-  // Home 또는 About 페이지인지 확인
-  const isHomeOrAbout = pathname === "/" || pathname === "/about";
+  // Home 또는 About 페이지인지 확인 (마운트 후에만 판단)
+  const isHomeOrAbout = mounted && (pathname === "/" || pathname === "/about");
 
   // 링크 스타일 클래스 생성 함수
   const getLinkClassName = (href: string) => {
@@ -106,9 +112,9 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-10 left-0 right-0 z-50 transition-transform duration-300 ease-in-out ${
+      className={`fixed top-10 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${
         isVisible ? "translate-y-0" : "-translate-y-[1000%]"
-      }`}
+      } ${mounted ? "opacity-100" : "opacity-0"}`}
     >
       <nav className="flex items-center justify-between px-12">
         <div className="flex items-center gap-12">
