@@ -32,6 +32,7 @@ export default function BrandedPageClient({
   const viewportRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const dockAreaRef = useRef<HTMLDivElement>(null);
   const [scrollState, setScrollState] = useState({
     scrollLeft: 0,
     contentWidth: 0,
@@ -164,13 +165,31 @@ export default function BrandedPageClient({
 
   const showScrollUi = maxScroll > 0;
 
-  const mainRef = useRef<HTMLElement>(null);
+  const maxScrollRef = useRef(maxScroll);
+  maxScrollRef.current = maxScroll;
 
   useEffect(() => {
-    const el = mainRef.current;
+    const el = dockAreaRef.current;
     if (!el) return;
     const onWheel = (e: WheelEvent) => {
-      if (e.deltaX !== 0) e.preventDefault();
+      const mx = maxScrollRef.current;
+      if (mx <= 0) return;
+
+      // deltaX: 트랙패드 가로 제스처
+      // deltaY: 마우스 휠 위/아래 → 좌우로 변환
+      const delta = e.deltaX !== 0 ? e.deltaX : e.deltaY;
+      if (delta === 0) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const step = 120;
+      const amount = delta > 0 ? step : -step;
+
+      setScrollState((prev) => ({
+        ...prev,
+        scrollLeft: Math.max(0, Math.min(mx, prev.scrollLeft + amount)),
+      }));
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
@@ -178,12 +197,12 @@ export default function BrandedPageClient({
 
   return (
     <main
-      ref={mainRef}
       className="w-full relative flex flex-col pt-24"
       style={{ minHeight: "100vh" }}
     >
       {/* overflow-x-hidden + 100vw로 양옆 채우기: 뷰포트 전체 너비 블록이라 스크롤 안 생기고, 배경으로 양옆 채움 */}
       <div
+        ref={dockAreaRef}
         className="flex-1 flex flex-col items-center justify-center w-full gap-4 overflow-x-hidden bg-[#E3E3E3] dark:bg-[#1a1a1a]"
         style={{
           width: "100vw",

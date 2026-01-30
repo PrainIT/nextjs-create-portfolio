@@ -57,7 +57,7 @@ export const DockIcon: React.FC<DockIconProps> = ({
     <motion.div
       ref={ref}
       style={{ width }}
-      className="flex aspect-square items-center justify-center rounded-2xl bg-white/90 dark:bg-gray-800/90 shadow-lg hover:shadow-xl transition-shadow backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 overflow-hidden"
+      className="flex aspect-square items-center justify-center rounded-2xl bg-white/90 dark:bg-gray-800/90 shadow-lg hover:shadow-xl transition-shadow backdrop-blur-sm dark:border-gray-700/50 overflow-hidden"
     >
       <a
         href={href}
