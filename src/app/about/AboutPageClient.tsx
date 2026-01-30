@@ -91,24 +91,25 @@ function AnimatedNumber({ value }: { value: number | [number, number] }) {
 // 통계 섹션 컴포넌트
 function StatsSection() {
   const stats = [
-    { value: 3000, label: "Donation Received" },
-    { value: 1, label: "Donation Received" },
-    { value: [6, 50] as [number, number], label: "Donation Received" },
+    { value: 3000, label: "프로젝트 수주 건수", label2: "3000여 건의 프로젝트를\n 진행하여다양한 경험과\n 노하우를 축적하였습니다." },
+    { value: 1, label: "대한민국 유일 국내 최대", label2: "프레인글로벌은 해외 PR Awards에서\n대상을 수상한 국내 유일, 국내 최대의\nPR 전문 기업입니다." },
+    { value: [6, 50] as [number, number], label: "아시아 6위/세계 50위", label2: "프레인글로벌은 세계적으로\n인정받고 있는 국내 최고의\n커뮤니케이션 컨설팅 기업입니다." },
   ];
 
   return (
-    <div className="flex gap-16 justify-center items-center mt-16">
-      {stats.map((stat, index) => (
-        <div key={index} className="flex items-center">
-          <div className="flex flex-col items-center">
+    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 mt-24">
+      <div className="flex gap-12 justify-center items-center">
+        {stats.flatMap((stat, index) => [
+          <div key={`stat-${index}`} className="flex-1 min-w-0 flex flex-col items-center justify-center text-center">
             <AnimatedNumber value={stat.value} />
             <p className="text-white text-xl opacity-80 mb-1">{stat.label}</p>
-            <p className="text-white text-xs opacity-40">{stat.label}</p>
-            <p className="text-white text-xs opacity-40">{stat.label}</p>
-          </div>
-
-        </div>
-      ))}
+            <p className="text-white text-xs opacity-40 whitespace-pre-line">{stat.label2}</p>
+          </div>,
+          ...(index < stats.length - 1
+            ? [<div key={`divider-${index}`} className="w-px self-stretch bg-white opacity-20 shrink-0" />]
+            : []),
+        ])}
+      </div>
     </div>
   );
 }
@@ -145,7 +146,7 @@ export default function AboutPageClient({
 
       <StatsSection />
 
-      <div className="flex justify-center mt-12 mb-60">
+      <div className="flex justify-center mt-24 mb-60">
         <button
           onClick={() => router.push("/contact")}
           className="bg-[#272727] text-white px-2 py-4 rounded-full min-w-40 w-[200px] hover:opacity-80 transition-all duration-300"

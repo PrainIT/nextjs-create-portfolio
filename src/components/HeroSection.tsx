@@ -23,13 +23,13 @@ export default function HeroSection() {
       {/* 2. 텍스트 레이어: 비디오 정중앙에 절대 위치로 배치 */}
       <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
         <motion.div
-          className="text-center font-extrabold text-white opacity-20"
+          className="text-center font-extrabold text-white"
           style={{
             fontSize: "clamp(40px, 15vw, 250px)", // 반응형 크기 조절
             lineHeight: "0.9",
           }}
           initial={{ y: 80, opacity: 0 }}
-          animate={{ y: 0, opacity: 0.2 }}
+          animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
         >
           (P)REATIVE<br />THINKING
