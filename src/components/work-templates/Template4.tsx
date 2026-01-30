@@ -15,7 +15,6 @@ const categoryLabels: Record<string, string> = {
   video: "영상 콘텐츠",
   design: "디자인 콘텐츠",
   photo: "사진 콘텐츠",
-  ai: "AI 콘텐츠",
 };
 
 const workCategories = [
@@ -56,10 +55,6 @@ const workCategories = [
       { label: "인물", value: "portrait" },
       { label: "스케치", value: "sketch" },
     ],
-  },
-  {
-    title: "AI 콘텐츠",
-    items: [],
   },
 ] as const;
 

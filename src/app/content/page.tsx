@@ -63,10 +63,6 @@ const contentCategories = [
       { label: "스케치", value: "sketch" },
     ],
   },
-  {
-    title: "AI 콘텐츠",
-    items: [],
-  },
 ] as const;
 
 export default async function ContentPage() {

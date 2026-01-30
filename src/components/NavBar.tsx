@@ -73,12 +73,12 @@ export default function NavBar({
     >
       <div className="flex flex-col gap-8">
         {/* HOME | PageName */}
-        <div className="flex items-center gap-2 text-sm text-grey-400">
-          <Link href="/" className="hover:text-grey-200 transition-colors">
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <Link href="/" className="hover:text-gray-900 transition-colors">
             HOME
           </Link>
-          <span className="text-grey-600">|</span>
-          <span className="text-grey-200 font-medium">{pageName}</span>
+          <span className="text-gray-400">|</span>
+          <span className="text-gray-800 font-medium">{pageName}</span>
         </div>
 
         {/* 뒤로가기 버튼 */}
@@ -89,7 +89,7 @@ export default function NavBar({
             whileHover={{ x: -5 }}
             whileTap={{ x: -2 }}
             onClick={handleBack}
-            className="flex items-center gap-2 text-sm text-grey-200 hover:text-grey-100 cursor-pointer transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900 cursor-pointer transition-colors"
           >
             <svg
               width="28"
@@ -113,12 +113,12 @@ export default function NavBar({
         {onTitleClick ? (
           <button
             onClick={onTitleClick}
-            className="text-white font-bold text-lg text-left hover:text-brand transition-colors cursor-pointer"
+            className="text-gray-900 font-bold text-lg text-left hover:text-brand transition-colors cursor-pointer"
           >
             {title}
           </button>
         ) : (
-          <h2 className="text-white font-bold text-lg">{title}</h2>
+          <h2 className="text-gray-900 font-bold text-lg">{title}</h2>
         )}
 
         {/* 카테고리별 메뉴 */}
@@ -126,7 +126,7 @@ export default function NavBar({
           {categories.map((category, categoryIndex) => (
             <div key={category.title} className="flex flex-col gap-4">
               {/* 카테고리 제목 */}
-              <h3 className="text-white font-bold text-sm">{category.title}</h3>
+              <h3 className="text-gray-900 font-bold text-sm">{category.title}</h3>
 
               {/* 카테고리 아이템들 */}
               <div className="flex flex-col gap-3">
@@ -150,7 +150,7 @@ export default function NavBar({
                           className={`w-5 h-5 rounded-full border-2 transition-all ${
                             isSelected
                               ? "border-brand bg-brand"
-                              : "border-grey-500 group-hover:border-grey-400"
+                              : "border-gray-400 group-hover:border-gray-600"
                           }`}
                         />
                         {isSelected && (
@@ -177,8 +177,8 @@ export default function NavBar({
                       <span
                         className={`text-sm transition-all ${
                           isSelected
-                            ? "text-white font-medium"
-                            : "text-grey-400 group-hover:text-grey-200"
+                            ? "text-gray-900 font-medium"
+                            : "text-gray-500 group-hover:text-gray-700"
                         }`}
                       >
                         {item.label}
