@@ -43,33 +43,32 @@ export default function SearchAndFilter({
               placeholder="ENTER A KEYWORD"
               value={searchKeyword}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full h-[100px] px-[14px] pr-[70px] rounded-full bg-[#0f0f0f] text-grey-200 text-3xl placeholder-grey-400 placeholder:text-3xl placeholder:text-white placeholder:opacity-10 text-center focus:outline-none focus:ring-2 focus:ring-brand"
+              className="w-full h-[100px] px-[14px] pr-[70px] rounded-full bg-[#000000] text-grey-200 text-3xl placeholder-grey-400 placeholder:text-3xl placeholder:text-white placeholder:opacity-10 text-center focus:outline-none focus:ring-2 focus:ring-brand"
               style={{
                 textAlign: "center",
                 lineHeight: "120px",
               }}
             />
             <button
-              className="absolute right-[14px] top-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-[#FF6B35] flex items-center justify-center hover:opacity-80 transition-opacity"
+              className="absolute right-[14px] top-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-white flex items-center justify-center hover:opacity-80 transition-opacity"
               type="button"
             >
               <svg
-                width="28"
-                height="28"
+                className="size-7 shrink-0 text-brand"
                 viewBox="0 0 20 20"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
                   d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z"
-                  stroke="white"
+                  stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
                 <path
                   d="M19 19L14.65 14.65"
-                  stroke="white"
+                  stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"

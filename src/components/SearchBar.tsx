@@ -42,7 +42,7 @@ export default function SearchBar({
           placeholder={placeholder}
           value={searchKeyword}
           onChange={handleChange}
-          className="w-full max-w-[400px] h-[57px] px-[14px] rounded-full bg-[#0f0f0f] text-grey-200 text-2xl ring-1 ring-grey-700 placeholder-grey-400 placeholder:text-2xl placeholder:text-white placeholder:pl-4 placeholder:opacity-10 focus:outline-none focus:ring-2 focus:ring-brand"
+          className="w-full max-w-[400px] h-[57px] px-[14px] rounded-full bg-white text-black text-2xl ring-1 ring-grey-500 placeholder:text-2xl placeholder:text-gray-400 placeholder:pl-4 focus:outline-none focus:ring-2 focus:ring-brand"
           style={{
             textAlign: "left",
             lineHeight: "120px",
