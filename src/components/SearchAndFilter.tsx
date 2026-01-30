@@ -36,7 +36,7 @@ export default function SearchAndFilter({
     <div className="w-full py-28 px-4">
       <div className="mx-auto py-4">
         {/* 검색바 */}
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-6">
           <div className="relative max-w-[560px] w-full">
             <input
               type="text"
@@ -76,6 +76,13 @@ export default function SearchAndFilter({
               </svg>
             </button>
           </div>
+
+          <button
+            type="button"
+            className="px-8 py-3 rounded-full border-1 border-white text-white font-medium hover:bg-black hover:text-brand hover:border-brand transition-colors"
+          >
+            전체보기
+          </button>
         </div>
       </div>
     </div>
