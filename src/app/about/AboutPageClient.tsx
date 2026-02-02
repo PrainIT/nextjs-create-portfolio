@@ -155,8 +155,10 @@ export default function AboutPageClient({
         </button>
       </div>
 
-      {/* 하단 선 */}
-      <div className="w-full h-px bg-white mt-12 opacity-40" />
+      {/* 하단 선 - 부모 padding으로 좌우 inset */}
+      <div className="px-2 md:px-12 mt-12">
+        <div className="w-full h-px bg-white opacity-40" />
+      </div>
 
       {/* 저작권 텍스트 */}
       <div className="text-center py-6">

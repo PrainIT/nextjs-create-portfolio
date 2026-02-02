@@ -320,7 +320,10 @@ export default function ContentPageClient({
         </div>
       </div>
 
-      <div className="w-full h-px bg-grey-700 mt-12 mb-12" />
+      {/* 하단 선 - 부모 padding으로 좌우 inset */}
+      <div className="px-2 md:px-12 my-12">
+        <div className="w-full h-px bg-gray-700 opacity-40" />
+      </div>
 
       <BottomPopup isOpen={isPopupOpen} onClose={handleClosePopup} heightOption={{ heightVh: 90 }}>
         {selectedProject && (
