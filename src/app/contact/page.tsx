@@ -1,7 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { format, parse, isValid } from "date-fns";
+import { ko } from "date-fns/locale";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+} from "@/components/ui/popover";
+
+function parseDateSafe(value: string): Date | undefined {
+  if (!value.trim()) return undefined;
+  try {
+    const d = parse(value.trim(), "yyyy-MM-dd", new Date());
+    return isValid(d) ? d : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 const PROJECT_TYPES = [
   "영상",
@@ -24,7 +42,37 @@ export default function ContactPage() {
     endDate: "",
   });
   const [referenceFile, setReferenceFile] = useState<File | null>(null);
+  const [startDateOpen, setStartDateOpen] = useState(false);
+  const [endDateOpen, setEndDateOpen] = useState(false);
+  const startDateAnchorRef = useRef<HTMLDivElement>(null);
+  const endDateAnchorRef = useRef<HTMLDivElement>(null);
+  const [startDatePopoverWidth, setStartDatePopoverWidth] = useState<
+    number | undefined
+  >(undefined);
+  const [endDatePopoverWidth, setEndDatePopoverWidth] = useState<
+    number | undefined
+  >(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 캘린더 팝오버 너비를 인풋(앵커)과 동일하게
+  useEffect(() => {
+    if (!startDateOpen || !startDateAnchorRef.current) return;
+    const el = startDateAnchorRef.current;
+    const update = () => setStartDatePopoverWidth(el.offsetWidth);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [startDateOpen]);
+  useEffect(() => {
+    if (!endDateOpen || !endDateAnchorRef.current) return;
+    const el = endDateAnchorRef.current;
+    const update = () => setEndDatePopoverWidth(el.offsetWidth);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [endDateOpen]);
   const [submitStatus, setSubmitStatus] = useState<{
     type: "success" | "error" | null;
     message: string;
@@ -196,22 +244,86 @@ export default function ContactPage() {
         />
 
         <div className="grid grid-cols-2 gap-4">
-          <input
-            type="text"
-            name="startDate"
-            value={formData.startDate}
-            onChange={handleInputChange}
-            placeholder="프로젝트 시작 예상일"
-            className="w-full h-12 rounded-md bg-white border border-grey-200 px-4 text-grey-800 text-sm text-center placeholder:text-grey-400 placeholder:text-center focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <input
-            type="text"
-            name="endDate"
-            value={formData.endDate}
-            onChange={handleInputChange}
-            placeholder="프로젝트 종료 예상일"
-            className="w-full h-12 rounded-md bg-white border border-grey-200 px-4 text-grey-800 text-sm text-center placeholder:text-grey-400 placeholder:text-center focus:outline-none focus:ring-2 focus:ring-brand"
-          />
+          <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
+            <PopoverAnchor asChild>
+              <div ref={startDateAnchorRef} className="w-full">
+                <input
+                  type="text"
+                  name="startDate"
+                  readOnly
+                  value={formData.startDate}
+                  onClick={() => setStartDateOpen(true)}
+                  placeholder="프로젝트 시작 예상일"
+                  className="w-full h-12 rounded-md bg-white border border-grey-200 px-4 text-grey-800 text-sm text-center placeholder:text-grey-400 placeholder:text-center focus:outline-none focus:ring-2 focus:ring-brand cursor-pointer"
+                />
+              </div>
+            </PopoverAnchor>
+            <PopoverContent
+              className="p-0"
+              align="start"
+              style={
+                startDatePopoverWidth != null
+                  ? { width: startDatePopoverWidth }
+                  : undefined
+              }
+            >
+              <Calendar
+                mode="single"
+                selected={parseDateSafe(formData.startDate)}
+                onSelect={(date) => {
+                  if (date) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      startDate: format(date, "yyyy-MM-dd"),
+                    }));
+                    setStartDateOpen(false);
+                  }
+                }}
+                captionLayout="dropdown"
+                locale={ko}
+              />
+            </PopoverContent>
+          </Popover>
+          <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
+            <PopoverAnchor asChild>
+              <div ref={endDateAnchorRef} className="w-full">
+                <input
+                  type="text"
+                  name="endDate"
+                  readOnly
+                  value={formData.endDate}
+                  onClick={() => setEndDateOpen(true)}
+                  placeholder="프로젝트 종료 예상일"
+                  className="w-full h-12 rounded-md bg-white border border-grey-200 px-4 text-grey-800 text-sm text-center placeholder:text-grey-400 placeholder:text-center focus:outline-none focus:ring-2 focus:ring-brand cursor-pointer"
+                />
+              </div>
+            </PopoverAnchor>
+            <PopoverContent
+              className="p-0"
+              align="start"
+              style={
+                endDatePopoverWidth != null
+                  ? { width: endDatePopoverWidth }
+                  : undefined
+              }
+            >
+              <Calendar
+                mode="single"
+                selected={parseDateSafe(formData.endDate)}
+                onSelect={(date) => {
+                  if (date) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      endDate: format(date, "yyyy-MM-dd"),
+                    }));
+                    setEndDateOpen(false);
+                  }
+                }}
+                captionLayout="dropdown"
+                locale={ko}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
 
         <label className="flex flex-col gap-2 cursor-pointer">
