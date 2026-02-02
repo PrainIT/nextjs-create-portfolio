@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import NavBar from "@/components/NavBar";
 import ContentCard from "@/components/ContentCard";
 import SearchBar from "@/components/SearchBar";
@@ -298,8 +299,12 @@ export default function ContentPageClient({
 
           <div className="columns-3 gap-6" style={{ columnGap: "1rem" }}>
             {filteredProjects.map((project, index) => (
-              <div
+              <motion.div
                 key={project.id}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.08 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
                 onClick={() => handleProjectClick(project)}
                 className="cursor-pointer hover:opacity-90 transition-opacity mb-6 break-inside-avoid"
               >
@@ -314,7 +319,7 @@ export default function ContentPageClient({
                   disableVideoInteraction={true}
                   contentType={project.contentType}
                 />
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
