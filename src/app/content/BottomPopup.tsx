@@ -4,155 +4,148 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type HeightOption = {
-  heightPixel?: number; // 정적인 높이 (px)
-  heightVh?: number; // 뷰포트 높이 기준 퍼센트 (vh)
-  wrapChildren?: boolean; // 자식 콘텐츠의 높이를 기준으로 자동 계산할지 여부
+  heightPixel?: number;
+  heightVh?: number;
+  wrapChildren?: boolean;
 };
 
 type BottomPopupProps = {
-  isOpen: boolean; // 팝업 열림 여부
-  onClose: () => void; // 팝업 닫기 콜백
-  children?: React.ReactNode; // 팝업 내부에 들어갈 콘텐츠
-  heightOption?: HeightOption; // 높이 옵션
+  isOpen: boolean;
+  onClose: () => void;
+  children?: React.ReactNode;
+  heightOption?: HeightOption;
 };
 
-const BottomPopup = ({
+const OVERLAY_DURATION = 0.25;
+const PANEL_DURATION = 0.35;
+
+export default function BottomPopup({
   isOpen,
   onClose,
   children,
   heightOption,
-}: BottomPopupProps) => {
-  const [isInDOM, setIsInDOM] = useState(false);
-  const [measuredHeight, setMeasuredHeight] = useState<number>(
-    typeof window !== "undefined" ? window.innerHeight / 2 : 400
-  );
+}: BottomPopupProps) {
+  const [measuredHeight, setMeasuredHeight] = useState<number>(400);
   const contentRef = useRef<HTMLDivElement>(null);
-  const bodyOverflowRef = useRef<string>("auto");
-  const topRef = useRef<string>("0px");
 
-  const { heightPixel: _heightPixel, heightVh: _heightVh, wrapChildren } = heightOption || {};
+  const {
+    heightPixel: _heightPixel,
+    heightVh: _heightVh,
+    wrapChildren,
+  } = heightOption || {};
 
-  // 오버레이 클릭 시 팝업 닫기
   const handleOverlayClick = useCallback(() => onClose(), [onClose]);
-
-  // 콘텐츠 클릭 시 이벤트 전파 방지
   const handleContentClick = useCallback(
     (e: React.MouseEvent) => e.stopPropagation(),
-    []
+    [],
   );
 
-  // 팝업 열림 상태 변화 감지
-  useEffect(() => {
-    if (!isOpen) {
-      setIsInDOM(false);
-      return;
-    }
+  const overlayRef = useRef<HTMLDivElement>(null);
 
-    // 현재 스크롤 위치 저장
-    const scrollY = window.scrollY;
-
-    // body 스타일 백업
-    bodyOverflowRef.current = document.body.style.overflow;
-    topRef.current = document.body.style.top;
-
-    // body 스크롤 막고 현재 위치 고정
-    document.body.style.overflow = "hidden";
-    document.body.style.top = `-${scrollY}px`;
-
-    // DOM에 포함되도록 상태 설정
-    setIsInDOM(true);
-  }, [isOpen]);
-
-  // DOM 렌더링 완료 후 높이 측정
-  useEffect(() => {
-    if (isInDOM) {
-      if (wrapChildren && contentRef.current) {
-        // 높이 측정 함수
-        const measureHeight = () => {
-          if (contentRef.current) {
-            const h = contentRef.current.offsetHeight;
-            if (h > 0) setMeasuredHeight(h);
-          }
-        };
-
-        // 즉시 측정
-        measureHeight();
-
-        // iframe 등 비동기 콘텐츠 로드를 위해 약간의 지연 후 재측정
-        const timeoutId = setTimeout(measureHeight, 100);
-        const timeoutId2 = setTimeout(measureHeight, 500);
-
-        // ResizeObserver로 크기 변경 감지
-        let resizeObserver: ResizeObserver | null = null;
-        if (typeof ResizeObserver !== 'undefined' && contentRef.current) {
-          resizeObserver = new ResizeObserver(() => {
-            measureHeight();
-          });
-          resizeObserver.observe(contentRef.current);
-        }
-
-        return () => {
-          clearTimeout(timeoutId);
-          clearTimeout(timeoutId2);
-          if (resizeObserver) {
-            resizeObserver.disconnect();
-          }
-        };
-      } else if (_heightVh) {
-        // heightVh 옵션이 있으면 vh 단위로 계산
-        const vhInPixels = (window.innerHeight * _heightVh) / 100;
-        setMeasuredHeight(vhInPixels);
-      } else if (_heightPixel) {
-        // heightOption에 주어진 정적인 높이 사용
-        setMeasuredHeight(_heightPixel);
-      }
-    } else {
-      // 팝업이 DOM에서 제거될 때 body 스타일 복원
-      const scrollY = document.body.style.top;
-      document.body.style.overflow = bodyOverflowRef.current;
-      document.body.style.top = topRef.current;
-
-      // 스크롤 위치 복원
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || "0") * -1);
-      }
-    }
-  }, [isInDOM, wrapChildren, _heightPixel, _heightVh]);
-
-  // 컴포넌트 언마운트 시 body 스타일 복원
-  useEffect(() => {
-    return () => {
-      document.body.style.overflow = bodyOverflowRef.current;
-      document.body.style.top = topRef.current;
-    };
+  // 배경 스크롤만 막고, body 스타일은 건드리지 않음 (리플로우/리렌더 방지)
+  const handleOverlayWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
   }, []);
 
-  // 팝업이 열리지 않았고 wrapChildren이 아니라면 렌더링하지 않음
-  if (!wrapChildren && !isInDOM) return null;
+  // 터치 스크롤은 passive: false로 막아야 iOS 등에서 확실히 동작
+  useEffect(() => {
+    const el = overlayRef.current;
+    if (!el || !isOpen) return;
+    const prevent = (e: TouchEvent) => e.preventDefault();
+    el.addEventListener("touchmove", prevent, { passive: false });
+    return () => el.removeEventListener("touchmove", prevent);
+  }, [isOpen]);
+
+  // 높이 계산 (isOpen일 때만 사용)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (wrapChildren && contentRef.current) {
+      const measure = () => {
+        if (contentRef.current && contentRef.current.offsetHeight > 0) {
+          setMeasuredHeight(contentRef.current.offsetHeight);
+        }
+      };
+      measure();
+      const t1 = setTimeout(measure, 100);
+      const t2 = setTimeout(measure, 500);
+      let ro: ResizeObserver | null = null;
+      if (typeof ResizeObserver !== "undefined" && contentRef.current) {
+        ro = new ResizeObserver(measure);
+        ro.observe(contentRef.current);
+      }
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        ro?.disconnect();
+      };
+    }
+    if (_heightVh) {
+      setMeasuredHeight((window.innerHeight * _heightVh) / 100);
+    } else if (_heightPixel) {
+      setMeasuredHeight(_heightPixel);
+    }
+  }, [isOpen, wrapChildren, _heightPixel, _heightVh]);
+
+  const measuredHeightPx = wrapChildren
+    ? measuredHeight
+    : _heightVh
+      ? typeof window !== "undefined"
+        ? (window.innerHeight * _heightVh) / 100
+        : 400
+      : (_heightPixel ?? 400);
 
   return (
     <AnimatePresence>
-      {isInDOM && (
-        <>
-          {/* 오버레이 */}
+      {isOpen && (
+        <motion.div
+          key="bottom-popup"
+          initial={false}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: OVERLAY_DURATION }}
+          className="fixed inset-0 z-[999] flex flex-col justify-end"
+          aria-hidden={!isOpen}
+        >
+          {/* 오버레이: 클릭으로 닫기, 휠/터치로 배경 스크롤만 막음 (body 미변경) */}
           <motion.div
+            ref={overlayRef}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-black/50 z-[999]"
+            transition={{ duration: OVERLAY_DURATION }}
+            className="absolute inset-0 bg-black/50"
             onClick={handleOverlayClick}
+            onWheel={handleOverlayWheel}
+            style={{ touchAction: "none" }}
           />
-          {/* 팝업 콘텐츠 */}
+
+          {/* 팝업 패널: 스크롤 가능, 스크롤바 UI만 숨김 / 아래에서 올라왔다 내려가는 애니메이션 */}
           <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: `${measuredHeight}px` }}
-            exit={{ height: 0 }}
-            transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[1440px] bg-white rounded-t-2xl shadow-[0_-4px_10px_rgba(0,0,0,0.2)] z-[1000] overflow-y-auto scrollbar-hide pb-[env(safe-area-inset-bottom)]"
-            style={{ 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{
+              height: `${measuredHeightPx}px`,
+              opacity: 1,
+            }}
+            exit={{
+              height: 0,
+              opacity: 0,
+              transition: {
+                height: { duration: PANEL_DURATION, ease: [0.32, 0.72, 0, 1] },
+                opacity: { duration: OVERLAY_DURATION },
+              },
+            }}
+            transition={{
+              height: { type: "spring", damping: 32, stiffness: 320 },
+              opacity: { duration: OVERLAY_DURATION },
+            }}
+            className="relative w-full max-w-[1440px] mx-auto bg-white rounded-t-2xl shadow-[0_-4px_10px_rgba(0,0,0,0.2)] z-[1000] overflow-y-auto overflow-x-hidden scrollbar-hide pb-[env(safe-area-inset-bottom)]"
+            style={{
               WebkitOverflowScrolling: "touch",
-              maxHeight: _heightVh ? `${_heightVh}vh` : "90vh"
+              maxHeight: _heightVh ? `${_heightVh}vh` : "90vh",
+              // 스크롤은 되고, 스크롤바 UI만 숨김 (팝업 내부만 스크롤)
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
             }}
             onClick={handleContentClick}
           >
@@ -160,10 +153,8 @@ const BottomPopup = ({
               {children}
             </div>
           </motion.div>
-        </>
+        </motion.div>
       )}
     </AnimatePresence>
   );
-};
-
-export default BottomPopup;
+}
