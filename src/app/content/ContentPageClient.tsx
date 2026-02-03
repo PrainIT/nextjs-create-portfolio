@@ -117,7 +117,9 @@ function ImageSlider({ images, title }: { images: string[]; title: string }) {
             onClick={handleNext}
             disabled={currentIndex === images.length - 1}
             className={`absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all ${
-              currentIndex === images.length - 1 ? "opacity-50 cursor-not-allowed" : ""
+              currentIndex === images.length - 1
+                ? "opacity-50 cursor-not-allowed"
+                : ""
             }`}
             aria-label="다음 이미지"
           >
@@ -159,22 +161,26 @@ interface ContentPageClientProps {
   workProjects: ContentProject[];
   workCategories: readonly WorkCategory[];
   pageTitle?: string;
+  initialSearchKeyword?: string;
 }
 
 export default function ContentPageClient({
   workProjects,
   workCategories,
   pageTitle = "전체 프로젝트",
+  initialSearchKeyword: initialSearch = "",
 }: ContentPageClientProps) {
-  const [isSearching, setIsSearching] = useState(false);
+  const [isSearching, setIsSearching] = useState(!!initialSearch);
   const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [selectedProject, setSelectedProject] = useState<ContentProject | null>(null);
+  const [searchKeyword, setSearchKeyword] = useState(initialSearch);
+  const [selectedProject, setSelectedProject] = useState<ContentProject | null>(
+    null,
+  );
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const handleSelect = (value: string) => {
     setSelectedCategory((prev) =>
-      prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value]
+      prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value],
     );
   };
 
@@ -213,7 +219,9 @@ export default function ContentPageClient({
     if (selectedCategory.length > 0) {
       filtered = filtered.filter((project) => {
         if (Array.isArray(project.subCategory)) {
-          return project.subCategory.some((subCat) => selectedCategory.includes(subCat));
+          return project.subCategory.some((subCat) =>
+            selectedCategory.includes(subCat),
+          );
         }
         return selectedCategory.includes(project.subCategory || "");
       });
@@ -223,7 +231,9 @@ export default function ContentPageClient({
       filtered = filtered.filter(
         (project) =>
           (project.title?.toLowerCase() || "").includes(keyword) ||
-          (project.tags || []).some((tag) => (tag?.toLowerCase() || "").includes(keyword))
+          (project.tags || []).some((tag) =>
+            (tag?.toLowerCase() || "").includes(keyword),
+          ),
       );
     }
     return filtered;
@@ -233,7 +243,7 @@ export default function ContentPageClient({
     if (!selectedProject || !selectedProject.category) return [];
     const hasMatchingSubCategory = (
       sel: string | string[] | undefined,
-      proj: string | string[] | undefined
+      proj: string | string[] | undefined,
     ): boolean => {
       if (!sel && !proj) return true;
       if (!sel) return true;
@@ -247,7 +257,7 @@ export default function ContentPageClient({
         (p) =>
           p.category === selectedProject.category &&
           hasMatchingSubCategory(selectedProject.subCategory, p.subCategory) &&
-          p.id !== selectedProject.id
+          p.id !== selectedProject.id,
       )
       .map((p) => ({
         id: p.id,
@@ -268,7 +278,6 @@ export default function ContentPageClient({
       className="w-full relative flex flex-col overflow-x-hidden pt-24"
       style={{ minHeight: "100vh" }}
     >
-
       <div className="flex-1 flex min-w-0">
         <div className="w-64 flex-shrink-0">
           <NavBar
@@ -330,7 +339,11 @@ export default function ContentPageClient({
         <div className="w-full h-px bg-gray-700 opacity-40" />
       </div>
 
-      <BottomPopup isOpen={isPopupOpen} onClose={handleClosePopup} heightOption={{ heightVh: 90 }}>
+      <BottomPopup
+        isOpen={isPopupOpen}
+        onClose={handleClosePopup}
+        heightOption={{ heightVh: 90 }}
+      >
         {selectedProject && (
           <div className="px-6 sm:px-12 md:px-16 lg:px-20 xl:px-24 py-8">
             <button
@@ -355,10 +368,15 @@ export default function ContentPageClient({
             )}
 
             <div className="flex items-end gap-4 mb-4 px-6 sm:px-12 md:px-24 lg:px-32 xl:px-48">
-              <h2 className="text-2xl font-bold text-black">{selectedProject.title}</h2>
+              <h2 className="text-2xl font-bold text-black">
+                {selectedProject.title}
+              </h2>
               {selectedProject.publishedAt && (
                 <div className="text-sm text-gray-500 whitespace-nowrap">
-                  {new Date(selectedProject.publishedAt).toISOString().split("T")[0].replace(/-/g, "-")}
+                  {new Date(selectedProject.publishedAt)
+                    .toISOString()
+                    .split("T")[0]
+                    .replace(/-/g, "-")}
                 </div>
               )}
             </div>
@@ -370,11 +388,15 @@ export default function ContentPageClient({
             )}
 
             {selectedProject.contentType &&
-              (selectedProject.contentType === 3 || selectedProject.contentType === 4) &&
+              (selectedProject.contentType === 3 ||
+                selectedProject.contentType === 4) &&
               selectedProject.contentImages &&
               selectedProject.contentImages.length > 0 && (
                 <div className="px-6 sm:px-12 md:px-24 lg:px-32 xl:px-48">
-                  <ImageSlider images={selectedProject.contentImages} title={selectedProject.title} />
+                  <ImageSlider
+                    images={selectedProject.contentImages}
+                    title={selectedProject.title}
+                  />
                 </div>
               )}
 
@@ -382,17 +404,18 @@ export default function ContentPageClient({
               !selectedProject.videoUrl &&
               !selectedProject.hasThumbnailImage &&
               (!selectedProject.contentType ||
-                (selectedProject.contentType !== 3 && selectedProject.contentType !== 4) ||
+                (selectedProject.contentType !== 3 &&
+                  selectedProject.contentType !== 4) ||
                 !selectedProject.contentImages ||
                 selectedProject.contentImages.length === 0) && (
-              <div className="mb-6">
-                <img
-                  src={selectedProject.image}
-                  alt={selectedProject.title}
-                  className="w-full h-auto rounded-lg"
-                />
-              </div>
-            )}
+                <div className="mb-6">
+                  <img
+                    src={selectedProject.image}
+                    alt={selectedProject.title}
+                    className="w-full h-auto rounded-lg"
+                  />
+                </div>
+              )}
 
             {/* Video */}
             {selectedProject.contentType === 2 ||
@@ -425,7 +448,9 @@ export default function ContentPageClient({
                 {(() => {
                   const url =
                     selectedProject.videoUrl ||
-                    (selectedProject.videoUrls?.length ? selectedProject.videoUrls[0] : null);
+                    (selectedProject.videoUrls?.length
+                      ? selectedProject.videoUrls[0]
+                      : null);
                   if (!url) return null;
                   const embed = getYouTubeEmbedUrl(url);
                   if (!embed) return null;
@@ -525,7 +550,10 @@ export default function ContentPageClient({
 
             {relatedVideos.length > 0 && (
               <div className="mt-6 -mx-6 sm:-mx-12 md:-mx-16 lg:-mx-20 xl:-mx-24 -mb-8">
-                <RelationContentCard videos={relatedVideos} title="관련 영상을 더 찾으셨나요?" />
+                <RelationContentCard
+                  videos={relatedVideos}
+                  title="관련 영상을 더 찾으셨나요?"
+                />
               </div>
             )}
           </div>

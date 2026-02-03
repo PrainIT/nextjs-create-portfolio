@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 // Industry 서브카테고리 필터 (value와 label 매핑)
 export const industrySubCategories = [
@@ -18,7 +19,11 @@ export const industrySubCategories = [
 // 기본 필터 (Industry 서브카테고리 기반)
 export const defaultFilters = [
   { name: "전체", value: "all", count: 0 },
-  ...industrySubCategories.map(cat => ({ name: cat.label, value: cat.value, count: 0 }))
+  ...industrySubCategories.map((cat) => ({
+    name: cat.label,
+    value: cat.value,
+    count: 0,
+  })),
 ];
 
 // 호환성을 위해 filters도 export
@@ -33,12 +38,29 @@ export default function SearchAndFilter({
   searchKeyword,
   onSearchChange,
 }: SearchAndFilterProps) {
+  const router = useRouter();
+
+  const goToContentWithSearch = () => {
+    const url = searchKeyword.trim()
+      ? `/content?q=${encodeURIComponent(searchKeyword.trim())}`
+      : "/content";
+    router.push(url);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    goToContentWithSearch();
+  };
+
   return (
     <div className="w-full py-28 px-4">
       <div className="mx-auto py-4">
         {/* 검색바 */}
         <div className="flex flex-col items-center gap-6">
-          <div className="relative max-w-[560px] w-full">
+          <form
+            onSubmit={handleSubmit}
+            className="relative max-w-[560px] w-full"
+          >
             <input
               type="text"
               placeholder="ENTER A KEYWORD"
@@ -52,7 +74,7 @@ export default function SearchAndFilter({
             />
             <button
               className="absolute right-[14px] top-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-white flex items-center justify-center hover:opacity-80 transition-opacity"
-              type="button"
+              type="submit"
             >
               <svg
                 className="size-7 shrink-0 text-brand"
@@ -76,7 +98,7 @@ export default function SearchAndFilter({
                 />
               </svg>
             </button>
-          </div>
+          </form>
 
           <Link
             href="/content"

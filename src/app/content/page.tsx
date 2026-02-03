@@ -65,22 +65,38 @@ const contentCategories = [
   },
 ] as const;
 
-export default async function ContentPage() {
-  const contents = await client.fetch<SanityDocument[]>(CONTENT_QUERY, {}, options);
+interface ContentPageProps {
+  searchParams: Promise<{ q?: string }>;
+}
+
+export default async function ContentPage({ searchParams }: ContentPageProps) {
+  const params = await searchParams;
+  const initialSearchKeyword =
+    typeof params.q === "string" ? decodeURIComponent(params.q) : undefined;
+
+  const contents = await client.fetch<SanityDocument[]>(
+    CONTENT_QUERY,
+    {},
+    options,
+  );
 
   // 콘텐츠 썸네일 URL 추출 함수
   const getContentThumbnailUrl = (
-    content: any
+    content: any,
   ): { image?: string; videoUrl?: string } => {
     // 1. thumbnailImage가 있으면 이미지 반환 (카드에 표시)
     // videoUrl도 함께 반환하여 BottomPopup에서 사용할 수 있도록 함
     if (content.thumbnailImage) {
       return {
         image: urlForImage(content.thumbnailImage),
-        videoUrl: content.videoUrl || (content.videoUrls && content.videoUrls.length > 0 ? content.videoUrls[0] : undefined),
+        videoUrl:
+          content.videoUrl ||
+          (content.videoUrls && content.videoUrls.length > 0
+            ? content.videoUrls[0]
+            : undefined),
       };
     }
-    
+
     // 2. Content 1, 2에서 썸네일 이미지가 없는 경우
     // 카드에는 빈 사각형 표시 (이미지 URL 반환하지 않음)
     // videoUrl은 BottomPopup용으로 반환
@@ -96,7 +112,7 @@ export default async function ContentPage() {
         };
       }
     }
-    
+
     // 4. images 배열의 첫 번째 항목 확인 (콘텐츠 3, 4 또는 영상이 없을 때 fallback)
     if (content.images && content.images.length > 0) {
       return {
@@ -114,10 +130,10 @@ export default async function ContentPage() {
     const contentImages = content.images
       ? content.images.map((img: any) => urlForImage(img))
       : [];
-    
+
     return {
       id: content._id,
-      title: content.title || '제목 없음',
+      title: content.title || "제목 없음",
       tags: content.tags || [], // Content 팝업에서 표시될 태그들
       image: thumbnail.image,
       // videoUrl은 썸네일 함수에서 가져오되, 없으면 content에서 직접 가져오기 (Content 1용)
@@ -142,6 +158,7 @@ export default async function ContentPage() {
       workProjects={workProjects}
       workCategories={contentCategories}
       pageTitle="전체 프로젝트"
+      initialSearchKeyword={initialSearchKeyword}
     />
   );
 }
