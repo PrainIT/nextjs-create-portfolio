@@ -12,6 +12,8 @@ interface CategoryItem {
 
 interface Category {
   readonly title: string;
+  /** 서브카테고리 없을 때 필터용(예: ai, linkedin) */
+  readonly value?: string;
   readonly items: readonly CategoryItem[];
 }
 
@@ -24,6 +26,8 @@ interface NavBarProps {
   selectedValue?: string[];
   onSelect?: (value: string) => void;
   onTitleClick?: () => void;
+  /** 카테고리 제목(예: 영상 콘텐츠) 클릭 시 해당 카테고리 전체의 value 배열로 호출 */
+  onCategoryTitleClick?: (itemValues: string[]) => void;
   absolute?: boolean;
 }
 
@@ -36,6 +40,7 @@ export default function NavBar({
   selectedValue,
   onSelect,
   onTitleClick,
+  onCategoryTitleClick,
   absolute = false,
 }: NavBarProps) {
   const router = useRouter();
@@ -125,8 +130,34 @@ export default function NavBar({
         <div className="flex flex-col gap-8 mt-4">
           {categories.map((category, categoryIndex) => (
             <div key={category.title} className="flex flex-col gap-4">
-              {/* 카테고리 제목 */}
-              <h3 className="text-gray-900 font-bold text-sm">{category.title}</h3>
+              {/* 카테고리 제목 - 클릭 시 해당 카테고리 전체 선택 */}
+              {onCategoryTitleClick ? (
+                <motion.button
+                  type="button"
+                  onClick={() => {
+                    const itemValues =
+                      category.items.length > 0
+                        ? category.items.map((item) => item.value)
+                        : category.value
+                          ? [category.value]
+                          : [];
+                    onCategoryTitleClick(itemValues);
+                  }}
+                  className={`text-left font-bold text-sm hover:text-brand transition-colors cursor-pointer ${
+                    category.items.length === 0 &&
+                    category.value &&
+                    selected.includes(category.value)
+                      ? "text-brand"
+                      : "text-gray-900"
+                  }`}
+                >
+                  {category.title}
+                </motion.button>
+              ) : (
+                <h3 className="text-gray-900 font-bold text-sm">
+                  {category.title}
+                </h3>
+              )}
 
               {/* 카테고리 아이템들 */}
               <div className="flex flex-col gap-3">

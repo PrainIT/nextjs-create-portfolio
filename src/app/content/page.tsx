@@ -23,10 +23,11 @@ const CONTENT_QUERY = `*[_type == "content"] | order(date desc, _createdAt desc)
 
 const options = { next: { revalidate: 30 } };
 
-// 모든 콘텐츠 포함
+// 모든 콘텐츠 포함 (value: 상위 카테고리 키, 서브카테고리 없으면 items: [])
 const contentCategories = [
   {
     title: "영상 콘텐츠",
+    value: "video",
     items: [
       { label: "브랜디드 영상", value: "branded-video" },
       { label: "캠페인 영상", value: "campaign-video" },
@@ -42,6 +43,7 @@ const contentCategories = [
   },
   {
     title: "디자인 콘텐츠",
+    value: "design",
     items: [
       { label: "SNS 콘텐츠", value: "sns-content" },
       { label: "브랜딩", value: "branding" },
@@ -57,12 +59,15 @@ const contentCategories = [
   },
   {
     title: "사진 콘텐츠",
+    value: "photo",
     items: [
       { label: "제품", value: "product" },
       { label: "인물", value: "portrait" },
       { label: "스케치", value: "sketch" },
     ],
   },
+  { title: "AI 콘텐츠", value: "ai", items: [] },
+  { title: "링크드인", value: "linkedin", items: [] },
 ] as const;
 
 interface ContentPageProps {

@@ -194,6 +194,22 @@ export default function ContentPageClient({
     setIsSearching(false);
   };
 
+  /** 카테고리 제목 클릭: 첫 클릭 = 해당 카테고리 전체 선택, 다시 클릭 = 해당 카테고리 전체 취소 */
+  const handleCategoryTitleClick = (itemValues: string[]) => {
+    const isFullySelected = itemValues.every((v) =>
+      selectedCategory.includes(v),
+    );
+    if (isFullySelected) {
+      setSelectedCategory((prev) =>
+        prev.filter((v) => !itemValues.includes(v)),
+      );
+    } else {
+      setSelectedCategory(itemValues);
+    }
+    setSearchKeyword("");
+    setIsSearching(false);
+  };
+
   const handleProjectClick = useCallback((project: ContentProject) => {
     setSelectedProject(project);
     setIsPopupOpen(true);
@@ -218,12 +234,16 @@ export default function ContentPageClient({
     let filtered = workProjects;
     if (selectedCategory.length > 0) {
       filtered = filtered.filter((project) => {
-        if (Array.isArray(project.subCategory)) {
-          return project.subCategory.some((subCat) =>
-            selectedCategory.includes(subCat),
-          );
-        }
-        return selectedCategory.includes(project.subCategory || "");
+        // 서브카테고리로 매칭 (영상/디자인/사진 등)
+        const subCatMatch = Array.isArray(project.subCategory)
+          ? project.subCategory.some((subCat) =>
+              selectedCategory.includes(subCat),
+            )
+          : selectedCategory.includes(project.subCategory || "");
+        // 상위 카테고리만 있는 경우(ai, linkedin) project.category로 매칭
+        const categoryMatch =
+          project.category && selectedCategory.includes(project.category);
+        return subCatMatch || categoryMatch;
       });
     }
     if (searchKeyword) {
@@ -288,6 +308,7 @@ export default function ContentPageClient({
             selectedValue={selectedCategory as string[]}
             onSelect={handleSelect}
             onTitleClick={handleTitleClick}
+            onCategoryTitleClick={handleCategoryTitleClick}
           />
         </div>
 
