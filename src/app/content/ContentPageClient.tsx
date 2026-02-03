@@ -298,60 +298,56 @@ export default function ContentPageClient({
       className="w-full relative flex flex-col overflow-x-hidden pt-24"
       style={{ minHeight: "100vh" }}
     >
-      <div className="flex-1 flex min-w-0">
-        <div className="w-64 flex-shrink-0">
-          <NavBar
-            pageName="CONTENT"
-            title={pageTitle}
-            categories={workCategories}
-            showBackButton={true}
-            selectedValue={selectedCategory as string[]}
-            onSelect={handleSelect}
-            onTitleClick={handleTitleClick}
-            onCategoryTitleClick={handleCategoryTitleClick}
-          />
+      <NavBar
+        pageName="CONTENT"
+        title={pageTitle}
+        categories={workCategories}
+        showBackButton={true}
+        selectedValue={selectedCategory as string[]}
+        onSelect={handleSelect}
+        onTitleClick={handleTitleClick}
+        onCategoryTitleClick={handleCategoryTitleClick}
+      />
+
+      <div className="flex-1 px-8 py-8 min-w-0">
+        <div className="flex items-center justify-end mb-8 w-full">
+          <div className="w-full max-w-[850px]">
+            <SearchBar
+              placeholder="SEARCH"
+              onSearch={handleSearch}
+              value={searchKeyword}
+              onChange={(v) => {
+                setSearchKeyword(v);
+                handleSearch(v);
+              }}
+            />
+          </div>
         </div>
 
-        <div className="flex-1 pr-8 py-8 min-w-0">
-          <div className="flex items-center justify-end mb-8 w-full">
-            <div className="w-full max-w-[850px]">
-              <SearchBar
-                placeholder="SEARCH"
-                onSearch={handleSearch}
-                value={searchKeyword}
-                onChange={(v) => {
-                  setSearchKeyword(v);
-                  handleSearch(v);
-                }}
+        <div className="columns-3 gap-6" style={{ columnGap: "1rem" }}>
+          {filteredProjects.map((project, index) => (
+            <motion.div
+              key={project.id}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.08 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              onClick={() => handleProjectClick(project)}
+              className="cursor-pointer hover:opacity-90 transition-opacity mb-6 break-inside-avoid"
+            >
+              <ContentCard
+                id={index + 1}
+                title={project.title}
+                image={project.image}
+                videoUrl={project.videoUrl}
+                isSearchMode={isSearching}
+                forceSquare={false}
+                forceFullHeight={true}
+                disableVideoInteraction={true}
+                contentType={project.contentType}
               />
-            </div>
-          </div>
-
-          <div className="columns-3 gap-6" style={{ columnGap: "1rem" }}>
-            {filteredProjects.map((project, index) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.08 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-                onClick={() => handleProjectClick(project)}
-                className="cursor-pointer hover:opacity-90 transition-opacity mb-6 break-inside-avoid"
-              >
-                <ContentCard
-                  id={index + 1}
-                  title={project.title}
-                  image={project.image}
-                  videoUrl={project.videoUrl}
-                  isSearchMode={isSearching}
-                  forceSquare={false}
-                  forceFullHeight={true}
-                  disableVideoInteraction={true}
-                  contentType={project.contentType}
-                />
-              </motion.div>
-            ))}
-          </div>
+            </motion.div>
+          ))}
         </div>
       </div>
 
