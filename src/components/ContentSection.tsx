@@ -9,8 +9,8 @@ export default function ContentSection() {
 
   return (
     <div className="relative w-full">
-      {/* aspect-ratio로 이미지 로딩 전 공간 예약 → CLS 방지 */}
-      <div className="relative w-full aspect-[2880/1800] min-h-[280px] overflow-hidden bg-black/20">
+      {/* aspect-ratio + min/max h: 작은 화면에선 최소 50vh, 큰 화면에선 최대 75vh로 여백 균형 */}
+      <div className="relative w-full aspect-[2880/1800] min-h-[max(200px,50vh)] max-h-[75vh] overflow-hidden">
         <Image
           src="/MainHeroImage.png"
           alt="메인 히어로 콘텐츠 모음"
