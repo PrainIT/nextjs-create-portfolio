@@ -190,7 +190,7 @@ export default function LogoSlider({
 
       <div className="flex flex-row items-center items-start mt-12">
         <div className="flex flex-col gap-12 px-12">
-          <div className="text-3xl font-medium ">
+          <div className="text-3xl font-medium tracking-tighter">
             함께하면 더 좋은 일들,
             <br />
             편하게 연락해주세요!
@@ -219,21 +219,21 @@ export default function LogoSlider({
                       }}
                     />
                   ) : (
-                    <span className="text-grey-400 text-xl font-medium whitespace-nowrap">
+                    <span className="text-grey-400 text-xl font-medium whitespace-nowrap tracking-tighter">
                       {link.name}
                     </span>
                   )}
                 </a>
               ))
             ) : (
-              <span className="text-white text-xl font-medium whitespace-nowrap">
+              <span className="text-white text-xl font-medium whitespace-nowrap tracking-tighter">
                 준비중
               </span>
             )}
           </div>
         </div>
         <div className="flex flex-col gap-8 ml-32">
-          <div className="text-base text-white">
+          <div className="text-base text-white tracking-tighter">
             서로의 강점을 신뢰하며 아이디어를 확장시킵니다.
             <br />
             각자의 전문 분야가 하나의 완성된 결과로 자연스럽게 이어집니다.
@@ -242,7 +242,7 @@ export default function LogoSlider({
           </div>
           <button
             onClick={() => router.push("/contact")}
-            className="bg-[#272727] text-white px-2 py-4 rounded-full min-w-40 w-[200px] hover:opacity-80 transition-all duration-300"
+            className="bg-[#272727] text-white px-2 py-4 rounded-full min-w-40 w-[200px] hover:opacity-80 transition-all duration-300 tracking-tighter"
           >
             CONTACT
           </button>
