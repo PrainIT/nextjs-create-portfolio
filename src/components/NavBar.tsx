@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
@@ -21,8 +19,6 @@ interface NavBarProps {
   pageName: string;
   title: string;
   categories: readonly Category[];
-  showBackButton?: boolean;
-  backButtonHref?: string;
   selectedValue?: string[];
   onSelect?: (value: string) => void;
   onTitleClick?: () => void;
@@ -35,15 +31,12 @@ export default function NavBar({
   pageName,
   title,
   categories,
-  showBackButton = false,
-  backButtonHref,
   selectedValue,
   onSelect,
   onTitleClick,
   onCategoryTitleClick,
   absolute = false,
 }: NavBarProps) {
-  const router = useRouter();
   const [selected, setSelected] = useState<string[]>(selectedValue || []);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -62,14 +55,6 @@ export default function NavBar({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [isMenuOpen]);
 
-  const handleBack = () => {
-    if (backButtonHref) {
-      router.push(backButtonHref);
-    } else {
-      router.back();
-    }
-  };
-
   const handleSelect = (value: string) => {
     setSelected((prev) => {
       if (prev.includes(value)) {
@@ -82,44 +67,7 @@ export default function NavBar({
   };
 
   const navContent = (
-    <div className="flex flex-col gap-6">
-      {/* HOME | PageName */}
-      <div className="flex items-center gap-2 text-xs text-gray-500">
-        <Link href="/" className="hover:text-gray-900 transition-colors">
-          HOME
-        </Link>
-        <span className="text-gray-400">|</span>
-        <span className="text-gray-800 font-medium">{pageName}</span>
-      </div>
-
-      {/* 뒤로가기 버튼 */}
-      {showBackButton && (
-        <motion.button
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1 }}
-          whileHover={{ x: -5 }}
-          whileTap={{ x: -2 }}
-          onClick={handleBack}
-          className="flex items-center gap-2 text-xs text-gray-700 hover:text-gray-900 cursor-pointer transition-colors"
-        >
-          <svg
-            width="28"
-            height="28"
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M10 12L6 8L10 4"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </motion.button>
-      )}
-
+    <div className="flex flex-col gap-2">
       {/* 제목 */}
       {onTitleClick ? (
         <button
@@ -133,9 +81,9 @@ export default function NavBar({
       )}
 
       {/* 카테고리별 메뉴 */}
-      <div className="flex flex-col gap-6 mt-3">
+      <div className="flex flex-col gap-4 mt-3">
         {categories.map((category, categoryIndex) => (
-          <div key={category.title} className="flex flex-col gap-3">
+          <div key={category.title} className="flex flex-col gap-2">
             {onCategoryTitleClick ? (
               <motion.button
                 type="button"
@@ -148,7 +96,7 @@ export default function NavBar({
                         : [];
                   onCategoryTitleClick(itemValues);
                 }}
-                className={`text-left font-bold text-xs hover:text-brand transition-colors cursor-pointer ${
+                className={`text-left font-bold text-sm hover:text-brand transition-colors cursor-pointer ${
                   category.items.length === 0 &&
                   category.value &&
                   selected.includes(category.value)
@@ -159,7 +107,7 @@ export default function NavBar({
                 {category.title}
               </motion.button>
             ) : (
-              <h3 className="text-gray-900 font-bold text-xs">
+              <h3 className="text-gray-900 font-bold text-sm">
                 {category.title}
               </h3>
             )}
@@ -208,7 +156,7 @@ export default function NavBar({
                     </div>
 
                     <span
-                      className={`text-xs transition-all ${
+                      className={`text-sm transition-all ${
                         isSelected
                           ? "text-gray-900 font-medium"
                           : "text-gray-500 group-hover:text-gray-700"
@@ -274,7 +222,7 @@ export default function NavBar({
 
         {/* 메뉴 패널: 항상 DOM에 두고 닫을 때만 화면 밖으로 슬라이드 → 블록 높이가 처음부터 동일해 토글 위치 고정 */}
         <motion.aside
-          className={`nav-panel-scroll w-[min(320px,85vw)] min-h-0 flex-1 max-h-[min(80vh,80dvh)] bg-white pl-6 py-6 overflow-y-auto transition-shadow duration-200 ${
+          className={`nav-panel-scroll w-[min(281px,85vw)] min-h-0 flex-1 max-h-[min(65vh,65dvh)] bg-white pl-6 py-6 overflow-y-auto transition-shadow duration-200 ${
             isMenuOpen
               ? "shadow-[4px_0_24px_-4px_rgba(0,0,0,0.15),4px_0_12px_-2px_rgba(0,0,0,0.08)]"
               : "shadow-none"

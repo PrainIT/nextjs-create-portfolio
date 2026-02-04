@@ -30,7 +30,6 @@ const workCategories = [
       { label: "인터뷰 영상", value: "interview-video" },
       { label: "모션그래픽", value: "motion-graphics" },
       { label: "뮤직비디오", value: "music-video" },
-      { label: "LIVE", value: "live" },
     ],
   },
   {

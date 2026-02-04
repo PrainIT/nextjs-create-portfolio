@@ -302,7 +302,6 @@ export default function ContentPageClient({
         pageName="CONTENT"
         title={pageTitle}
         categories={workCategories}
-        showBackButton={true}
         selectedValue={selectedCategory as string[]}
         onSelect={handleSelect}
         onTitleClick={handleTitleClick}
