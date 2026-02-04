@@ -104,8 +104,8 @@ export default function Header() {
       // 나머지 페이지일 때: #000000 opacity-20, hover 시 #FF6B00
       return `text-sm transition-colors ${
         isActive(href)
-          ? "text-[#FF6B00]"
-          : "text-[#000000] opacity-20 hover:text-[#FF6B00] hover:opacity-100"
+          ? "text-brand font-bold"
+          : "text-black opacity-40 hover:text-brand hover:opacity-40"
       }`;
     }
   };
