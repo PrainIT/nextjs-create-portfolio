@@ -7,14 +7,15 @@ export default function HeroSection() {
     /* h-screen 대신 min-h-screen을 사용하거나, 비디오 비율에 맡깁니다 */
     <section className="relative w-full bg-black overflow-hidden">
       
-      {/* 1. 비디오 레이어: 컨테이너 역할을 하며 비율을 유지함 */}
-      <div className="relative w-full z-0 bg-brand">
+      {/* 1. 비디오 레이어: aspect-ratio로 로딩 전 공간 예약 → CLS 방지 */}
+      <div className="relative w-full z-0 bg-brand aspect-video min-h-[50vh]">
         <video
           autoPlay
           loop
           muted
           playsInline
-          className="w-full h-auto block object-cover invisible"
+          preload="metadata"
+          className="absolute inset-0 w-full h-full object-cover invisible"
         >
           <source src="/preview.mp4" type="video/mp4" />
         </video>
