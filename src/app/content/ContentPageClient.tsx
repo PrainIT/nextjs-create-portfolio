@@ -323,31 +323,39 @@ export default function ContentPageClient({
           </div>
         </div>
 
-        <div className="columns-3 gap-6" style={{ columnGap: "1rem" }}>
-          {filteredProjects.map((project, index) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.08 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-              onClick={() => handleProjectClick(project)}
-              className="cursor-pointer hover:opacity-90 transition-opacity mb-6 break-inside-avoid"
-            >
-              <ContentCard
-                id={index + 1}
-                title={project.title}
-                image={project.image}
-                videoUrl={project.videoUrl}
-                isSearchMode={isSearching}
-                forceSquare={false}
-                forceFullHeight={true}
-                disableVideoInteraction={true}
-                contentType={project.contentType}
-              />
-            </motion.div>
-          ))}
-        </div>
+        {filteredProjects.length === 0 ? (
+          <div className="w-full py-24 text-center">
+            <p className="text-grey-400 text-xl tracking-tight">
+              컨텐츠가 없습니다.
+            </p>
+          </div>
+        ) : (
+          <div className="columns-3 gap-6" style={{ columnGap: "1rem" }}>
+            {filteredProjects.map((project, index) => (
+              <motion.div
+                key={project.id}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.08 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                onClick={() => handleProjectClick(project)}
+                className="cursor-pointer hover:opacity-90 transition-opacity mb-6 break-inside-avoid"
+              >
+                <ContentCard
+                  id={index + 1}
+                  title={project.title}
+                  image={project.image}
+                  videoUrl={project.videoUrl}
+                  isSearchMode={isSearching}
+                  forceSquare={false}
+                  forceFullHeight={true}
+                  disableVideoInteraction={true}
+                  contentType={project.contentType}
+                />
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 하단 선 - 부모 padding으로 좌우 inset */}
