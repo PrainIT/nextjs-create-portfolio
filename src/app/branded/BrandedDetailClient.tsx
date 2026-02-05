@@ -1,6 +1,7 @@
 "use client";
 
 import { type SanityDocument } from "next-sanity";
+import { PortableText, type PortableTextBlock } from "@portabletext/react";
 import { motion } from "framer-motion";
 import { useRef, useEffect, useState, useMemo } from "react";
 import Link from "next/link";
@@ -10,6 +11,7 @@ import Template2 from "@/components/work-templates/Template2";
 import Template3 from "@/components/work-templates/Template3";
 import Template4 from "@/components/work-templates/Template4";
 import RelationContentCard from "@/components/RelationContentCard";
+import { urlForImage } from "@/sanity/utils";
 
 interface Content {
   _id?: string;
@@ -37,6 +39,8 @@ interface RelatedVideo {
 
 interface BrandedDetailClientProps {
   work: SanityDocument & {
+    displayType?: "type1" | "type2";
+    body?: PortableTextBlock[];
     client?: string;
     summary?: string;
     clientLogoUrl?: string | null;
@@ -98,6 +102,115 @@ const categoryLabels: Record<string, string> = {
 
 const BASE_PATH = "/branded";
 
+/** Type2 본문 블록 커스텀 렌더링 (내용·사진·영상·사진3장 순서 자유) */
+function getBodyPortableTextComponents() {
+  return {
+    types: {
+      brandedBodyImage: ({
+        value,
+      }: {
+        value: { image?: { asset?: { _ref?: string } }; caption?: string };
+      }) => {
+        if (!value?.image) return null;
+        const src = urlForImage(value.image);
+        return (
+          <figure className="my-8">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={src}
+              alt={value.caption || ""}
+              className="w-full rounded-lg object-contain max-h-[70vh]"
+            />
+            {value.caption && (
+              <figcaption className="mt-2 text-center text-sm text-gray-400">
+                {value.caption}
+              </figcaption>
+            )}
+          </figure>
+        );
+      },
+      brandedBodyVideo: ({
+        value,
+      }: {
+        value: { url?: string; caption?: string };
+      }) => {
+        if (!value?.url) return null;
+        const url = value.url.trim();
+        const isYoutube =
+          /youtube\.com\/watch\?v=|youtu\.be\//.test(url) ||
+          /youtube\.com\/embed\//.test(url);
+        const isVimeo = /vimeo\.com\//.test(url);
+        let embedSrc: string | null = null;
+        if (isYoutube) {
+          const m = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})(?:&|$)/);
+          embedSrc = m ? `https://www.youtube.com/embed/${m[1]}` : null;
+        } else if (isVimeo) {
+          const m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+          embedSrc = m ? `https://player.vimeo.com/video/${m[1]}` : null;
+        }
+        return (
+          <figure className="my-8">
+            <div className="aspect-video w-full overflow-hidden rounded-lg bg-black">
+              {embedSrc ? (
+                <iframe
+                  src={embedSrc}
+                  title="영상"
+                  className="h-full w-full"
+                  allowFullScreen
+                />
+              ) : (
+                <video
+                  src={url}
+                  controls
+                  className="h-full w-full"
+                  playsInline
+                />
+              )}
+            </div>
+            {value.caption && (
+              <figcaption className="mt-2 text-center text-sm text-gray-400">
+                {value.caption}
+              </figcaption>
+            )}
+          </figure>
+        );
+      },
+      brandedBodyImageRow: ({
+        value,
+      }: {
+        value: {
+          images?: Array<{ image?: { asset?: unknown }; caption?: string }>;
+        };
+      }) => {
+        const images = value?.images?.filter((i) => i?.image) ?? [];
+        if (images.length === 0) return null;
+        return (
+          <figure className="my-8 grid grid-cols-3 gap-2 md:gap-4">
+            {images.map((item, idx) => {
+              const src = urlForImage(item.image!);
+              return (
+                <div key={idx} className="overflow-hidden rounded-lg">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={src}
+                    alt={item.caption || ""}
+                    className="h-full w-full object-cover"
+                  />
+                  {item.caption && (
+                    <figcaption className="mt-1 text-center text-xs text-gray-400">
+                      {item.caption}
+                    </figcaption>
+                  )}
+                </div>
+              );
+            })}
+          </figure>
+        );
+      },
+    },
+  };
+}
+
 export default function WorkDetailClient({
   work,
   workImageUrl,
@@ -107,6 +220,7 @@ export default function WorkDetailClient({
   const contentRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const [activeContent, setActiveContent] = useState<number | null>(null);
   const [showStickyNav, setShowStickyNav] = useState(false);
+  const isType2 = work.displayType === "type2";
 
   const handleBack = () => {
     router.push(BASE_PATH);
@@ -352,7 +466,7 @@ export default function WorkDetailClient({
               </div>
             )}
           </div>
-          {processedContents && processedContents.length > 0 && (
+          {!isType2 && processedContents && processedContents.length > 0 && (
             <div className="sticky top-[0%] flex flex-col gap-2 py-2.5">
               {processedContents.map((content, index) => (
                 <button
@@ -391,19 +505,36 @@ export default function WorkDetailClient({
               </motion.div>
             )}
 
-            {processedContents && processedContents.length > 0 && (
-              <div className="space-y-24">
-                {processedContents.map((content, index) => (
-                  <div
-                    key={content._id || index}
-                    ref={(el) => {
-                      contentRefs.current[index] = el;
-                    }}
-                  >
-                    {renderContent(content, index)}
-                  </div>
-                ))}
-              </div>
+            {isType2 ? (
+              work.body && work.body.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="[&_p]:text-gray-300 [&_p]:leading-relaxed [&_p]:mb-4 [&_h1]:text-white [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4 [&_h2]:text-white [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-3 [&_h3]:text-white [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mb-2 [&_a]:text-brand [&_a]:underline [&_strong]:text-white [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:text-gray-300 [&_li]:mb-1"
+                >
+                  <PortableText
+                    value={work.body}
+                    components={getBodyPortableTextComponents()}
+                  />
+                </motion.div>
+              )
+            ) : (
+              processedContents &&
+              processedContents.length > 0 && (
+                <div className="space-y-24">
+                  {processedContents.map((content, index) => (
+                    <div
+                      key={content._id || index}
+                      ref={(el) => {
+                        contentRefs.current[index] = el;
+                      }}
+                    >
+                      {renderContent(content, index)}
+                    </div>
+                  ))}
+                </div>
+              )
             )}
           </motion.div>
         </div>

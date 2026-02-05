@@ -7,6 +7,8 @@ const WORK_QUERY = `*[_type == "branded" && slug.current == $slug][0] {
   _id,
   title,
   slug,
+  displayType,
+  body,
   image,
   clientLogo,
   tags,
