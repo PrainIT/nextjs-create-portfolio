@@ -3,7 +3,7 @@
 import { type SanityDocument } from "next-sanity";
 import { PortableText, type PortableTextBlock } from "@portabletext/react";
 import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import ScrollSectionNav, { useScrollSectionNav } from "@/components/ScrollSectionNav";
 import Template1 from "@/components/work-templates/Template1";
@@ -62,9 +62,29 @@ interface BrandedDetailClientProps {
 
 const BASE_PATH = "/branded";
 
-/** Type2 본문 블록 커스텀 렌더링 (내용·사진·영상·사진3장 순서 자유) */
+/** Type2 본문 블록 커스텀 렌더링 (내용·사진·영상·정렬·글자색 등) */
 function getBodyPortableTextComponents() {
   return {
+    block: {
+      normal: ({ children }: { children?: ReactNode }) => <p className="mb-4">{children}</p>,
+      h1: ({ children }: { children?: ReactNode }) => <h1 className="text-white text-2xl font-bold mb-4">{children}</h1>,
+      h2: ({ children }: { children?: ReactNode }) => <h2 className="text-white text-xl font-bold mb-3">{children}</h2>,
+      h3: ({ children }: { children?: ReactNode }) => <h3 className="text-white text-lg font-semibold mb-2">{children}</h3>,
+      alignLeft: ({ children }: { children?: ReactNode }) => <div className="mb-4" style={{ textAlign: "left" }}>{children}</div>,
+      alignCenter: ({ children }: { children?: ReactNode }) => <div className="mb-4" style={{ textAlign: "center" }}>{children}</div>,
+      alignRight: ({ children }: { children?: ReactNode }) => <div className="mb-4" style={{ textAlign: "right" }}>{children}</div>,
+    },
+    marks: {
+      textColorMark: ({
+        children,
+        value,
+      }: {
+        children?: ReactNode;
+        value?: { hex?: string };
+      }) => (
+        <span style={{ color: value?.hex ?? "inherit" }}>{children}</span>
+      ),
+    },
     types: {
       brandedBodyImage: ({
         value,
@@ -74,12 +94,12 @@ function getBodyPortableTextComponents() {
         if (!value?.image) return null;
         const src = urlForImage(value.image);
         return (
-          <figure className="my-8">
+          <figure className="my-8 w-full">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={src}
               alt={value.caption || ""}
-              className="w-full rounded-lg object-contain max-h-[70vh]"
+              className="w-full rounded-lg object-cover object-center"
             />
             {value.caption && (
               <figcaption className="mt-2 text-center text-sm text-gray-400">

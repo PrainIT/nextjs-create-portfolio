@@ -9,44 +9,67 @@ interface FullWidthImageBlockProps {
 }
 
 /**
- * 처음엔 블로그 width 내부, 스크롤하면 브라우저 풀 width로 확장되는 이미지
+ * 처음엔 블로그 width, 스크롤할수록 부드럽게 브라우저 풀 width로 확장
  */
 export default function FullWidthImageBlock({
   src,
   alt = "",
   caption,
 }: FullWidthImageBlockProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const ref = useRef<HTMLFigureElement>(null);
+  const [containerWidth, setContainerWidth] = useState(896); // max-w-4xl fallback
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // 뷰포트에 들어오면(스크롤 시) 풀 width로 확장
-        setIsExpanded(entry.isIntersecting);
-      },
-      {
-        threshold: 0.1,
-        rootMargin: "-10% 0px -10% 0px",
-      }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
+    const measure = () => {
+      const parent = el.parentElement;
+      if (parent) setContainerWidth(parent.offsetWidth);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el.parentElement!);
+    return () => ro.disconnect();
   }, []);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const onScroll = () => {
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // progress 0: 이미지 상단이 뷰포트 하단에 닿기 전
+      // progress 1: 이미지 상단이 뷰포트 상단을 지나감
+      let p = 0;
+      if (rect.top <= vh) {
+        p = Math.min(1, 1 - rect.top / vh);
+      }
+      setProgress(p);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const vw = typeof window !== "undefined" ? window.innerWidth : 896;
+  const width = containerWidth + (vw - containerWidth) * progress;
+  const marginLeft = (containerWidth - width) / 2;
 
   return (
     <figure
       ref={ref}
-      className={`my-8 transition-all duration-500 ${
-        isExpanded
-          ? "w-[100vw] relative left-1/2 -translate-x-1/2"
-          : "w-full max-w-4xl mx-auto"
-      }`}
+      className="my-8 overflow-hidden transition-none"
+      style={{
+        width: `${width}px`,
+        marginLeft: `${marginLeft}px`,
+        maxWidth: "none",
+      }}
     >
-      <div className="overflow-hidden">
+      <div className="w-full h-full overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={src}
