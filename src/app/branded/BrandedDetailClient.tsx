@@ -3,14 +3,17 @@
 import { type SanityDocument } from "next-sanity";
 import { PortableText, type PortableTextBlock } from "@portabletext/react";
 import { motion } from "framer-motion";
-import { useRef, useEffect, useState, useMemo } from "react";
-import Link from "next/link";
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
+import ScrollSectionNav, { useScrollSectionNav } from "@/components/ScrollSectionNav";
 import Template1 from "@/components/work-templates/Template1";
 import Template2 from "@/components/work-templates/Template2";
 import Template3 from "@/components/work-templates/Template3";
 import Template4 from "@/components/work-templates/Template4";
 import RelationContentCard from "@/components/RelationContentCard";
+import FullWidthImageBlock from "@/components/branded/FullWidthImageBlock";
+import ImageSliderBlock from "@/components/branded/ImageSliderBlock";
+import type { SanityImageSource } from "@sanity/image-url";
 import { urlForImage } from "@/sanity/utils";
 
 interface Content {
@@ -40,6 +43,8 @@ interface RelatedVideo {
 interface BrandedDetailClientProps {
   work: SanityDocument & {
     displayType?: "type1" | "type2";
+    heroImage?: { asset?: { _ref?: string } };
+    subtitle?: string;
     body?: PortableTextBlock[];
     client?: string;
     summary?: string;
@@ -51,54 +56,9 @@ interface BrandedDetailClientProps {
     contents?: Content[];
   };
   workImageUrl: string | null;
+  heroImageUrl?: string | null;
   relatedVideos?: RelatedVideo[];
 }
-
-const BrandedCategories = [
-  {
-    title: "영상 콘텐츠",
-    items: [
-      { label: "브랜디드 영상", value: "branded-video" },
-      { label: "캠페인 영상", value: "campaign-video" },
-      { label: "숏폼", value: "short-form" },
-      { label: "웹예능", value: "web-entertainment" },
-      { label: "스케치 영상", value: "sketch-video" },
-      { label: "드라마", value: "drama" },
-      { label: "인터뷰 영상", value: "interview-video" },
-      { label: "모션그래픽", value: "motion-graphics" },
-      { label: "뮤직비디오", value: "music-video" },
-    ],
-  },
-  {
-    title: "디자인 콘텐츠",
-    items: [
-      { label: "SNS 콘텐츠", value: "sns-content" },
-      { label: "브랜딩", value: "branding" },
-      { label: "인포그래픽", value: "infographic" },
-      { label: "포스터", value: "poster" },
-      { label: "배너", value: "banner" },
-      { label: "카드뉴스", value: "card-news" },
-      { label: "키비주얼", value: "key-visual" },
-      { label: "인쇄물", value: "print" },
-      { label: "상세페이지", value: "detail-page" },
-      { label: "패키지", value: "package" },
-    ],
-  },
-  {
-    title: "사진 콘텐츠",
-    items: [
-      { label: "제품", value: "product" },
-      { label: "인물", value: "portrait" },
-      { label: "스케치", value: "sketch" },
-    ],
-  },
-] as const;
-
-const categoryLabels: Record<string, string> = {
-  video: "영상 콘텐츠",
-  design: "디자인 콘텐츠",
-  photo: "사진 콘텐츠",
-};
 
 const BASE_PATH = "/branded";
 
@@ -207,39 +167,153 @@ function getBodyPortableTextComponents() {
           </figure>
         );
       },
+      brandedBodyImageRow2: ({
+        value,
+      }: {
+        value: {
+          images?: Array<{ image?: { asset?: unknown }; caption?: string }>;
+        };
+      }) => {
+        const images = value?.images?.filter((i) => i?.image) ?? [];
+        if (images.length < 2) return null;
+        return (
+          <figure className="my-8 grid grid-cols-2 gap-2 md:gap-4">
+            {images.slice(0, 2).map((item, idx) => {
+              const src = urlForImage(item.image!);
+              return (
+                <div key={idx} className="overflow-hidden rounded-lg aspect-square">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={src}
+                    alt={item.caption || ""}
+                    className="h-full w-full object-cover"
+                  />
+                  {item.caption && (
+                    <figcaption className="mt-1 text-center text-xs text-gray-400">
+                      {item.caption}
+                    </figcaption>
+                  )}
+                </div>
+              );
+            })}
+          </figure>
+        );
+      },
+      brandedBodyImageGrid2x2: ({
+        value,
+      }: {
+        value: {
+          images?: Array<{ image?: { asset?: unknown }; caption?: string }>;
+        };
+      }) => {
+        const images = value?.images?.filter((i) => i?.image) ?? [];
+        if (images.length < 4) return null;
+        return (
+          <figure className="my-8 grid grid-cols-2 gap-2 md:gap-4">
+            {images.slice(0, 4).map((item, idx) => {
+              const src = urlForImage(item.image!);
+              return (
+                <div key={idx} className="overflow-hidden rounded-lg aspect-square">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={src}
+                    alt={item.caption || ""}
+                    className="h-full w-full object-cover"
+                  />
+                  {item.caption && (
+                    <figcaption className="mt-1 text-center text-xs text-gray-400">
+                      {item.caption}
+                    </figcaption>
+                  )}
+                </div>
+              );
+            })}
+          </figure>
+        );
+      },
+      brandedBodyImageGrid3x2: ({
+        value,
+      }: {
+        value: {
+          images?: Array<{ image?: { asset?: unknown }; caption?: string }>;
+        };
+      }) => {
+        const images = value?.images?.filter((i) => i?.image) ?? [];
+        if (images.length < 6) return null;
+        return (
+          <figure className="my-8 grid grid-cols-3 gap-2 md:gap-4 p-4 md:p-8 bg-black rounded-lg">
+            {images.slice(0, 6).map((item, idx) => {
+              const src = urlForImage(item.image!);
+              return (
+                <div key={idx} className="overflow-hidden rounded-lg aspect-square">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={src}
+                    alt={item.caption || ""}
+                    className="h-full w-full object-cover"
+                  />
+                  {item.caption && (
+                    <figcaption className="mt-1 text-center text-xs text-gray-400">
+                      {item.caption}
+                    </figcaption>
+                  )}
+                </div>
+              );
+            })}
+          </figure>
+        );
+      },
+      brandedBodyFullWidthImage: ({
+        value,
+      }: {
+        value: { image?: { asset?: unknown }; caption?: string };
+      }) => {
+        if (!value?.image) return null;
+        return (
+          <FullWidthImageBlock
+            src={urlForImage(value.image)}
+            alt={value.caption || ""}
+            caption={value.caption}
+          />
+        );
+      },
+      brandedBodyImageSlider: ({
+        value,
+      }: {
+        value: {
+          images?: Array<{ image?: { asset?: unknown }; caption?: string }>;
+        };
+      }) => {
+        const images = value?.images?.filter((i) => i?.image) ?? [];
+        if (images.length === 0) return null;
+        return (
+          <ImageSliderBlock
+            images={images}
+            urlForImage={(src) => urlForImage(src as SanityImageSource)}
+          />
+        );
+      },
     },
   };
+}
+
+function formatBlogDate(dateString?: string) {
+  if (!dateString) return "";
+  return new Date(dateString).toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
 }
 
 export default function WorkDetailClient({
   work,
   workImageUrl,
+  heroImageUrl,
   relatedVideos = [],
 }: BrandedDetailClientProps) {
   const router = useRouter();
-  const contentRefs = useRef<Record<number, HTMLDivElement | null>>({});
-  const [activeContent, setActiveContent] = useState<number | null>(null);
-  const [showStickyNav, setShowStickyNav] = useState(false);
   const isType2 = work.displayType === "type2";
-
-  const handleBack = () => {
-    router.push(BASE_PATH);
-  };
-
-  const getSubCategoryLabel = (category: string, subCategory: string) => {
-    const categoryGroup = BrandedCategories.find(
-      (cat) => cat.title === categoryLabels[category] || false
-    );
-    return (
-      categoryGroup?.items.find((item) => item.value === subCategory)?.label ||
-      subCategory
-    );
-  };
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return "";
-    return new Date(dateString).toLocaleDateString("ko-KR");
-  };
 
   // Content2 그룹화 및 videoUrls 병합 (branded 전용)
   const processedContents = useMemo(() => {
@@ -293,40 +367,9 @@ export default function WorkDetailClient({
     return finalContents;
   }, [work.contents]);
 
-  const scrollToContent = (contentIndex: number) => {
-    const content = processedContents?.[contentIndex];
-    if (content && contentRefs.current[contentIndex]) {
-      contentRefs.current[contentIndex]?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + window.innerHeight / 2;
-      setShowStickyNav(window.scrollY > 700);
-
-      processedContents?.forEach((_, index) => {
-        const element = contentRefs.current[index];
-        if (element) {
-          const { offsetTop, offsetHeight } = element;
-          if (
-            scrollPosition >= offsetTop &&
-            scrollPosition < offsetTop + offsetHeight
-          ) {
-            setActiveContent(index);
-          }
-        }
-      });
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [processedContents]);
+  const { sectionRefs, activeIndex, scrollToIndex } = useScrollSectionNav(
+    !isType2 && processedContents ? processedContents.length : 0
+  );
 
   const renderContent = (content: Content, index: number) => {
     const commonProps = {
@@ -383,116 +426,37 @@ export default function WorkDetailClient({
       className="w-full relative flex flex-col overflow-x-hidden pt-24"
       style={{ minHeight: "100vh" }}
     >
+      {/* Type2: 히어로 이미지 (화면 width 가득) */}
+      {isType2 && heroImageUrl && (
+        <div className="w-screen relative left-1/2 -translate-x-1/2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={heroImageUrl}
+            alt={work.title || ""}
+            className="w-full h-[50vh] min-h-[300px] object-cover"
+          />
+        </div>
+      )}
 
       <div className="flex-1 flex min-w-0">
-        <div className="w-64 flex-shrink-0 pl-8 py-8 mr-8">
-          <div className="flex flex-col gap-8">
-            <div className="flex items-center gap-2 text-sm text-grey-400">
-              <Link href="/" className="hover:text-grey-200 transition-colors">
-                HOME
-              </Link>
-              <span className="text-grey-600">|</span>
-              <span className="text-grey-200 font-medium">BRANDED</span>
-            </div>
-
-            <motion.button
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1 }}
-              whileHover={{ x: -5 }}
-              whileTap={{ x: -2 }}
-              onClick={handleBack}
-              className="flex items-center gap-2 text-sm text-grey-200 hover:text-grey-100 cursor-pointer transition-colors"
-            >
-              <svg
-                width="28"
-                height="28"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M10 12L6 8L10 4"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </motion.button>
-
-            {work.title && (
-              <div className="text-white font-bold text-lg break-words">
-                {work.title}
-              </div>
-            )}
-
-            <div className="flex flex-col gap-2">
-              {work.client && (
-                <div className="text-sm text-grey-500">
-                  <span className="font-bold">Client</span> {work.client}
-                </div>
-              )}
-
-              {work.category && (
-                <div className="text-sm text-grey-500">
-                  <span className="font-bold">Work</span>{" "}
-                  {categoryLabels[work.category] || work.category}
-                  {work.subCategory &&
-                    ` > ${getSubCategoryLabel(work.category, work.subCategory)}`}
-                </div>
-              )}
-
-              {work.publishedAt && (
-                <div className="text-sm text-grey-500">
-                  <span className="font-bold">Data</span>{" "}
-                  {formatDate(work.publishedAt)}
-                </div>
-              )}
-            </div>
-
-            {work.award && (work.award.title || work.award.description) && (
-              <div className="mb-4">
-                <div className="text-sm text-grey-500 mb-2">Award</div>
-                {work.award.title && (
-                  <div className="text-white font-bold mb-1">
-                    {work.award.title}
-                  </div>
-                )}
-                {work.award.description && (
-                  <div className="text-grey-400 text-sm">
-                    {work.award.description}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-          {!isType2 && processedContents && processedContents.length > 0 && (
-            <div className="sticky top-[0%] flex flex-col gap-2 py-2.5">
-              {processedContents.map((content, index) => (
-                <button
-                  key={index}
-                  onClick={() => scrollToContent(index)}
-                  className={`w-full text-center px-4 py-2 rounded-full text-xl font-medium transition-all ${
-                    activeContent === index
-                      ? "bg-brand text-white border-none"
-                      : "border border-grey-700 text-grey-700 hover:text-white hover:border-white"
-                  }`}
-                >
-                  Content {content.contentType}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="flex-1 pr-8 py-8 min-w-0">
+        <div className="flex-1 px-8 py-8 min-w-0">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="w-full max-w-4xl"
+            className="w-full max-w-4xl mx-auto"
           >
-            {work.summary && (
+            {!isType2 && processedContents && processedContents.length > 0 && (
+              <ScrollSectionNav
+                items={processedContents.map((c) => ({
+                  label: `Content ${c.contentType}`,
+                }))}
+                activeIndex={activeIndex}
+                onSelect={scrollToIndex}
+                className="mb-8"
+              />
+            )}
+            {!isType2 && work.summary && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -506,30 +470,44 @@ export default function WorkDetailClient({
             )}
 
             {isType2 ? (
-              work.body && work.body.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                  className="[&_p]:text-gray-300 [&_p]:leading-relaxed [&_p]:mb-4 [&_h1]:text-white [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4 [&_h2]:text-white [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-3 [&_h3]:text-white [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mb-2 [&_a]:text-brand [&_a]:underline [&_strong]:text-white [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:text-gray-300 [&_li]:mb-1"
-                >
-                  <PortableText
-                    value={work.body}
-                    components={getBodyPortableTextComponents()}
-                  />
-                </motion.div>
-              )
+              <>
+                {/* Type2: 제목, 부제, 브랜드|날짜, 구분선, 본문 */}
+                <div className="mb-12">
+                  <h1 className="text-white text-3xl md:text-4xl font-bold mb-2">
+                    {work.title}
+                  </h1>
+                  {work.subtitle && (
+                    <p className="text-gray-400 text-xl md:text-2xl mb-4">
+                      {work.subtitle}
+                    </p>
+                  )}
+                  <p className="text-gray-500 text-sm">
+                    {[work.client, formatBlogDate(work.publishedAt)]
+                      .filter(Boolean)
+                      .join(" | ")}
+                  </p>
+                </div>
+                <div className="w-full h-px bg-grey-700 mb-12" />
+                {work.body && work.body.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    className="[&_p]:text-gray-300 [&_p]:leading-relaxed [&_p]:mb-4 [&_h1]:text-white [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4 [&_h2]:text-white [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-3 [&_h3]:text-white [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mb-2 [&_a]:text-brand [&_a]:underline [&_strong]:text-white [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:text-gray-300 [&_li]:mb-1"
+                  >
+                    <PortableText
+                      value={work.body}
+                      components={getBodyPortableTextComponents()}
+                    />
+                  </motion.div>
+                )}
+              </>
             ) : (
               processedContents &&
               processedContents.length > 0 && (
                 <div className="space-y-24">
                   {processedContents.map((content, index) => (
-                    <div
-                      key={content._id || index}
-                      ref={(el) => {
-                        contentRefs.current[index] = el;
-                      }}
-                    >
+                    <div key={content._id || index} ref={sectionRefs(index)}>
                       {renderContent(content, index)}
                     </div>
                   ))}

@@ -8,6 +8,8 @@ const WORK_QUERY = `*[_type == "branded" && slug.current == $slug][0] {
   title,
   slug,
   displayType,
+  heroImage,
+  subtitle,
   body,
   image,
   clientLogo,
@@ -84,7 +86,8 @@ export default async function BrandedDetailPage({
   }
 
   const workImageUrl = work?.image ? urlForImage(work.image) : null;
-  
+  const heroImageUrl = work?.heroImage ? urlForImage(work.heroImage) : null;
+
   // clientLogo 우선, 없으면 clientRef 로고 사용
   const clientLogoUrl = work?.clientLogo 
     ? urlForImage(work.clientLogo) 
@@ -145,6 +148,7 @@ export default async function BrandedDetailPage({
         contents: contentsWithImageUrls,
       }}
       workImageUrl={workImageUrl}
+      heroImageUrl={heroImageUrl}
       relatedVideos={relatedVideos}
     />
   );
