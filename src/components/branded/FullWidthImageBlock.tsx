@@ -16,7 +16,7 @@ export default function FullWidthImageBlock({
   alt = "",
   caption,
 }: FullWidthImageBlockProps) {
-  const ref = useRef<HTMLFigureElement>(null);
+  const ref = useRef<HTMLElement>(null);
   const [containerWidth, setContainerWidth] = useState(896); // max-w-4xl fallback
   const [progress, setProgress] = useState(0);
 

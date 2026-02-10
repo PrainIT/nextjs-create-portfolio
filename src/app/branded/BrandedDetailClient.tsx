@@ -67,9 +67,9 @@ function getBodyPortableTextComponents() {
   return {
     block: {
       normal: ({ children }: { children?: ReactNode }) => <p className="mb-4">{children}</p>,
-      h1: ({ children }: { children?: ReactNode }) => <h1 className="text-white text-2xl font-bold mb-4">{children}</h1>,
-      h2: ({ children }: { children?: ReactNode }) => <h2 className="text-white text-xl font-bold mb-3">{children}</h2>,
-      h3: ({ children }: { children?: ReactNode }) => <h3 className="text-white text-lg font-semibold mb-2">{children}</h3>,
+      h1: ({ children }: { children?: ReactNode }) => <h1 className="text-[#888888] text-2xl font-bold mb-4">{children}</h1>,
+      h2: ({ children }: { children?: ReactNode }) => <h2 className="text-[#888888] text-xl font-bold mb-3">{children}</h2>,
+      h3: ({ children }: { children?: ReactNode }) => <h3 className="text-[#888888] text-lg font-semibold mb-2">{children}</h3>,
       alignLeft: ({ children }: { children?: ReactNode }) => <div className="mb-4" style={{ textAlign: "left" }}>{children}</div>,
       alignCenter: ({ children }: { children?: ReactNode }) => <div className="mb-4" style={{ textAlign: "center" }}>{children}</div>,
       alignRight: ({ children }: { children?: ReactNode }) => <div className="mb-4" style={{ textAlign: "right" }}>{children}</div>,
@@ -493,7 +493,7 @@ export default function WorkDetailClient({
               <>
                 {/* Type2: 제목, 부제, 브랜드|날짜, 구분선, 본문 */}
                 <div className="mb-12">
-                  <h1 className="text-white text-3xl md:text-4xl font-bold mb-2">
+                  <h1 className="text-[#888888] text-3xl md:text-4xl font-bold mb-2">
                     {work.title}
                   </h1>
                   {work.subtitle && (
@@ -513,7 +513,7 @@ export default function WorkDetailClient({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
-                    className="[&_p]:text-gray-300 [&_p]:leading-relaxed [&_p]:mb-4 [&_h1]:text-white [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4 [&_h2]:text-white [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-3 [&_h3]:text-white [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mb-2 [&_a]:text-brand [&_a]:underline [&_strong]:text-white [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:text-gray-300 [&_li]:mb-1"
+                    className="[&_p]:text-gray-300 [&_p]:leading-relaxed [&_p]:mb-4 [&_h1]:text-[#999999] [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4 [&_h2]:text-[#888888] [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-3 [&_h3]:text-[#888888] [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mb-2 [&_a]:text-brand [&_a]:underline [&_strong]:text-[#888888] [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:text-gray-300 [&_li]:mb-1"
                   >
                     <PortableText
                       value={work.body}

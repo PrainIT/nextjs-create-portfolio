@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
+import Link from "next/link";
 import {
   motion,
   useMotionValue,
@@ -20,7 +21,6 @@ export const DockIcon: React.FC<DockIconProps> = ({
   mouseX,
   href,
   children,
-  onClick,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const defaultMouseX = useMotionValue(Infinity);
@@ -46,12 +46,7 @@ export const DockIcon: React.FC<DockIconProps> = ({
     damping: 12,
   });
 
-  const handleClick = (e: React.MouseEvent) => {
-    if (onClick) {
-      e.preventDefault();
-      onClick();
-    }
-  };
+  const isLink = href && href !== "#";
 
   return (
     <motion.div
@@ -59,13 +54,18 @@ export const DockIcon: React.FC<DockIconProps> = ({
       style={{ width }}
       className="flex aspect-square items-center justify-center rounded-2xl bg-white/90 dark:bg-gray-800/90 shadow-lg hover:shadow-xl transition-shadow backdrop-blur-sm dark:border-gray-700/50 overflow-hidden"
     >
-      <a
-        href={href}
-        className="flex h-full w-full items-center justify-center"
-        onClick={handleClick}
-      >
-        {children}
-      </a>
+      {isLink ? (
+        <Link
+          href={href}
+          className="flex h-full w-full items-center justify-center"
+        >
+          {children}
+        </Link>
+      ) : (
+        <div className="flex h-full w-full items-center justify-center cursor-default">
+          {children}
+        </div>
+      )}
     </motion.div>
   );
 };

@@ -1,7 +1,5 @@
 "use client";
 
-import {
-  useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FloatingDock, DockIcon } from "@/components/FloatingDock";
 
@@ -28,7 +26,6 @@ const DOCK_VERTICAL_MARGIN = 52; // 상하: (188-96)/2 + 여유
 export default function BrandedPageClient({
   workProjects,
 }: BrandedPageClientProps) {
-  const router = useRouter();
   const viewportRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -157,12 +154,6 @@ export default function BrandedPageClient({
     };
   }, [isDragging, maxScroll, thumbMaxLeft]);
 
-  const handleProjectClick = (project: BrandedProject) => {
-    if (project.slug) {
-      router.push(`/branded/${project.slug}`);
-    }
-  };
-
   const showScrollUi = maxScroll > 0;
 
   const maxScrollRef = useRef(maxScroll);
@@ -235,7 +226,6 @@ export default function BrandedPageClient({
                 <DockIcon
                   key={project.id}
                   href={project.slug ? `/branded/${project.slug}` : "#"}
-                  onClick={() => handleProjectClick(project)}
                 >
                   {project.image ? (
                     <img
